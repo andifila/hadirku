@@ -76,6 +76,15 @@ function InviteContent() {
       .finally(() => setLoading(false));
   }, [slug, isPreview]);
 
+  // Lock body scroll while envelope is visible — prevents iOS Safari touch events
+  // from falling through the fixed overlay to the scrollable InvitationView below.
+  useEffect(() => {
+    if (!invite || opened) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [invite, opened]);
+
   function refreshMessages(id: string) {
     getPublicMessages(id).then(setMessages);
   }
@@ -119,25 +128,29 @@ function InviteContent() {
           <motion.div
             key="envelope"
             className={`fixed inset-0 z-[60]${isPreview ? " pt-8" : ""}`}
-            exit={{ opacity: 0, transition: { duration: 0.45, ease: "easeInOut" } }}
+            exit={{ opacity: 0, transition: { duration: 0.4, ease: "easeInOut" } }}
           >
             <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => setOpened(true)} />
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={opened ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.35 }}
-      >
-        <InvitationView
-          invite={invite}
-          guestName={guestName}
-          messages={messages}
-          onRsvpSuccess={() => refreshMessages(invite.id)}
-          autoPlay={opened}
-        />
-      </motion.div>
+
+      {/* Mount only after envelope exits — avoids iOS Safari touch fall-through */}
+      {opened && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.1 }}
+        >
+          <InvitationView
+            invite={invite}
+            guestName={guestName}
+            messages={messages}
+            onRsvpSuccess={() => refreshMessages(invite.id)}
+            autoPlay={opened}
+          />
+        </motion.div>
+      )}
     </>
   );
 }
@@ -162,7 +175,6 @@ function EnvelopeCover({
   onOpen: () => void;
 }) {
   const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
-  const [opening, setOpening] = useState(false);
   const inviteUrl = typeof window !== "undefined" ? window.location.href : "";
   const displayName = guestName ? `Bapak/Ibu ${guestName}` : "Tamu Undangan";
 
@@ -171,12 +183,6 @@ function EnvelopeCover({
   const day = eventDate.getDate();
   const month = eventDate.toLocaleDateString("id-ID", { month: "long" });
   const year = eventDate.getFullYear();
-
-  function handleOpen() {
-    if (opening) return;
-    setOpening(true);
-    setTimeout(onOpen, 480);
-  }
 
   return (
     <div
@@ -270,9 +276,8 @@ function EnvelopeCover({
         className="mt-5 w-full max-w-sm"
       >
         <button
-          onClick={handleOpen}
-          disabled={opening}
-          className="flex w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-xl active:scale-[0.98] disabled:opacity-70"
+          onClick={onOpen}
+          className="flex w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-xl active:scale-[0.98]"
           style={{
             background: theme.primary,
             color: "#fff",
@@ -281,14 +286,8 @@ function EnvelopeCover({
             boxShadow: `0 8px 32px -8px ${theme.primary}88`,
           }}
         >
-          {opening ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <>
-              <Mail className="h-5 w-5" />
-              Buka Undangan
-            </>
-          )}
+          <Mail className="h-5 w-5" />
+          Buka Undangan
         </button>
       </motion.div>
 
