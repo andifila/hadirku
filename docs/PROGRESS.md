@@ -6,132 +6,131 @@
 
 | Layer | Library / Tools |
 |---|---|
-| Framework | Next.js 16.2.4 (React 19, App Router) |
-| Bahasa | TypeScript |
-| Styling | Tailwind CSS v4 |
+| Framework | Next.js 16.2.4 (React 19, App Router, Static Export) |
+| UI | React 19 + Tailwind CSS v4 + Framer Motion |
 | Backend / DB | Supabase (Auth, PostgreSQL, Storage) |
-| Animasi | Framer Motion |
-| Ikon | Lucide React |
-| Excel | xlsx (SheetJS) |
+| Bahasa | TypeScript |
+| Deploy | GitHub Pages via GitHub Actions |
 
 ---
 
 ## Fitur yang Sudah Selesai
 
 ### Autentikasi
-- [x] Login via Supabase Auth (`/login`)
-- [x] Auth callback handler (`/auth/callback`)
-- [x] `AuthGuard` component — redirect jika belum login
-- [x] `useAuth` hook — expose `user` + `signOut`
+- [x] Login via magic link email (Supabase Auth) — seluruhnya Bahasa Indonesia
+- [x] Auth callback handler
+- [x] `AuthGuard` — redirect ke `/login` jika belum login
+- [x] `useAuth` hook — handle network error agar tidak blank putih
+- [x] Root page (`/`) redirect otomatis ke dashboard atau login
 
 ### Dashboard (`/dashboard`)
-- [x] Tampil undangan pertama milik user (1 undangan per akun)
 - [x] Kartu undangan: nama pengantin, tanggal, venue, status published/draft
-- [x] Tombol Lihat (preview) + Edit
+- [x] Warning banner jika undangan masih draft
+- [x] Tombol Lihat — otomatis preview mode untuk draft
 - [x] Statistik RSVP: Hadir / Tidak Hadir / Belum
-- [x] Daftar tamu inline (tanpa halaman terpisah)
+- [x] Daftar tamu inline + search/filter nama
 - [x] Tambah tamu manual (form inline dengan animasi)
-- [x] Upload tamu via Excel (`.xlsx` / `.xls` / `.csv`)
-- [x] Download template Excel kosong
-- [x] Per tamu: kirim WhatsApp, salin link personal, hapus tamu
-- [x] Tampil pesan/ucapan tamu jika ada
+- [x] Upload tamu via Excel (`.xlsx` / `.xls`)
+- [x] Download template Excel
+- [x] Per tamu: kirim WhatsApp, salin link, hapus (dengan konfirmasi Ya/Batal)
+- [x] Tampil pesan/ucapan tamu
 - [x] Empty state saat belum ada undangan
 
-### Form Buat / Edit Undangan (`/dashboard/new`, `/dashboard/edit`)
-- [x] Pilih template (dari DB)
-- [x] Input nama pengantin (mempelai wanita & pria)
-- [x] Input tanggal & waktu acara
-- [x] Input nama & alamat venue
-- [x] Input kutipan / pesan kustom
-- [x] Upload foto cover (Supabase Storage, max 5 MB)
-- [x] Upload musik background (Supabase Storage, max 10 MB)
+### Form Buat / Edit Undangan
+- [x] Pilih tema dengan preview warna (5 tema)
+- [x] Input nama pengantin, tanggal & waktu, venue
+- [x] Warning tanggal lampau
+- [x] Input kutipan kustom
+- [x] Upload foto cover (Supabase Storage, maks 5 MB) — file lama auto-hapus
+- [x] Upload musik background (Supabase Storage, maks 8 MB) — file lama auto-hapus
+- [x] Slug kustom dengan validasi reserved words
+- [x] Slug tersimpan dengan benar saat edit
 - [x] Toggle publish / draft
-- [x] Auto-generate slug dari nama pengantin
 
 ### Halaman Undangan Publik (`/invite?s=<slug>&to=<nama>`)
-- [x] **Amplop / Envelope cover** — animasi slide-up saat dibuka
-  - Desain kertas amplop dengan garis diagonal
-  - Nama tamu personal ("Kepada Yth. Bapak/Ibu ...")
-  - Wax seal interaktif (pulse ring, spring animation)
-  - Tombol share WhatsApp di cover
-- [x] **5 tema warna** — garden-bloom, rustic-gold, modern-minimal, royal-elegance, floral-dream
-- [x] **Hero section** — nama pengantin besar, tanggal, scroll indicator
-- [x] **Kutipan** — custom message dengan styling italic
-- [x] **Waktu & Tempat** — detail hari/tanggal/jam/lokasi, Google Maps embed (iframe), tombol buka Maps
-- [x] **Countdown timer** — hitung mundur real-time (hari/jam/menit/detik)
-- [x] **RSVP form** — pilih hadir/tidak hadir, nama, nomor WhatsApp, ucapan/doa
-  - Pencegahan duplikat submit via localStorage
-  - Pesan konfirmasi setelah submit
-  - Share undangan via WhatsApp setelah submit
-- [x] **Ucapan & Doa tamu** — tampil setelah ada yang submit RSVP
-- [x] **Floating music player** — auto-play saat amplop dibuka, toggle play/pause
-- [x] **Footer** — nama pengantin + tanggal
-- [x] **FadeSection** — semua section fade-in saat di-scroll (Framer Motion viewport)
-- [x] Ornament SVG (lingkaran konsentris + garis diagonal) sebagai background hero
+- [x] Amplop animasi dengan wax seal interaktif
+- [x] Personalisasi nama tamu ("Kepada Yth.")
+- [x] 5 tema warna
+- [x] Hero: nama pengantin, tanggal, scroll indicator
+- [x] Kutipan kustom
+- [x] Waktu & Tempat + Google Maps embed + tombol Buka Maps
+- [x] Countdown real-time menuju hari H
+- [x] RSVP form — dengan dedup server-side (nama yang sama tidak bisa submit 2x)
+- [x] Ucapan & Doa dari tamu
+- [x] Musik background (auto-play saat amplop dibuka, toggle play/pause)
+- [x] WhatsApp share
+- [x] Preview mode (`?preview=1`) untuk owner melihat draft
+- [x] Network error ditangani — tidak hang, tampil pesan tidak ditemukan
 
-### Database (Supabase)
+### Infrastruktur
+- [x] GitHub Actions: auto-deploy ke GitHub Pages saat push ke `main`
+- [x] GitHub Actions: keep-alive ping Supabase setiap 3 hari (cegah free tier pause)
+- [x] Clipboard fallback untuk HTTP
 
-**Tabel:**
-- `profiles` — data user (id, email, full_name, plan)
-- `templates` — pilihan tema (name, slug, thumbnail_url, is_premium)
-- `invitations` — data undangan lengkap
-- `guests` — daftar tamu per undangan (name, phone, rsvp_status, message)
-
-**View:**
-- `invitation_stats` — ringkasan per undangan (total, hadir, tidak hadir, pending)
-
-**Supabase libs (`src/lib/supabase/`):**
-| File | Fungsi |
-|---|---|
-| `client.ts` | Inisialisasi Supabase client |
-| `auth.ts` | Sign in, sign out, get session |
-| `invitations.ts` | Ambil stats undangan milik user |
-| `invitation-crud.ts` | CRUD undangan + list template + generate slug |
-| `guests.ts` | Tambah, hapus, bulk-add tamu; build invite URL & WA link |
-| `rsvp.ts` | Submit RSVP dari tamu |
-| `public-invitation.ts` | Ambil undangan by slug (publik) + pesan tamu |
-| `storage.ts` | Upload cover & musik ke Supabase Storage |
+### Keamanan / Data
+- [x] RLS pada semua tabel (`profiles`, `templates`, `invitations`, `guests`)
+- [x] `getUserInvitations` filter by `user_id` — data user tidak bocor ke user lain
+- [x] RSVP dedup server-side via `ilike` query
 
 ---
 
-## Struktur File
+## Yang Belum / Perlu Dikerjakan
 
-```
-src/
-├── app/
-│   ├── page.tsx                  # Root redirect
-│   ├── layout.tsx                # Root layout + font
-│   ├── globals.css               # CSS variables + Tailwind
-│   ├── login/page.tsx            # Halaman login
-│   ├── auth/callback/page.tsx    # OAuth callback
-│   ├── invite/page.tsx           # Halaman undangan publik
-│   └── dashboard/
-│       ├── layout.tsx            # Dashboard layout (auth guard)
-│       ├── page.tsx              # Dashboard utama + guest list
-│       ├── new/page.tsx          # Buat undangan baru
-│       ├── edit/page.tsx         # Edit undangan
-│       └── guests/page.tsx       # (legacy — sudah inline di dashboard)
-├── components/
-│   ├── auth/AuthGuard.tsx
-│   └── invitation/InvitationForm.tsx
-├── hooks/
-│   └── useAuth.ts
-├── lib/
-│   ├── utils.ts                  # cn() helper
-│   └── supabase/                 # Semua fungsi Supabase
-└── types/
-    └── index.ts                  # Re-export types
-```
+### High Priority
+- [ ] **404 page custom** — GitHub Pages tampilkan 404 generik. Perlu `public/404.html` yang redirect ke `/login`
+- [ ] **RLS pada view `invitation_stats`** — perlu tambah `WITH (security_invoker = true)` di SQL Supabase agar RLS tabel `invitations` berlaku saat query view
+- [ ] **OG meta tags dinamis** — link undangan yang dibagikan di WA/sosmed preview-nya masih generic. Butuh SSR atau solusi workaround (tidak bisa di static export)
 
----
-
-## Yang Belum / Potensial Dikerjakan
-
+### Medium Priority
+- [ ] Rate limiting RSVP — dedup per nama ada, tapi belum ada proteksi spam banyak nama
 - [ ] Multiple undangan per akun (saat ini hanya 1)
 - [ ] Enforcement plan free vs premium (kolom `plan` sudah ada di DB, belum dipakai)
-- [ ] Template thumbnails (UI pemilih template masih basic)
-- [ ] Paginasi / virtual scroll daftar tamu (jika tamu sangat banyak)
-- [ ] Notifikasi email saat ada RSVP masuk
+- [ ] Template thumbnails (saat ini hanya dot warna, tidak ada gambar preview)
+- [ ] Notifikasi ke owner saat ada RSVP masuk (email / WA)
 - [ ] Analytics — jumlah view undangan
-- [ ] Deploy ke production (Vercel + Supabase production project)
+
+### Low Priority
 - [ ] Custom domain untuk link undangan
+- [ ] Paginasi daftar tamu (untuk 100+ tamu)
+- [ ] Export daftar tamu + status RSVP ke Excel
+
+---
+
+## Catatan Penting
+
+### Supabase Free Tier — Pause Prevention
+Project Supabase pause otomatis setelah 7 hari tidak ada request.
+Keep-alive workflow di `.github/workflows/keep-alive.yml` ping setiap 3 hari.
+Jika terlanjur pause: `https://supabase.com/dashboard` → Resume project.
+
+### Alur Publish Undangan (wajib diikuti)
+1. Buat undangan → status **Draft**
+2. Edit → aktifkan toggle **Dipublikasikan** → Simpan
+3. Baru bisa diakses lewat link publik `/invite?s=<slug>`
+
+Dashboard menampilkan warning banner jika undangan masih draft.
+
+### Slug Update (fix: 19 Mei 2026)
+Edit slug di form sekarang tersimpan dengan benar. Jika slug tidak berubah sebelumnya, buka Edit dan simpan ulang.
+
+### RLS `invitation_stats` View — Action Required
+Jalankan di Supabase SQL Editor untuk keamanan penuh:
+```sql
+CREATE OR REPLACE VIEW invitation_stats
+WITH (security_invoker = true) AS
+SELECT
+  i.id              AS invitation_id,
+  i.user_id,
+  i.slug,
+  i.bride_name,
+  i.groom_name,
+  i.event_date,
+  i.is_published,
+  count(g.id)                                                  AS total_guests,
+  count(g.id) FILTER (WHERE g.rsvp_status = 'attending')      AS attending,
+  count(g.id) FILTER (WHERE g.rsvp_status = 'not_attending')  AS not_attending,
+  count(g.id) FILTER (WHERE g.rsvp_status = 'pending')        AS pending
+FROM invitations i
+LEFT JOIN guests g ON g.invitation_id = i.id
+GROUP BY i.id;
+```

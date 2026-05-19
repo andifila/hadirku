@@ -245,6 +245,24 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* ── Draft warning ── */}
+            {!invitation.is_published && (
+              <div
+                className="flex items-start gap-3 rounded-2xl px-5 py-4"
+                style={{ background: "#fef3c7", border: "1px solid #fcd34d" }}
+              >
+                <span className="mt-0.5 text-base">⚠️</span>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: "#92400e", fontFamily: "var(--font-inter)" }}>
+                    Undangan masih Draft
+                  </p>
+                  <p className="mt-0.5 text-xs" style={{ color: "#a16207", fontFamily: "var(--font-inter)" }}>
+                    Tamu tidak bisa membuka link undangan. Klik <strong>Edit</strong> dan aktifkan toggle <strong>Dipublikasikan</strong>.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* ── Guest Section ── */}
             <div
               className="rounded-2xl overflow-hidden"

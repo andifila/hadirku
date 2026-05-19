@@ -1,26 +1,23 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { Loader2 } from "lucide-react";
+
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading) {
+      router.replace(user ? "/dashboard" : "/login");
+    }
+  }, [user, loading, router]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[var(--background)] px-4">
-      <div className="text-center">
-        <p
-          className="mb-3 text-sm uppercase tracking-widest"
-          style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
-        >
-          Coming soon
-        </p>
-        <h1
-          className="text-5xl font-bold mb-4"
-          style={{ fontFamily: "var(--font-playfair)" }}
-        >
-          WeddingInvite
-        </h1>
-        <p
-          className="text-lg max-w-md mx-auto"
-          style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
-        >
-          Beautiful digital wedding invitations — step by step.
-        </p>
-      </div>
-    </main>
+    <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--background)" }}>
+      <Loader2 className="h-7 w-7 animate-spin" style={{ color: "var(--primary)" }} />
+    </div>
   );
 }

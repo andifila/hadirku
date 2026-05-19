@@ -72,6 +72,7 @@ function InviteContent() {
         return getPublicMessages(data.id);
       })
       .then((msgs) => { if (msgs) setMessages(msgs); })
+      .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [slug, isPreview]);
 

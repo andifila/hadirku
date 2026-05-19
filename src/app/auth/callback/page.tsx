@@ -54,7 +54,7 @@ export default function CallbackPage() {
             fontFamily: "var(--font-inter)",
           }}
         >
-          Signing you in&hellip;
+          Sedang masuk&hellip;
         </p>
       </motion.div>
 
