@@ -87,7 +87,7 @@ export default function LoginPage() {
             className="text-3xl font-bold"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            Welcome back
+            Selamat Datang
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -99,7 +99,7 @@ export default function LoginPage() {
               fontFamily: "var(--font-inter)",
             }}
           >
-            Enter your email — we&apos;ll send you a magic link to sign in.
+            Masukkan email Anda — kami akan kirimkan magic link untuk masuk.
           </motion.p>
         </div>
 
@@ -134,13 +134,13 @@ export default function LoginPage() {
                     className="font-semibold"
                     style={{ fontFamily: "var(--font-playfair)", fontSize: "1.1rem" }}
                   >
-                    Check your email
+                    Cek Email Anda
                   </p>
                   <p
                     className="mt-1 text-sm"
                     style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
                   >
-                    We sent a magic link to{" "}
+                    Kami mengirimkan magic link ke{" "}
                     <span style={{ color: "var(--foreground)", fontWeight: 500 }}>
                       {email}
                     </span>
@@ -151,7 +151,7 @@ export default function LoginPage() {
                   className="text-sm underline underline-offset-4"
                   style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
                 >
-                  Use a different email
+                  Gunakan email lain
                 </button>
               </motion.div>
             ) : (
@@ -172,7 +172,7 @@ export default function LoginPage() {
                       fontFamily: "var(--font-inter)",
                     }}
                   >
-                    Email address
+                    Alamat Email
                   </label>
                   <div className="relative">
                     <Mail
@@ -217,7 +217,7 @@ export default function LoginPage() {
                         fontFamily: "var(--font-inter)",
                       }}
                     >
-                      {errorMsg || "Something went wrong. Please try again."}
+                      {errorMsg || "Terjadi kesalahan. Coba lagi."}
                     </motion.p>
                   )}
                 </AnimatePresence>
@@ -239,7 +239,7 @@ export default function LoginPage() {
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <>
-                      Send magic link
+                      Kirim Magic Link
                       <ArrowRight className="h-4 w-4" />
                     </>
                   )}
@@ -253,7 +253,7 @@ export default function LoginPage() {
           className="mt-6 text-center text-xs"
           style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
         >
-          No password required. Just your email.
+          Tidak perlu password. Cukup email Anda.
         </p>
       </motion.div>
     </main>

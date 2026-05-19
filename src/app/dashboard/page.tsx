@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LogOut, Calendar, ExternalLink, Loader2, Plus, Pencil,
   Download, Trash2, MessageCircle, Link2, Check, UserPlus,
-  Users, FileSpreadsheet, X,
+  Users, FileSpreadsheet, X, CheckCircle2, Search,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations } from "@/lib/supabase/invitations";
@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [uploadState, setUploadState] = useState<"idle" | "uploading" | "done" | "error">("idle");
   const [uploadMsg, setUploadMsg] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -95,6 +96,10 @@ export default function DashboardPage() {
   const attending    = guests.filter((g) => g.rsvp_status === "attending").length;
   const notAttending = guests.filter((g) => g.rsvp_status === "not_attending").length;
   const pending      = guests.filter((g) => g.rsvp_status === "pending").length;
+
+  const filteredGuests = searchQuery.trim()
+    ? guests.filter((g) => g.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : guests;
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
@@ -215,7 +220,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex flex-shrink-0 gap-2">
                   <Link
-                    href={`/invite/?s=${invitation.slug}`}
+                    href={`/invite/?s=${invitation.slug}${!invitation.is_published ? "&preview=1" : ""}`}
                     target="_blank"
                     className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all hover:opacity-80"
                     style={{
@@ -354,6 +359,31 @@ export default function DashboardPage() {
                 ))}
               </div>
 
+              {/* Search */}
+              {guests.length > 0 && (
+                <div className="px-5 pb-3">
+                  <div
+                    className="flex items-center gap-2 rounded-xl px-3 py-2.5"
+                    style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
+                  >
+                    <Search className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--muted-foreground)" }} />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Cari nama tamu..."
+                      className="flex-1 bg-transparent text-sm outline-none"
+                      style={{ fontFamily: "var(--font-inter)" }}
+                    />
+                    {searchQuery && (
+                      <button onClick={() => setSearchQuery("")} className="flex-shrink-0 hover:opacity-70">
+                        <X className="h-3.5 w-3.5" style={{ color: "var(--muted-foreground)" }} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Add guest inline form */}
               <AnimatePresence>
                 {showAddForm && (
@@ -398,7 +428,11 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {guests.map((guest, i) => (
+                    {filteredGuests.length === 0 && searchQuery ? (
+                      <p className="py-6 text-center text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                        Tidak ada tamu dengan nama &ldquo;{searchQuery}&rdquo;
+                      </p>
+                    ) : filteredGuests.map((guest, i) => (
                       <GuestCard
                         key={guest.id}
                         guest={guest}
@@ -520,6 +554,7 @@ function GuestCard({
 }) {
   const [copied, setCopied] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const rsvp = RSVP[guest.rsvp_status] ?? RSVP.pending;
   const inviteUrl = buildInviteUrl(invitation.slug, guest.name);
@@ -530,13 +565,25 @@ function GuestCard({
     : `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(inviteUrl);
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = inviteUrl;
+      el.style.position = "fixed";
+      el.style.opacity = "0";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
   async function handleRemove() {
     setRemoving(true);
+    setConfirmDelete(false);
     await onRemove();
   }
 
@@ -604,15 +651,35 @@ function GuestCard({
               : <><Link2 className="h-3.5 w-3.5" />Salin Link</>
             }
           </button>
-          <button
-            onClick={handleRemove}
-            disabled={removing}
-            className="rounded-xl p-2 transition-all hover:opacity-70 disabled:opacity-40"
-            style={{ color: "#dc2626" }}
-            title="Hapus tamu"
-          >
-            {removing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-          </button>
+          {confirmDelete ? (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>Hapus?</span>
+              <button
+                onClick={handleRemove}
+                className="rounded-lg px-2 py-1 text-xs font-medium"
+                style={{ background: "#dc2626", color: "#fff", fontFamily: "var(--font-inter)" }}
+              >
+                Ya
+              </button>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="rounded-lg px-2 py-1 text-xs font-medium"
+                style={{ background: "var(--muted)", color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+              >
+                Batal
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              disabled={removing}
+              className="rounded-xl p-2 transition-all hover:opacity-70 disabled:opacity-40"
+              style={{ color: "#dc2626" }}
+              title="Hapus tamu"
+            >
+              {removing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            </button>
+          )}
         </div>
       </div>
     </motion.div>

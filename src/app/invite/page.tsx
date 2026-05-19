@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import {
   getInvitationBySlug,
+  getInvitationBySlugPreview,
   getPublicMessages,
   type PublicInvitation,
   type GuestMessage,
@@ -53,6 +54,7 @@ function InviteContent() {
   const params = useSearchParams();
   const slug = params.get("s") ?? "";
   const guestName = params.get("to") ?? "";
+  const isPreview = params.get("preview") === "1";
 
   const [invite, setInvite] = useState<PublicInvitation | null>(null);
   const [messages, setMessages] = useState<GuestMessage[]>([]);
@@ -62,7 +64,8 @@ function InviteContent() {
 
   useEffect(() => {
     if (!slug) { setNotFound(true); setLoading(false); return; }
-    getInvitationBySlug(slug)
+    const fetcher = isPreview ? getInvitationBySlugPreview : getInvitationBySlug;
+    fetcher(slug)
       .then((data) => {
         if (!data) { setNotFound(true); return; }
         setInvite(data);
@@ -70,7 +73,7 @@ function InviteContent() {
       })
       .then((msgs) => { if (msgs) setMessages(msgs); })
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, isPreview]);
 
   function refreshMessages(id: string) {
     getPublicMessages(id).then(setMessages);
@@ -102,11 +105,19 @@ function InviteContent() {
 
   return (
     <>
+      {isPreview && (
+        <div
+          className="fixed left-0 right-0 top-0 z-[70] px-4 py-2 text-center text-xs font-medium"
+          style={{ background: "#fef3c7", color: "#92400e", fontFamily: "var(--font-inter)" }}
+        >
+          Mode Preview — undangan belum dipublikasikan
+        </div>
+      )}
       <AnimatePresence>
         {!opened && (
           <motion.div
             key="envelope"
-            className="fixed inset-0 z-[60]"
+            className={`fixed inset-0 z-[60]${isPreview ? " pt-8" : ""}`}
             exit={{ y: "-100%", transition: { duration: 0.65, ease: [0.4, 0, 0.2, 1] } }}
           >
             <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => setOpened(true)} />
@@ -807,8 +818,12 @@ function RsvpSection({
       setState("done");
       onSuccess();
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Terjadi kesalahan.");
-      setState("error");
+      if (err instanceof Error && err.message === "ALREADY_SUBMITTED") {
+        setState("already_submitted");
+      } else {
+        setErrorMsg(err instanceof Error ? err.message : "Terjadi kesalahan.");
+        setState("error");
+      }
     }
   }
 

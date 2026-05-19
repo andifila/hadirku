@@ -44,3 +44,22 @@ export async function getInvitationBySlug(
   };
   return { ...rest, template_slug: templates?.slug ?? "rustic-gold" };
 }
+
+// Used for preview mode — no is_published filter. RLS handles auth: owner can
+// see their own draft; unauthenticated users can only see published ones.
+export async function getInvitationBySlugPreview(
+  slug: string
+): Promise<PublicInvitation | null> {
+  const { data, error } = await supabase
+    .from("invitations")
+    .select("*, templates(slug)")
+    .eq("slug", slug)
+    .single();
+
+  if (error) return null;
+
+  const { templates, ...rest } = data as typeof data & {
+    templates: { slug: string } | null;
+  };
+  return { ...rest, template_slug: templates?.slug ?? "rustic-gold" };
+}

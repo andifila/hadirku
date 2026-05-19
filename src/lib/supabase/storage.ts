@@ -17,3 +17,11 @@ async function upload(bucket: string, file: File): Promise<string> {
 
 export function uploadCover(file: File) { return upload("covers", file); }
 export function uploadMusic(file: File)  { return upload("music",  file); }
+
+export async function deleteStorageFile(bucket: string, url: string): Promise<void> {
+  const marker = `/object/public/${bucket}/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return;
+  const path = decodeURIComponent(url.slice(idx + marker.length).split("?")[0]);
+  await supabase.storage.from(bucket).remove([path]);
+}

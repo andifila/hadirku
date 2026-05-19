@@ -10,9 +10,20 @@ export type RsvpPayload = {
 };
 
 export async function submitRsvp(payload: RsvpPayload): Promise<void> {
+  const trimmedName = payload.name.trim();
+
+  const { data: existing } = await supabase
+    .from("guests")
+    .select("id")
+    .eq("invitation_id", payload.invitation_id)
+    .ilike("name", trimmedName)
+    .maybeSingle();
+
+  if (existing) throw new Error("ALREADY_SUBMITTED");
+
   const { error } = await supabase.from("guests").insert({
     invitation_id: payload.invitation_id,
-    name: payload.name.trim(),
+    name: trimmedName,
     phone: payload.phone?.trim() || null,
     rsvp_status: payload.rsvp_status,
     message: payload.message?.trim() || null,
