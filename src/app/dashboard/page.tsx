@@ -677,63 +677,75 @@ export default function DashboardPage() {
                   className="overflow-hidden rounded-2xl"
                   style={{ background: "var(--background)", border: "1px solid var(--border)" }}
                 >
-                  {/* Header */}
-                  <div
-                    className="flex items-center justify-between px-5 py-4"
-                    style={{ borderBottom: "1px solid var(--border)" }}
-                  >
-                    <div>
-                      <h2 className="font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
-                        Daftar Tamu
-                      </h2>
-                      <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                        {guests.length} tamu terdaftar
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={downloadTemplate}
-                        title="Download template Excel"
-                        className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-opacity hover:opacity-80"
-                        style={{
-                          background: "var(--muted)",
-                          color: "var(--foreground)",
-                          border: "1px solid var(--border)",
-                          fontFamily: "var(--font-inter)",
-                        }}
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Template</span>
-                      </button>
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploadState === "uploading"}
-                        className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-opacity hover:opacity-80 disabled:opacity-50"
-                        style={{
-                          background: "var(--muted)",
-                          color: "var(--foreground)",
-                          border: "1px solid var(--border)",
-                          fontFamily: "var(--font-inter)",
-                        }}
-                      >
-                        {uploadState === "uploading"
-                          ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          : <FileSpreadsheet className="h-3.5 w-3.5" />
-                        }
-                        <span className="hidden sm:inline">Excel</span>
-                      </button>
-                      <button
-                        onClick={() => setShowAddForm((v) => !v)}
-                        className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-opacity hover:opacity-90"
-                        style={{
-                          background: "var(--primary)",
-                          color: "var(--primary-foreground)",
-                          fontFamily: "var(--font-inter)",
-                        }}
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Tambah</span>
-                      </button>
+                  {/* Section header */}
+                  <div className="px-5 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
+                    <div className="flex items-start justify-between gap-3">
+                      {/* Title + contextual subtitle */}
+                      <div>
+                        <h2
+                          className="text-base font-semibold"
+                          style={{ fontFamily: "var(--font-inter)" }}
+                        >
+                          Daftar Tamu
+                        </h2>
+                        <p
+                          className="mt-0.5 text-xs"
+                          style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+                        >
+                          {guests.length === 0
+                            ? "Belum ada tamu"
+                            : `${guests.length} diundang · ${attending} hadir · ${pending} belum konfirmasi`}
+                        </p>
+                      </div>
+
+                      {/* Actions — primary first */}
+                      <div className="flex flex-shrink-0 items-center gap-2">
+                        {/* Template download — icon only, tooltip */}
+                        <button
+                          onClick={downloadTemplate}
+                          title="Download template Excel"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl transition-opacity hover:opacity-70"
+                          style={{
+                            background: "var(--muted)",
+                            color: "var(--muted-foreground)",
+                            border: "1px solid var(--border)",
+                          }}
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+
+                        {/* Excel upload — icon only, tooltip */}
+                        <button
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploadState === "uploading"}
+                          title="Upload daftar tamu dari Excel"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl transition-opacity hover:opacity-70 disabled:opacity-40"
+                          style={{
+                            background: "var(--muted)",
+                            color: "var(--muted-foreground)",
+                            border: "1px solid var(--border)",
+                          }}
+                        >
+                          {uploadState === "uploading"
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : <FileSpreadsheet className="h-4 w-4" />
+                          }
+                        </button>
+
+                        {/* Tambah Tamu — primary CTA */}
+                        <button
+                          onClick={() => setShowAddForm((v) => !v)}
+                          className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-opacity hover:opacity-90"
+                          style={{
+                            background: "var(--primary)",
+                            color: "var(--primary-foreground)",
+                            fontFamily: "var(--font-inter)",
+                          }}
+                        >
+                          <Plus className="h-4 w-4 flex-shrink-0" />
+                          <span className="hidden sm:inline">Tambah Tamu</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -754,25 +766,35 @@ export default function DashboardPage() {
                             fontFamily: "var(--font-inter)",
                           }}
                         >
-                          <span>{uploadMsg}</span>
+                          <div className="flex items-center gap-2">
+                            {uploadState === "done"
+                              ? <Check className="h-4 w-4 flex-shrink-0" />
+                              : <X className="h-4 w-4 flex-shrink-0" />
+                            }
+                            <span>{uploadMsg}</span>
+                          </div>
                           <button
                             onClick={() => setUploadMsg("")}
-                            className="flex-shrink-0 hover:opacity-70"
+                            className="flex-shrink-0 rounded-lg p-1 hover:opacity-70"
                           >
-                            <X className="h-4 w-4" />
+                            <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  {/* Search + Filter */}
+                  {/* Search + Filter toolbar */}
                   <div className="space-y-3 px-5 py-4">
+                    {/* Search input */}
                     <div
-                      className="flex items-center gap-2 rounded-xl px-3 py-2.5"
+                      className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5"
                       style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
                     >
-                      <Search className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--muted-foreground)" }} />
+                      <Search
+                        className="h-4 w-4 flex-shrink-0"
+                        style={{ color: "var(--muted-foreground)" }}
+                      />
                       <input
                         type="text"
                         value={searchQuery}
@@ -784,41 +806,59 @@ export default function DashboardPage() {
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery("")}
-                          className="flex-shrink-0 hover:opacity-70"
+                          className="flex-shrink-0 rounded-md p-0.5 hover:opacity-70"
                         >
                           <X className="h-3.5 w-3.5" style={{ color: "var(--muted-foreground)" }} />
                         </button>
                       )}
                     </div>
 
-                    {/* RSVP filter pills */}
-                    <div className="flex flex-wrap gap-1.5">
+                    {/* RSVP filter tabs */}
+                    <div className="flex gap-1.5 overflow-x-auto pb-0.5">
                       {(
                         [
-                          { key: "all"           as const, label: "Semua",       count: guests.length  },
-                          { key: "attending"     as const, label: "Hadir",       count: attending      },
-                          { key: "not_attending" as const, label: "Tidak Hadir", count: notAttending   },
-                          { key: "pending"       as const, label: "Belum",       count: pending        },
+                          { key: "all"           as const, label: "Semua",       count: guests.length, dot: null         },
+                          { key: "attending"     as const, label: "Hadir",       count: attending,     dot: "#16a34a"    },
+                          { key: "not_attending" as const, label: "Tidak Hadir", count: notAttending,  dot: "#dc2626"    },
+                          { key: "pending"       as const, label: "Belum",       count: pending,       dot: "#d97706"    },
                         ]
-                      ).map((tab) => (
-                        <button
-                          key={tab.key}
-                          onClick={() => setRsvpFilter(tab.key)}
-                          className="rounded-lg px-3 py-1.5 text-xs font-medium transition-opacity"
-                          style={{
-                            background: rsvpFilter === tab.key ? "var(--primary)" : "var(--muted)",
-                            color: rsvpFilter === tab.key ? "var(--primary-foreground)" : "var(--muted-foreground)",
-                            border: `1px solid ${rsvpFilter === tab.key ? "var(--primary)" : "var(--border)"}`,
-                            fontFamily: "var(--font-inter)",
-                          }}
-                        >
-                          {tab.label} ({tab.count})
-                        </button>
-                      ))}
+                      ).map((tab) => {
+                        const active = rsvpFilter === tab.key;
+                        return (
+                          <button
+                            key={tab.key}
+                            onClick={() => setRsvpFilter(tab.key)}
+                            className="flex flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all"
+                            style={{
+                              background: active ? "var(--primary)" : "var(--muted)",
+                              color: active ? "var(--primary-foreground)" : "var(--muted-foreground)",
+                              border: `1px solid ${active ? "var(--primary)" : "var(--border)"}`,
+                              fontFamily: "var(--font-inter)",
+                            }}
+                          >
+                            {tab.dot && !active && (
+                              <span
+                                className="h-1.5 w-1.5 rounded-full flex-shrink-0"
+                                style={{ background: tab.dot }}
+                              />
+                            )}
+                            {tab.label}
+                            <span
+                              className="rounded-full px-1.5 py-0.5 text-xs leading-none font-semibold"
+                              style={{
+                                background: active ? "rgba(255,255,255,0.25)" : "var(--border)",
+                                color: active ? "#fff" : "var(--muted-foreground)",
+                              }}
+                            >
+                              {tab.count}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Add guest form */}
+                  {/* Add guest inline form */}
                   <AnimatePresence>
                     {showAddForm && (
                       <motion.div
@@ -838,47 +878,65 @@ export default function DashboardPage() {
                   </AnimatePresence>
 
                   {/* Guest list */}
-                  <div className="px-5 pb-5">
+                  <div className="px-4 pb-4">
                     {guests.length === 0 ? (
-                      <div
-                        className="flex flex-col items-center justify-center rounded-xl py-12 text-center"
+                      /* Empty state */
+                      <div className="flex flex-col items-center justify-center rounded-2xl py-14 text-center"
                         style={{ background: "var(--muted)" }}
                       >
-                        <Users
-                          className="mb-3 h-8 w-8 opacity-30"
-                          style={{ color: "var(--muted-foreground)" }}
-                        />
-                        <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>
+                        <div
+                          className="mb-4 flex h-14 w-14 items-center justify-center rounded-full"
+                          style={{ background: "var(--background)", border: "1px solid var(--border)" }}
+                        >
+                          <Users className="h-6 w-6" style={{ color: "var(--muted-foreground)", opacity: 0.5 }} />
+                        </div>
+                        <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
                           Belum ada tamu
                         </p>
-                        <p
-                          className="mt-1 text-xs"
+                        <p className="mt-1 max-w-[220px] text-xs leading-relaxed"
                           style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
                         >
-                          Tambah manual atau upload file Excel.
+                          Tambah satu per satu atau upload sekaligus via file Excel.
                         </p>
-                        <button
-                          onClick={() => setShowAddForm(true)}
-                          className="mt-4 flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium"
-                          style={{
-                            background: "var(--primary)",
-                            color: "var(--primary-foreground)",
-                            fontFamily: "var(--font-inter)",
-                          }}
-                        >
-                          <UserPlus className="h-4 w-4" />
-                          Tambah Tamu
-                        </button>
+                        <div className="mt-5 flex gap-2">
+                          <button
+                            onClick={() => setShowAddForm(true)}
+                            className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium"
+                            style={{
+                              background: "var(--primary)",
+                              color: "var(--primary-foreground)",
+                              fontFamily: "var(--font-inter)",
+                            }}
+                          >
+                            <UserPlus className="h-4 w-4" />
+                            Tambah Tamu
+                          </button>
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium"
+                            style={{
+                              background: "var(--background)",
+                              color: "var(--foreground)",
+                              border: "1px solid var(--border)",
+                              fontFamily: "var(--font-inter)",
+                            }}
+                          >
+                            <FileSpreadsheet className="h-4 w-4" />
+                            Upload Excel
+                          </button>
+                        </div>
                       </div>
                     ) : filteredGuests.length === 0 ? (
-                      <p
-                        className="py-8 text-center text-sm"
-                        style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
-                      >
-                        Tidak ada tamu yang cocok dengan filter ini.
-                      </p>
+                      <div className="py-10 text-center">
+                        <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>
+                          Tidak ada hasil
+                        </p>
+                        <p className="mt-1 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                          Coba ubah filter atau kata pencarian.
+                        </p>
+                      </div>
                     ) : (
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-2.5">
                         {filteredGuests.map((guest, i) => (
                           <GuestCard
                             key={guest.id}
@@ -955,15 +1013,36 @@ function AddGuestForm({
   }
 
   return (
-    <form
+    <motion.form
+      initial={{ opacity: 0, y: -4 }}
+      animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="rounded-2xl p-5"
+      className="overflow-hidden rounded-2xl"
       style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
     >
-      <p className="mb-4 text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
-        Tambah Tamu
-      </p>
-      <div className="flex flex-col gap-3">
+      {/* Form header */}
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: "1px solid var(--border)" }}
+      >
+        <div className="flex items-center gap-2">
+          <UserPlus className="h-4 w-4" style={{ color: "var(--primary)" }} />
+          <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
+            Tambah Tamu Baru
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-lg p-1.5 transition-opacity hover:opacity-70"
+          style={{ color: "var(--muted-foreground)" }}
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Fields */}
+      <div className="flex flex-col gap-3 p-4">
         <input
           type="text"
           value={name}
@@ -982,7 +1061,7 @@ function AddGuestForm({
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="No. WhatsApp (opsional)"
+          placeholder="No. WhatsApp (opsional, contoh: 08123...)"
           className="w-full rounded-xl px-4 py-3 text-sm outline-none"
           style={{
             background: "var(--background)",
@@ -995,35 +1074,23 @@ function AddGuestForm({
             {error}
           </p>
         )}
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={submitting || !name.trim()}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-medium disabled:opacity-60"
-            style={{
-              background: "var(--primary)",
-              color: "var(--primary-foreground)",
-              fontFamily: "var(--font-inter)",
-            }}
-          >
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Simpan"}
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-xl px-4 py-2.5 text-sm font-medium"
-            style={{
-              background: "var(--background)",
-              color: "var(--muted-foreground)",
-              border: "1px solid var(--border)",
-              fontFamily: "var(--font-inter)",
-            }}
-          >
-            Batal
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={submitting || !name.trim()}
+          className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold disabled:opacity-50"
+          style={{
+            background: "var(--primary)",
+            color: "var(--primary-foreground)",
+            fontFamily: "var(--font-inter)",
+          }}
+        >
+          {submitting
+            ? <Loader2 className="h-4 w-4 animate-spin" />
+            : <><UserPlus className="h-4 w-4" /> Simpan Tamu</>
+          }
+        </button>
       </div>
-    </form>
+    </motion.form>
   );
 }
 
@@ -1078,128 +1145,167 @@ function GuestCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(index * 0.04, 0.32) }}
-      className={removing ? "opacity-40" : ""}
+      transition={{ delay: Math.min(index * 0.035, 0.28), ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={removing ? "pointer-events-none opacity-40" : ""}
     >
       <div
-        className="rounded-2xl p-4"
-        style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
+        className="overflow-hidden rounded-2xl"
+        style={{ background: "var(--background)", border: "1px solid var(--border)" }}
       >
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
+        {/* ── Top: avatar + info + badge + delete ── */}
+        <div className="flex items-start gap-3 px-4 pb-3 pt-4">
+          {/* Avatar — tinted by RSVP status */}
           <div
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-            style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)" }}
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
+            style={{
+              background: rsvp.bg,
+              color: rsvp.color,
+              border: `1.5px solid ${rsvp.color}33`,
+              fontFamily: "var(--font-inter)",
+            }}
           >
             {initial}
           </div>
 
-          {/* Info */}
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-semibold leading-tight" style={{ fontFamily: "var(--font-inter)" }}>
+          {/* Name + phone */}
+          <div className="min-w-0 flex-1 pt-0.5">
+            <p
+              className="truncate text-[15px] font-semibold leading-snug"
+              style={{ fontFamily: "var(--font-inter)" }}
+            >
               {guest.name}
             </p>
-            {guest.phone && (
-              <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                {guest.phone}
-              </p>
-            )}
+            <p
+              className="mt-0.5 text-xs"
+              style={{
+                color: guest.phone ? "var(--muted-foreground)" : "var(--border)",
+                fontFamily: "var(--font-inter)",
+              }}
+            >
+              {guest.phone || "No. WhatsApp belum diisi"}
+            </p>
           </div>
 
           {/* RSVP badge */}
           <span
-            className="flex-shrink-0 rounded-full px-2.5 py-1 text-xs font-medium"
-            style={{ background: rsvp.bg, color: rsvp.color, fontFamily: "var(--font-inter)" }}
-          >
-            {rsvp.label}
-          </span>
-        </div>
-
-        {guest.message && (
-          <p
-            className="mt-2.5 line-clamp-2 rounded-lg px-3 py-2 text-xs italic"
+            className="mt-0.5 flex-shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold"
             style={{
-              background: "var(--background)",
-              color: "var(--muted-foreground)",
+              background: rsvp.bg,
+              color: rsvp.color,
+              border: `1px solid ${rsvp.color}33`,
               fontFamily: "var(--font-inter)",
             }}
           >
-            &ldquo;{guest.message}&rdquo;
-          </p>
+            {rsvp.label}
+          </span>
+
+          {/* Delete control */}
+          <div className="flex flex-shrink-0 items-center gap-1 pt-0.5">
+            {confirmDelete ? (
+              <>
+                <button
+                  onClick={handleRemove}
+                  className="rounded-lg px-2.5 py-1 text-xs font-semibold transition-opacity hover:opacity-80"
+                  style={{ background: "#dc2626", color: "#fff", fontFamily: "var(--font-inter)" }}
+                >
+                  Hapus
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="rounded-lg p-1.5 transition-opacity hover:opacity-70"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                disabled={removing}
+                title="Hapus tamu"
+                className="rounded-lg p-1.5 transition-opacity hover:opacity-60 disabled:opacity-30"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                {removing
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : <Trash2 className="h-4 w-4" />
+                }
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Message bubble (conditional) ── */}
+        {guest.message && (
+          <div className="px-4 pb-3">
+            <p
+              className="line-clamp-2 rounded-xl px-3.5 py-2.5 text-xs italic leading-relaxed"
+              style={{
+                background: "var(--muted)",
+                color: "var(--muted-foreground)",
+                fontFamily: "var(--font-inter)",
+                borderLeft: "3px solid var(--border)",
+              }}
+            >
+              &ldquo;{guest.message}&rdquo;
+            </p>
+          </div>
         )}
 
-        {/* Actions */}
-        <div className="mt-3 flex gap-2">
+        {/* ── Action row ── */}
+        <div
+          className="flex gap-2 px-4 py-3"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
+          {/* WhatsApp — dominant CTA */}
           <a
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-medium transition-opacity hover:opacity-80"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 active:scale-[0.98]"
             style={{ background: "#25d366", color: "#fff", fontFamily: "var(--font-inter)" }}
           >
-            <MessageCircle className="h-3.5 w-3.5" />
-            WhatsApp
+            <WaIcon />
+            <span>Kirim Undangan</span>
           </a>
+
+          {/* Copy link — secondary */}
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-opacity hover:opacity-80"
+            title="Salin link undangan tamu ini"
+            className="flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-xs font-medium transition-all hover:opacity-80"
             style={{
-              background: "var(--background)",
-              color: copied ? "#16a34a" : "var(--foreground)",
-              border: "1px solid var(--border)",
+              background: copied ? "#f0fdf4" : "var(--muted)",
+              color: copied ? "#16a34a" : "var(--muted-foreground)",
+              border: `1px solid ${copied ? "#bbf7d0" : "var(--border)"}`,
               fontFamily: "var(--font-inter)",
             }}
           >
             {copied
-              ? <><Check className="h-3.5 w-3.5" /> Tersalin</>
-              : <><Link2 className="h-3.5 w-3.5" /> Salin Link</>
+              ? <Check className="h-3.5 w-3.5 flex-shrink-0" />
+              : <Link2 className="h-3.5 w-3.5 flex-shrink-0" />
             }
+            <span className="hidden sm:inline">{copied ? "Tersalin" : "Salin"}</span>
           </button>
-          {confirmDelete ? (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>
-                Hapus?
-              </span>
-              <button
-                onClick={handleRemove}
-                className="rounded-lg px-2 py-1 text-xs font-medium"
-                style={{ background: "#dc2626", color: "#fff", fontFamily: "var(--font-inter)" }}
-              >
-                Ya
-              </button>
-              <button
-                onClick={() => setConfirmDelete(false)}
-                className="rounded-lg px-2 py-1 text-xs font-medium"
-                style={{
-                  background: "var(--muted)",
-                  color: "var(--muted-foreground)",
-                  fontFamily: "var(--font-inter)",
-                }}
-              >
-                Batal
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setConfirmDelete(true)}
-              disabled={removing}
-              className="rounded-xl p-2 transition-opacity hover:opacity-70 disabled:opacity-40"
-              style={{ color: "#dc2626" }}
-              title="Hapus tamu"
-            >
-              {removing
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : <Trash2 className="h-4 w-4" />
-              }
-            </button>
-          )}
         </div>
       </div>
     </motion.div>
   );
 }
+
+// ─── WhatsApp icon (inline SVG — lucide removed social icons) ─────────────────
+
+function WaIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 flex-shrink-0" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  );
+}
+
+
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
