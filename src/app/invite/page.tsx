@@ -234,7 +234,7 @@ function EnvelopeCover({
               {/* Pulse ring — only when not yet opening */}
               {!opening && (
                 <motion.div
-                  className="absolute -inset-3 rounded-full"
+                  className="pointer-events-none absolute -inset-3 rounded-full"
                   style={{ border: `2px solid ${theme.primary}` }}
                   animate={{ scale: [1, 1.22, 1], opacity: [0.45, 0, 0.45] }}
                   transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", delay: 1.0 }}
