@@ -90,6 +90,7 @@ export type Database = {
         };
         Update: {
           template_id?: string;
+          slug?: string;
           bride_name?: string;
           groom_name?: string;
           event_date?: string;
