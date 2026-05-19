@@ -15,8 +15,9 @@ async function upload(bucket: string, file: File): Promise<string> {
   return data.publicUrl;
 }
 
-export function uploadCover(file: File) { return upload("covers", file); }
-export function uploadMusic(file: File)  { return upload("music",  file); }
+export function uploadCover(file: File)   { return upload("covers", file); }
+export function uploadGallery(file: File) { return upload("covers", file); }
+export function uploadMusic(file: File)   { return upload("music",  file); }
 
 export async function deleteStorageFile(bucket: string, url: string): Promise<void> {
   const marker = `/object/public/${bucket}/`;

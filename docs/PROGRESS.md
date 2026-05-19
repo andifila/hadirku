@@ -38,24 +38,34 @@
 
 ### Form Buat / Edit Undangan
 - [x] Pilih tema dengan preview warna (5 tema)
-- [x] Input nama pengantin, tanggal & waktu, venue
+- [x] Input nama pengantin + nama ayah & ibu masing-masing mempelai
+- [x] Tanggal & waktu resepsi, venue nama & alamat
+- [x] Seksi Akad Nikah (toggle — muncul jika ada acara akad): tanggal, waktu, venue, alamat
 - [x] Warning tanggal lampau
+- [x] Input dresscode
 - [x] Input kutipan kustom
 - [x] Upload foto cover (Supabase Storage, maks 5 MB) — file lama auto-hapus
+- [x] Upload 3 foto galeri (Supabase Storage, reuse bucket `covers`)
 - [x] Upload musik background (Supabase Storage, maks 8 MB) — file lama auto-hapus
+- [x] Rekening/Angpao: tambah hingga 4 rekening (bank, nama, nomor) dengan dropdown bank umum
 - [x] Slug kustom dengan validasi reserved words
 - [x] Slug tersimpan dengan benar saat edit
 - [x] Toggle publish / draft
 
 ### Halaman Undangan Publik (`/invite?s=<slug>&to=<nama>`)
-- [x] Amplop animasi dengan wax seal interaktif
+- [x] Amplop animasi dengan tombol "Buka Undangan" full-width
+- [x] Skeleton loading saat data belum siap
+- [x] Fix iOS Safari touch fall-through — InvitationView hanya di-mount setelah amplop dibuka
 - [x] Personalisasi nama tamu ("Kepada Yth.")
 - [x] 5 tema warna
-- [x] Hero: nama pengantin, tanggal, scroll indicator
+- [x] Hero: nama pengantin + nama orang tua, tanggal, scroll indicator
 - [x] Kutipan kustom
-- [x] Waktu & Tempat + Google Maps embed + tombol Buka Maps
-- [x] Countdown real-time menuju hari H
-- [x] RSVP form — dengan dedup server-side (nama yang sama tidak bisa submit 2x)
+- [x] Seksi Akad Nikah (conditional — hanya tampil jika `akad_date` diisi)
+- [x] Seksi Resepsi + dresscode badge + Google Maps embed + tombol Buka Maps
+- [x] Countdown real-time menuju hari H — fallback "Alhamdulillah, acara telah berlangsung" jika sudah lewat
+- [x] Galeri foto (grid, conditional — hanya tampil jika minimal 1 foto galeri diisi)
+- [x] RSVP form — validasi nomor telepon 9–15 digit, dedup server-side
+- [x] Hadiah & Angpao — kartu rekening per bank dengan tombol salin nomor (clipboard + fallback)
 - [x] Ucapan & Doa dari tamu
 - [x] Musik background (auto-play saat amplop dibuka, toggle play/pause)
 - [x] WhatsApp share
