@@ -141,6 +141,7 @@ export default function DashboardPage() {
   const [uploadMsg,    setUploadMsg]    = useState("");
   const [searchQuery,  setSearchQuery]  = useState("");
   const [rsvpFilter,   setRsvpFilter]   = useState<"all" | "attending" | "not_attending" | "pending">("all");
+  const [linkCopied,   setLinkCopied]   = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -206,6 +207,8 @@ export default function DashboardPage() {
     const matchFilter = rsvpFilter === "all" || g.rsvp_status === rsvpFilter;
     return matchSearch && matchFilter;
   });
+
+  const daysUntil = invitation ? getDaysUntil(invitation.event_date) : null;
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
@@ -403,6 +406,31 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
+                    {/* Countdown badge */}
+                    {daysUntil !== null && (
+                      <div className="mt-3">
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+                          style={{
+                            background: daysUntil > 0
+                              ? "rgba(255,255,255,0.15)"
+                              : daysUntil === 0
+                                ? "rgba(251,191,36,0.3)"
+                                : "rgba(255,255,255,0.1)",
+                            color: daysUntil === 0 ? "#fbbf24" : "rgba(255,255,255,0.9)",
+                            border: `1px solid ${daysUntil === 0 ? "rgba(251,191,36,0.5)" : "rgba(255,255,255,0.2)"}`,
+                            fontFamily: "var(--font-inter)",
+                          }}
+                        >
+                          {daysUntil > 0
+                            ? `⏳ ${daysUntil} hari lagi`
+                            : daysUntil === 0
+                              ? "🎉 Hari ini!"
+                              : "✨ Acara sudah berlangsung"}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="mt-5 flex flex-wrap gap-2">
                       <Link
                         href={`/invite/?s=${invitation.slug}${!invitation.is_published ? "&preview=1" : ""}`}
@@ -419,6 +447,36 @@ export default function DashboardPage() {
                         <ExternalLink className="h-3.5 w-3.5" />
                         Lihat Undangan
                       </Link>
+                      <button
+                        onClick={() => {
+                          const link = getShareLink(invitation.slug);
+                          navigator.clipboard.writeText(link).catch(() => {
+                            const el = document.createElement("textarea");
+                            el.value = link;
+                            el.style.position = "fixed";
+                            el.style.opacity = "0";
+                            document.body.appendChild(el);
+                            el.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(el);
+                          });
+                          setLinkCopied(true);
+                          setTimeout(() => setLinkCopied(false), 2000);
+                        }}
+                        className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-medium transition-opacity hover:opacity-80"
+                        style={{
+                          background: linkCopied ? "rgba(22,163,74,0.3)" : "rgba(255,255,255,0.12)",
+                          color: linkCopied ? "#86efac" : "rgba(255,255,255,0.8)",
+                          border: `1px solid ${linkCopied ? "rgba(22,163,74,0.4)" : "rgba(255,255,255,0.2)"}`,
+                          backdropFilter: "blur(6px)",
+                          fontFamily: "var(--font-inter)",
+                        }}
+                      >
+                        {linkCopied
+                          ? <><Check className="h-3.5 w-3.5" /> Link Tersalin</>
+                          : <><Link2 className="h-3.5 w-3.5" /> Salin Link</>
+                        }
+                      </button>
                     </div>
                   </div>
 
@@ -457,6 +515,140 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* ── Quick Stats ── */}
+                <motion.div
+                  variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+                >
+                  {[
+                    {
+                      label: "Total Tamu",
+                      value: guests.length,
+                      sub: guests.length === 1 ? "tamu diundang" : "tamu diundang",
+                      valueColor: "var(--primary)",
+                      subColor: "var(--muted-foreground)",
+                      bg: "var(--background)",
+                      border: "var(--border)",
+                    },
+                    {
+                      label: "Hadir",
+                      value: attending,
+                      sub: guests.length > 0 ? `${Math.round((attending / guests.length) * 100)}% dari total` : "0%",
+                      valueColor: "#16a34a",
+                      subColor: "#16a34a",
+                      bg: "#f0fdf4",
+                      border: "#bbf7d0",
+                    },
+                    {
+                      label: "Tidak Hadir",
+                      value: notAttending,
+                      sub: guests.length > 0 ? `${Math.round((notAttending / guests.length) * 100)}% dari total` : "0%",
+                      valueColor: "#dc2626",
+                      subColor: "#dc2626",
+                      bg: "#fef2f2",
+                      border: "#fecaca",
+                    },
+                    {
+                      label: "Belum Konfirmasi",
+                      value: pending,
+                      sub: guests.length > 0 ? `${Math.round((pending / guests.length) * 100)}% dari total` : "0%",
+                      valueColor: "#d97706",
+                      subColor: "#d97706",
+                      bg: "#fffbeb",
+                      border: "#fde68a",
+                    },
+                  ].map((stat) => (
+                    <motion.div
+                      key={stat.label}
+                      variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }}
+                      className="rounded-2xl p-5"
+                      style={{ background: stat.bg, border: `1px solid ${stat.border}` }}
+                    >
+                      <p
+                        className="text-xs font-medium"
+                        style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+                      >
+                        {stat.label}
+                      </p>
+                      <p
+                        className="mt-2 text-4xl font-bold leading-none"
+                        style={{ fontFamily: "var(--font-playfair)", color: stat.valueColor }}
+                      >
+                        {stat.value}
+                      </p>
+                      <p
+                        className="mt-1.5 text-xs"
+                        style={{ color: stat.subColor, fontFamily: "var(--font-inter)", opacity: 0.8 }}
+                      >
+                        {stat.sub}
+                      </p>
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* Response rate bar */}
+                {guests.length > 0 && (
+                  <div
+                    className="rounded-2xl p-5"
+                    style={{ background: "var(--background)", border: "1px solid var(--border)" }}
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
+                          Response Rate
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+                        >
+                          {attending + notAttending} dari {guests.length} tamu sudah konfirmasi
+                        </p>
+                      </div>
+                      <span
+                        className="text-2xl font-bold"
+                        style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}
+                      >
+                        {Math.round(((attending + notAttending) / guests.length) * 100)}%
+                      </span>
+                    </div>
+                    <div
+                      className="relative h-2 overflow-hidden rounded-full"
+                      style={{ background: "var(--muted)" }}
+                    >
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${((attending + notAttending) / guests.length) * 100}%` }}
+                        transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+                        className="absolute inset-y-0 left-0 rounded-full"
+                        style={{ background: "linear-gradient(to right, #16a34a, var(--primary))" }}
+                      />
+                    </div>
+                    {/* Breakdown mini bars */}
+                    <div className="mt-3 flex gap-4">
+                      {[
+                        { label: "Hadir",       value: attending,    color: "#16a34a" },
+                        { label: "Tidak Hadir", value: notAttending, color: "#dc2626" },
+                        { label: "Belum",       value: pending,      color: "#d97706" },
+                      ].map((s) => (
+                        <div key={s.label} className="flex items-center gap-1.5">
+                          <span
+                            className="h-2 w-2 rounded-full flex-shrink-0"
+                            style={{ background: s.color }}
+                          />
+                          <span
+                            className="text-xs"
+                            style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+                          >
+                            {s.label}: <strong style={{ color: s.color }}>{s.value}</strong>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* ── Draft Warning ── */}
                 {!invitation.is_published && (
@@ -1044,6 +1236,23 @@ async function parseExcelGuests(
       name: String(row[0]).trim(),
       phone: row[1] ? String(row[1]).trim() : "",
     }));
+}
+
+function getDaysUntil(dateStr: string): number | null {
+  if (!dateStr) return null;
+  const event = new Date(dateStr);
+  const today = new Date();
+  event.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  return Math.round((event.getTime() - today.getTime()) / 86_400_000);
+}
+
+function getShareLink(slug: string): string {
+  if (typeof window === "undefined") return "";
+  const base = window.location.pathname.includes("/invitation-wedding")
+    ? `${window.location.origin}/invitation-wedding`
+    : window.location.origin;
+  return `${base}/invite/?s=${slug}`;
 }
 
 async function downloadTemplate() {
