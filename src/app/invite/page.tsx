@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Calendar, Clock, Heart, Loader2, CheckCircle,
-  Phone, MessageSquare, User, Music, Music2,
+  Phone, MessageSquare, User, Music, Music2, Mail,
 } from "lucide-react";
 import {
   getInvitationBySlug,
@@ -119,7 +119,7 @@ function InviteContent() {
           <motion.div
             key="envelope"
             className={`fixed inset-0 z-[60]${isPreview ? " pt-8" : ""}`}
-            exit={{ y: "-100%", transition: { duration: 0.65, ease: [0.4, 0, 0.2, 1] } }}
+            exit={{ opacity: 0, transition: { duration: 0.45, ease: "easeInOut" } }}
           >
             <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => setOpened(true)} />
           </motion.div>
@@ -164,13 +164,18 @@ function EnvelopeCover({
   const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
   const [opening, setOpening] = useState(false);
   const inviteUrl = typeof window !== "undefined" ? window.location.href : "";
-  // "Bapak/Ibu Name" when name given, fallback to generic
   const displayName = guestName ? `Bapak/Ibu ${guestName}` : "Tamu Undangan";
+
+  const eventDate = new Date(invite.event_date);
+  const dayName = eventDate.toLocaleDateString("id-ID", { weekday: "long" });
+  const day = eventDate.getDate();
+  const month = eventDate.toLocaleDateString("id-ID", { month: "long" });
+  const year = eventDate.getFullYear();
 
   function handleOpen() {
     if (opening) return;
     setOpening(true);
-    setTimeout(onOpen, 550);
+    setTimeout(onOpen, 480);
   }
 
   return (
@@ -178,42 +183,40 @@ function EnvelopeCover({
       className="flex min-h-screen flex-col items-center justify-center px-6 py-12"
       style={{ background: theme.muted }}
     >
-      <div className="relative w-full max-w-sm">
+      {/* Invitation card */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        className="w-full max-w-sm"
+      >
         <div
           className="relative overflow-hidden rounded-3xl px-8 py-10"
           style={{
             background: "linear-gradient(160deg, #fffdf9 0%, #f8f4ee 100%)",
             border: `1px solid ${theme.border}`,
-            boxShadow: `0 32px 80px -20px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.75)`,
+            boxShadow: "0 32px 80px -20px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.75)",
           }}
         >
-          {/* Envelope diagonal lines */}
+          {/* Envelope diagonal lines decoration */}
           <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden preserveAspectRatio="none">
-            <line x1="0" y1="0" x2="50%" y2="44%" stroke={theme.primary} strokeWidth="1" opacity="0.08" />
-            <line x1="100%" y1="0" x2="50%" y2="44%" stroke={theme.primary} strokeWidth="1" opacity="0.08" />
-            <line x1="0" y1="100%" x2="50%" y2="56%" stroke={theme.primary} strokeWidth="1" opacity="0.08" />
-            <line x1="100%" y1="100%" x2="50%" y2="56%" stroke={theme.primary} strokeWidth="1" opacity="0.08" />
+            <line x1="0" y1="0" x2="50%" y2="40%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
+            <line x1="100%" y1="0" x2="50%" y2="40%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
+            <line x1="0" y1="100%" x2="50%" y2="60%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
+            <line x1="100%" y1="100%" x2="50%" y2="60%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
           </svg>
 
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+          <p
             className="mb-8 text-center text-[10px] uppercase tracking-[0.35em]"
             style={{ color: theme.primary, fontFamily: "var(--font-inter)" }}
           >
             ✦ &nbsp; Undangan Pernikahan &nbsp; ✦
-          </motion.p>
+          </p>
 
-          {/* Personalized address */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mb-8 text-center"
-          >
+          {/* Recipient */}
+          <div className="mb-6 text-center">
             <p
-              className="mb-2 text-xs uppercase tracking-widest"
+              className="mb-1.5 text-xs uppercase tracking-widest"
               style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
             >
               Kepada Yth.
@@ -221,92 +224,84 @@ function EnvelopeCover({
             <p className="text-2xl font-bold leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
               {displayName}
             </p>
-          </motion.div>
+          </div>
 
-          {/* Wax seal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.65, type: "spring", damping: 12, stiffness: 180 }}
-            className="mb-8 flex justify-center"
-          >
-            <div className="relative">
-              {/* Pulse ring — only when not yet opening */}
-              {!opening && (
-                <motion.div
-                  className="pointer-events-none absolute -inset-3 rounded-full"
-                  style={{ border: `2px solid ${theme.primary}` }}
-                  animate={{ scale: [1, 1.22, 1], opacity: [0.45, 0, 0.45] }}
-                  transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", delay: 1.0 }}
-                />
-              )}
-              <motion.button
-                onClick={handleOpen}
-                disabled={opening}
-                whileHover={!opening ? { scale: 1.07, boxShadow: `0 12px 32px -8px ${theme.primary}66` } : {}}
-                whileTap={!opening ? { scale: 0.9 } : {}}
-                animate={opening ? { scale: 0, rotate: 15, opacity: 0 } : {}}
-                transition={opening ? { duration: 0.35 } : { type: "spring", stiffness: 300, damping: 20 }}
-                className="relative flex h-24 w-24 flex-col items-center justify-center rounded-full"
-                style={{
-                  background: `linear-gradient(145deg, ${theme.primary}, color-mix(in srgb, ${theme.primary} 80%, #000))`,
-                  color: "#fff",
-                  boxShadow: `0 8px 24px -6px ${theme.primary}55`,
-                }}
-                aria-label="Buka undangan"
-              >
-                <Heart className="h-7 w-7" fill="currentColor" />
-                <span className="mt-1.5 text-[9px] uppercase tracking-[0.2em]" style={{ fontFamily: "var(--font-inter)" }}>
-                  Buka
-                </span>
-                <div
-                  className="pointer-events-none absolute inset-[5px] rounded-full"
-                  style={{ border: "1px solid rgba(255,255,255,0.3)" }}
-                />
-              </motion.button>
-            </div>
-          </motion.div>
+          {/* Divider */}
+          <div className="mb-6 flex items-center gap-3">
+            <div className="h-px flex-1" style={{ background: theme.border }} />
+            <Heart className="h-4 w-4 flex-shrink-0" style={{ color: theme.primary }} fill={theme.primary} />
+            <div className="h-px flex-1" style={{ background: theme.border }} />
+          </div>
 
-          {/* Sender */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85 }}
-            className="text-center"
-          >
+          {/* Couple names */}
+          <div className="text-center">
             <p
-              className="mb-1 text-[10px] uppercase tracking-widest"
+              className="mb-2 text-[10px] uppercase tracking-widest"
               style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
             >
               Dari
             </p>
             <p className="text-xl font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>
-              {invite.bride_name} &amp; {invite.groom_name}
+              {invite.bride_name}
             </p>
-          </motion.div>
+            <p className="my-1 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              &amp;
+            </p>
+            <p className="text-xl font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>
+              {invite.groom_name}
+            </p>
+          </div>
+
+          {/* Date */}
+          <p
+            className="mt-4 text-center text-xs tracking-wide"
+            style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+          >
+            {dayName}, {day} {month} {year}
+          </p>
         </div>
-      </div>
+      </motion.div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.55 }}
-        transition={{ delay: 1.8 }}
-        className="mt-6 text-xs"
-        style={{ color: theme.primary, fontFamily: "var(--font-inter)" }}
+      {/* Primary CTA — large, impossible to miss */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45, duration: 0.45 }}
+        className="mt-5 w-full max-w-sm"
       >
-        Ketuk segel untuk membuka undangan
-      </motion.p>
+        <button
+          onClick={handleOpen}
+          disabled={opening}
+          className="flex w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-xl active:scale-[0.98] disabled:opacity-70"
+          style={{
+            background: theme.primary,
+            color: "#fff",
+            fontFamily: "var(--font-inter)",
+            minHeight: 56,
+            boxShadow: `0 8px 32px -8px ${theme.primary}88`,
+          }}
+        >
+          {opening ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <>
+              <Mail className="h-5 w-5" />
+              Buka Undangan
+            </>
+          )}
+        </button>
+      </motion.div>
 
-      {/* WhatsApp share on cover */}
+      {/* WhatsApp share */}
       {inviteUrl && (
         <motion.a
           href={generateWhatsAppLink(guestName, inviteUrl)}
           target="_blank"
           rel="noopener noreferrer"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.1 }}
-          className="mt-4 flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-medium shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.85 }}
+          className="mt-3 flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-medium shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
           style={{ background: "#25D366", color: "#fff", fontFamily: "var(--font-inter)" }}
         >
           <WhatsAppIcon className="h-4 w-4" />
@@ -427,7 +422,7 @@ function InvitationView({
             />
           </>
         )}
-        <Ornament />
+        <Ornament color={theme.primary} />
 
         <motion.div
           initial={{ opacity: 0, y: 32 }}
@@ -648,7 +643,7 @@ function InvitationView({
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition-all duration-200 hover:brightness-110 hover:shadow-lg active:scale-[0.98]"
                 style={{
-                  background: "linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 80%, #000 20%))",
+                  background: "var(--primary)",
                   color: "#fff",
                   fontFamily: "var(--font-inter)",
                 }}
@@ -951,7 +946,7 @@ function RsvpSection({
                 disabled={state === "submitting" || !name.trim()}
                 className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition-all duration-200 hover:brightness-110 hover:shadow-lg disabled:opacity-60 active:scale-[0.98]"
                 style={{
-                  background: "linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 80%, #000 20%))",
+                  background: "var(--primary)",
                   color: "#fff",
                   fontFamily: "var(--font-inter)",
                 }}
@@ -984,7 +979,7 @@ function FormField({
       style={{
         background: "var(--muted)",
         border: focused ? "1.5px solid var(--primary)" : "1px solid var(--border)",
-        boxShadow: focused ? "0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent)" : "none",
+        boxShadow: focused ? "0 0 0 3px rgba(0,0,0,0.07)" : "none",
       }}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
@@ -1004,20 +999,20 @@ function FormField({
   );
 }
 
-function Ornament() {
+function Ornament({ color }: { color: string }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
       <svg
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.06]"
         width="600" height="600" viewBox="0 0 200 200" fill="none"
       >
-        <circle cx="100" cy="100" r="90" stroke="#b08d57" strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="70" stroke="#b08d57" strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="50" stroke="#b08d57" strokeWidth="0.5" />
-        <line x1="10" y1="100" x2="190" y2="100" stroke="#b08d57" strokeWidth="0.5" />
-        <line x1="100" y1="10" x2="100" y2="190" stroke="#b08d57" strokeWidth="0.5" />
-        <line x1="29" y1="29" x2="171" y2="171" stroke="#b08d57" strokeWidth="0.5" />
-        <line x1="171" y1="29" x2="29" y2="171" stroke="#b08d57" strokeWidth="0.5" />
+        <circle cx="100" cy="100" r="90" stroke={color} strokeWidth="0.5" />
+        <circle cx="100" cy="100" r="70" stroke={color} strokeWidth="0.5" />
+        <circle cx="100" cy="100" r="50" stroke={color} strokeWidth="0.5" />
+        <line x1="10" y1="100" x2="190" y2="100" stroke={color} strokeWidth="0.5" />
+        <line x1="100" y1="10" x2="100" y2="190" stroke={color} strokeWidth="0.5" />
+        <line x1="29" y1="29" x2="171" y2="171" stroke={color} strokeWidth="0.5" />
+        <line x1="171" y1="29" x2="29" y2="171" stroke={color} strokeWidth="0.5" />
       </svg>
     </div>
   );
