@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   MapPin, Calendar, Clock, Heart, Loader2, CheckCircle,
   Phone, MessageSquare, User, Music, Music2, Mail, Shirt,
@@ -233,11 +233,15 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12" style={{ background: theme.muted }}>
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: "easeOut" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full max-w-sm"
       >
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        >
         <div
           className="relative overflow-hidden rounded-3xl px-8 py-10"
           style={{
@@ -285,6 +289,7 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
             {dayName}, {day} {month} {year}
           </p>
         </div>
+        </motion.div>
       </motion.div>
 
       <motion.div
@@ -343,6 +348,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   const [timeLeft, setTimeLeft] = useState(getTimeLeft(eventDate));
   const [musicPlaying, setMusicPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const coverParallaxY = useTransform(heroScroll, [0, 1], ["0%", "25%"]);
 
   useEffect(() => {
     const interval = setInterval(() => setTimeLeft(getTimeLeft(eventDate)), 1000);
@@ -400,24 +408,38 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
     >
       {/* Floating music toggle */}
       {invite.music_url && (
-        <button
-          onClick={toggleMusic}
-          className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:opacity-80 active:scale-95"
-          style={{ background: "var(--primary)", color: "#fff" }}
-          aria-label={musicPlaying ? "Pause musik" : "Putar musik"}
-        >
-          {musicPlaying ? <Music className="h-5 w-5" /> : <Music2 className="h-5 w-5" />}
-        </button>
+        <div className="fixed bottom-6 right-6 z-40">
+          {musicPlaying && (
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              animate={{ scale: [1, 1.9], opacity: [0.5, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
+              style={{ background: "var(--primary)" }}
+            />
+          )}
+          <button
+            onClick={toggleMusic}
+            className="relative flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:opacity-80 active:scale-95"
+            style={{ background: "var(--primary)", color: "#fff" }}
+            aria-label={musicPlaying ? "Pause musik" : "Putar musik"}
+          >
+            {musicPlaying ? <Music className="h-5 w-5" /> : <Music2 className="h-5 w-5" />}
+          </button>
+        </div>
       )}
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section
+        ref={heroRef}
         className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16"
         style={{ background: hasCover ? "transparent" : "var(--muted)" }}
       >
         {hasCover ? (
           <>
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${invite.cover_image_url})` }} />
+            <motion.div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${invite.cover_image_url})`, y: coverParallaxY }}
+            />
             <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 100%)" }} />
           </>
         ) : (
@@ -452,7 +474,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           </motion.p>
 
           {/* Bride */}
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5, duration: 0.6 }} className="flex flex-col items-center">
+          <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="flex flex-col items-center">
             <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
               {invite.bride_name}
             </h1>
@@ -481,12 +503,17 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
             )}
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7 }} className="my-5">
-            <Heart className="h-8 w-8" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)" }} fill="currentColor" />
+          <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7, type: "spring", stiffness: 200 }} className="my-5">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1, 1.2, 1] }}
+              transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
+            >
+              <Heart className="h-8 w-8" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)" }} fill="currentColor" />
+            </motion.div>
           </motion.div>
 
           {/* Groom */}
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.8, duration: 0.6 }} className="flex flex-col items-center">
+          <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="flex flex-col items-center">
             <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
               {invite.groom_name}
             </h1>
@@ -663,16 +690,27 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           <section className="px-6 py-16" style={{ background: "var(--background)" }}>
             <div className="mx-auto max-w-xl">
               <SectionTitle>Galeri</SectionTitle>
-              <div className={cn("mt-8 grid gap-3", galleryUrls.length === 1 ? "grid-cols-1" : galleryUrls.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3")}>
+              <motion.div
+                className={cn("mt-8 grid gap-3", galleryUrls.length === 1 ? "grid-cols-1" : galleryUrls.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3")}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
+              >
                 {galleryUrls.map((url, i) => (
-                  <img
+                  <motion.div
                     key={i}
-                    src={url}
-                    alt={`Foto ${i + 1}`}
-                    className={cn("w-full rounded-2xl object-cover", galleryUrls.length === 1 ? "aspect-video" : "aspect-square")}
-                  />
+                    variants={{ hidden: { opacity: 0, scale: 0.88, y: 20 }, visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] } } }}
+                    className={cn("overflow-hidden rounded-2xl", galleryUrls.length === 1 ? "aspect-video" : "aspect-square")}
+                  >
+                    <img
+                      src={url}
+                      alt={`Foto ${i + 1}`}
+                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                    />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </section>
         </FadeSection>
@@ -738,17 +776,27 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               </p>
 
               {bankAccounts.length > 0 && (
-                <div className="mt-6 flex flex-col gap-3">
+                <motion.div
+                  className="mt-6 flex flex-col gap-3"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
+                >
                   {bankAccounts.map((acc, i) => (
-                    <BankCard
+                    <motion.div
                       key={i}
-                      bank={acc.bank}
-                      accountName={acc.account_name}
-                      accountNumber={acc.account_number}
-                      qrisUrl={acc.qris_url}
-                    />
+                      variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+                    >
+                      <BankCard
+                        bank={acc.bank}
+                        accountName={acc.account_name}
+                        accountNumber={acc.account_number}
+                        qrisUrl={acc.qris_url}
+                      />
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               )}
 
               {invite.gift_address && (
@@ -781,9 +829,18 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           <section className="px-6 py-16" style={{ background: "var(--muted)" }}>
             <div className="mx-auto max-w-xl">
               <SectionTitle>Ucapan &amp; Doa</SectionTitle>
-              <div className="mt-8 flex flex-col gap-4">
+              <motion.div
+                className="mt-8 flex flex-col gap-4"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
+              >
                 {messages.map((m) => (
-                  <div key={m.id} className="rounded-2xl p-5" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
+                  <motion.div
+                    key={m.id}
+                    variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }}
+                    className="rounded-2xl p-5" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
                     <div className="mb-2 flex items-center justify-between gap-2">
                       <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{m.name}</p>
                       <span
@@ -800,9 +857,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                     <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", fontStyle: "italic" }}>
                       &ldquo;{m.message}&rdquo;
                     </p>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </section>
         </FadeSection>
@@ -1182,7 +1239,13 @@ function FormField({ icon, label, required, children }: { icon: React.ReactNode;
 function Ornament({ color }: { color: string }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.06]" width="600" height="600" viewBox="0 0 200 200" fill="none">
+      <motion.svg
+        animate={{ rotate: 360 }}
+        transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.06]"
+        width="600" height="600" viewBox="0 0 200 200" fill="none"
+        style={{ originX: "50%", originY: "50%" }}
+      >
         <circle cx="100" cy="100" r="90" stroke={color} strokeWidth="0.5" />
         <circle cx="100" cy="100" r="70" stroke={color} strokeWidth="0.5" />
         <circle cx="100" cy="100" r="50" stroke={color} strokeWidth="0.5" />
@@ -1190,14 +1253,29 @@ function Ornament({ color }: { color: string }) {
         <line x1="100" y1="10" x2="100" y2="190" stroke={color} strokeWidth="0.5" />
         <line x1="29" y1="29" x2="171" y2="171" stroke={color} strokeWidth="0.5" />
         <line x1="171" y1="29" x2="29" y2="171" stroke={color} strokeWidth="0.5" />
-      </svg>
+      </motion.svg>
+      <motion.svg
+        animate={{ rotate: -360 }}
+        transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03]"
+        width="900" height="900" viewBox="0 0 200 200" fill="none"
+        style={{ originX: "50%", originY: "50%" }}
+      >
+        <circle cx="100" cy="100" r="95" stroke={color} strokeWidth="0.4" strokeDasharray="4 8" />
+        <circle cx="100" cy="100" r="78" stroke={color} strokeWidth="0.4" strokeDasharray="2 6" />
+      </motion.svg>
     </div>
   );
 }
 
 function FadeSection({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.6 }}>
+    <motion.div
+      initial={{ opacity: 0, y: 48 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
       {children}
     </motion.div>
   );
@@ -1206,8 +1284,24 @@ function FadeSection({ children }: { children: React.ReactNode }) {
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3">
-      <p className="text-xs uppercase tracking-[0.3em]" style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>{children}</p>
-      <div className="h-px w-16" style={{ background: "var(--primary)", opacity: 0.3 }} />
+      <motion.p
+        initial={{ opacity: 0, y: 8 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="text-xs uppercase tracking-[0.3em]"
+        style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
+      >
+        {children}
+      </motion.p>
+      <motion.div
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
+        className="h-px w-16 origin-center"
+        style={{ background: "var(--primary)", opacity: 0.3 }}
+      />
     </div>
   );
 }
