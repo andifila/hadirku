@@ -70,6 +70,7 @@ function EditContent() {
     try {
       await updateInvitation(id, {
         template_id: values.template_id,
+        slug: values.slug.trim(),
         bride_name: values.bride_name.trim(),
         groom_name: values.groom_name.trim(),
         event_date: values.event_date,
