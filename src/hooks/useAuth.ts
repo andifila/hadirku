@@ -18,9 +18,13 @@ export function useAuth(): AuthState & { signOut: () => Promise<void> } {
   });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setState({ user: session?.user ?? null, session, loading: false });
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setState({ user: session?.user ?? null, session, loading: false });
+      })
+      .catch(() => {
+        setState({ user: null, session: null, loading: false });
+      });
 
     const {
       data: { subscription },
