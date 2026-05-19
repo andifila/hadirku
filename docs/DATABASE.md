@@ -66,11 +66,15 @@ Data undangan milik user.
 | `template_id` | uuid (FK → templates) | Tema yang dipilih |
 | `slug` | text (unique) | URL path undangan |
 | `bride_name` | text | Nama mempelai wanita |
+| `bride_title` | text | Gelar mempelai wanita (cth. S.E.) |
 | `bride_father_name` | text | Nama ayah mempelai wanita |
 | `bride_mother_name` | text | Nama ibu mempelai wanita |
+| `bride_instagram` | text | Instagram handle mempelai wanita |
 | `groom_name` | text | Nama mempelai pria |
+| `groom_title` | text | Gelar mempelai pria (cth. S.T.) |
 | `groom_father_name` | text | Nama ayah mempelai pria |
 | `groom_mother_name` | text | Nama ibu mempelai pria |
+| `groom_instagram` | text | Instagram handle mempelai pria |
 | `event_date` | date | Tanggal resepsi |
 | `event_time` | time | Jam resepsi |
 | `venue_name` | text | Nama gedung/tempat resepsi |
@@ -86,7 +90,9 @@ Data undangan milik user.
 | `gallery_url_3` | text | URL foto galeri 3 (Supabase Storage `covers`) |
 | `music_url` | text | URL musik background (Supabase Storage `music`) |
 | `custom_message` | text | Kutipan/pesan kustom |
-| `bank_accounts` | jsonb | Array rekening angpao: `[{bank, account_name, account_number}]` |
+| `bank_accounts` | jsonb | Array rekening angpao: `[{bank, account_name, account_number, qris_url?}]` |
+| `gift_address` | text | Alamat pengiriman hadiah fisik (opsional) |
+| `owner_whatsapp` | text | Nomor WA owner untuk konfirmasi tamu (opsional) |
 | `is_published` | boolean | Apakah undangan bisa diakses publik |
 | `created_at` | timestamptz | |
 | `updated_at` | timestamptz | Auto-update via trigger |
@@ -157,6 +163,7 @@ Setup bucket ada di [`supabase/storage-setup.sql`](../supabase/storage-setup.sql
 Jalankan di Supabase SQL Editor untuk menambah kolom yang diperlukan fitur terbaru:
 
 ```sql
+-- Batch 1 (19 Mei 2026)
 ALTER TABLE invitations
   ADD COLUMN IF NOT EXISTS bride_father_name  text,
   ADD COLUMN IF NOT EXISTS bride_mother_name  text,
@@ -171,4 +178,16 @@ ALTER TABLE invitations
   ADD COLUMN IF NOT EXISTS gallery_url_1      text,
   ADD COLUMN IF NOT EXISTS gallery_url_2      text,
   ADD COLUMN IF NOT EXISTS gallery_url_3      text;
+
+-- Batch 2 (20 Mei 2026)
+ALTER TABLE invitations
+  ADD COLUMN IF NOT EXISTS bride_title     text,
+  ADD COLUMN IF NOT EXISTS groom_title     text,
+  ADD COLUMN IF NOT EXISTS bride_instagram text,
+  ADD COLUMN IF NOT EXISTS groom_instagram text,
+  ADD COLUMN IF NOT EXISTS gift_address    text,
+  ADD COLUMN IF NOT EXISTS owner_whatsapp  text;
+
+ALTER TABLE guests
+  ADD COLUMN IF NOT EXISTS guest_count integer DEFAULT 1;
 ```

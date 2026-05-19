@@ -1,6 +1,6 @@
 export type PlanType = "free" | "premium";
 export type RsvpStatus = "pending" | "attending" | "not_attending";
-export type BankAccount = { bank: string; account_name: string; account_number: string };
+export type BankAccount = { bank: string; account_name: string; account_number: string; qris_url?: string };
 
 export type Database = {
   public: {
@@ -62,11 +62,15 @@ export type Database = {
           slug: string;
           // Mempelai
           bride_name: string;
+          bride_title: string | null;
           bride_father_name: string | null;
           bride_mother_name: string | null;
+          bride_instagram: string | null;
           groom_name: string;
+          groom_title: string | null;
           groom_father_name: string | null;
           groom_mother_name: string | null;
+          groom_instagram: string | null;
           // Resepsi (main event)
           event_date: string;
           event_time: string;
@@ -86,8 +90,11 @@ export type Database = {
           gallery_url_1: string | null;
           gallery_url_2: string | null;
           gallery_url_3: string | null;
-          // Angpao
+          // Angpao & Hadiah
           bank_accounts: BankAccount[] | null;
+          gift_address: string | null;
+          // Kontak
+          owner_whatsapp: string | null;
           // Status
           is_published: boolean;
           created_at: string;
@@ -99,11 +106,15 @@ export type Database = {
           template_id: string;
           slug: string;
           bride_name: string;
+          bride_title?: string | null;
           bride_father_name?: string | null;
           bride_mother_name?: string | null;
+          bride_instagram?: string | null;
           groom_name: string;
+          groom_title?: string | null;
           groom_father_name?: string | null;
           groom_mother_name?: string | null;
+          groom_instagram?: string | null;
           event_date: string;
           event_time: string;
           venue_name: string;
@@ -120,17 +131,23 @@ export type Database = {
           gallery_url_2?: string | null;
           gallery_url_3?: string | null;
           bank_accounts?: BankAccount[] | null;
+          gift_address?: string | null;
+          owner_whatsapp?: string | null;
           is_published?: boolean;
         };
         Update: {
           template_id?: string;
           slug?: string;
           bride_name?: string;
+          bride_title?: string | null;
           bride_father_name?: string | null;
           bride_mother_name?: string | null;
+          bride_instagram?: string | null;
           groom_name?: string;
+          groom_title?: string | null;
           groom_father_name?: string | null;
           groom_mother_name?: string | null;
+          groom_instagram?: string | null;
           event_date?: string;
           event_time?: string;
           venue_name?: string;
@@ -147,6 +164,8 @@ export type Database = {
           gallery_url_2?: string | null;
           gallery_url_3?: string | null;
           bank_accounts?: BankAccount[] | null;
+          gift_address?: string | null;
+          owner_whatsapp?: string | null;
           is_published?: boolean;
         };
         Relationships: [
@@ -174,6 +193,7 @@ export type Database = {
           phone: string | null;
           rsvp_status: RsvpStatus;
           message: string | null;
+          guest_count: number | null;
           created_at: string;
         };
         Insert: {
@@ -183,10 +203,12 @@ export type Database = {
           phone?: string | null;
           rsvp_status?: RsvpStatus;
           message?: string | null;
+          guest_count?: number | null;
         };
         Update: {
           rsvp_status?: RsvpStatus;
           message?: string | null;
+          guest_count?: number | null;
         };
         Relationships: [
           {

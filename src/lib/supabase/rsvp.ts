@@ -7,6 +7,7 @@ export type RsvpPayload = {
   phone?: string;
   rsvp_status: RsvpStatus;
   message?: string;
+  guest_count?: number;
 };
 
 export async function submitRsvp(payload: RsvpPayload): Promise<void> {
@@ -27,6 +28,7 @@ export async function submitRsvp(payload: RsvpPayload): Promise<void> {
     phone: payload.phone?.trim() || null,
     rsvp_status: payload.rsvp_status,
     message: payload.message?.trim() || null,
+    guest_count: payload.rsvp_status === "attending" ? (payload.guest_count ?? 1) : null,
   });
 
   if (error) throw error;

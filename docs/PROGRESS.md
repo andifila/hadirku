@@ -47,7 +47,11 @@
 - [x] Upload foto cover (Supabase Storage, maks 5 MB) — file lama auto-hapus
 - [x] Upload 3 foto galeri (Supabase Storage, reuse bucket `covers`)
 - [x] Upload musik background (Supabase Storage, maks 8 MB) — file lama auto-hapus
-- [x] Rekening/Angpao: tambah hingga 4 rekening (bank, nama, nomor) dengan dropdown bank umum
+- [x] Rekening/Angpao: tambah hingga 4 rekening (bank, nama, nomor) dengan dropdown bank umum + upload QRIS per rekening
+- [x] Alamat pengiriman hadiah fisik
+- [x] Nomor WhatsApp owner untuk konfirmasi tamu
+- [x] Gelar/credentials per mempelai (cth. S.E., M.Kom.)
+- [x] Instagram handle per mempelai
 - [x] Slug kustom dengan validasi reserved words
 - [x] Slug tersimpan dengan benar saat edit
 - [x] Toggle publish / draft
@@ -64,8 +68,12 @@
 - [x] Seksi Resepsi + dresscode badge + Google Maps embed + tombol Buka Maps
 - [x] Countdown real-time menuju hari H — fallback "Alhamdulillah, acara telah berlangsung" jika sudah lewat
 - [x] Galeri foto (grid, conditional — hanya tampil jika minimal 1 foto galeri diisi)
-- [x] RSVP form — validasi nomor telepon 9–15 digit, dedup server-side
-- [x] Hadiah & Angpao — kartu rekening per bank dengan tombol salin nomor (clipboard + fallback)
+- [x] RSVP form — validasi nomor telepon 9–15 digit, dedup server-side, input jumlah tamu (stepper)
+- [x] Hadiah & Angpao — kartu rekening per bank dengan tombol salin nomor + toggle QRIS image
+- [x] Hadiah fisik — alamat pengiriman (conditional)
+- [x] Konfirmasi via WhatsApp — tombol langsung ke nomor owner (conditional) di form RSVP & setelah submit
+- [x] Add to Calendar — Google Calendar link + iCal download per acara (Akad & Resepsi)
+- [x] Instagram links per mempelai di hero & footer
 - [x] Ucapan & Doa dari tamu
 - [x] Musik background (auto-play saat amplop dibuka, toggle play/pause)
 - [x] WhatsApp share

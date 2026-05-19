@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Image, Music, Upload, X, CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Image, Music, Upload, X, CheckCircle2, Plus, Trash2, QrCode } from "lucide-react";
 import {
   getTemplates,
   generateSlug,
@@ -35,11 +35,15 @@ export type FormValues = {
   template_id: string;
   // Mempelai
   bride_name: string;
+  bride_title: string;
   bride_father_name: string;
   bride_mother_name: string;
+  bride_instagram: string;
   groom_name: string;
+  groom_title: string;
   groom_father_name: string;
   groom_mother_name: string;
+  groom_instagram: string;
   // Resepsi
   event_date: string;
   event_time: string;
@@ -59,8 +63,11 @@ export type FormValues = {
   gallery_url_1: string;
   gallery_url_2: string;
   gallery_url_3: string;
-  // Angpao
+  // Angpao & Hadiah
   bank_accounts: BankAccount[];
+  gift_address: string;
+  // Kontak
+  owner_whatsapp: string;
   // Pengaturan
   slug: string;
   is_published: boolean;
@@ -77,31 +84,37 @@ type Props = {
 export default function InvitationForm({ initial, submitting, error, onSubmit, submitLabel }: Props) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [values, setValues] = useState<FormValues>({
-    template_id:      initial?.template_id      ?? "",
-    bride_name:       initial?.bride_name        ?? "",
-    bride_father_name: initial?.bride_father_name ?? "",
-    bride_mother_name: initial?.bride_mother_name ?? "",
-    groom_name:       initial?.groom_name        ?? "",
-    groom_father_name: initial?.groom_father_name ?? "",
-    groom_mother_name: initial?.groom_mother_name ?? "",
-    event_date:       initial?.event_date        ?? "",
-    event_time:       initial?.event_time        ?? "10:00",
-    venue_name:       initial?.venue_name        ?? "",
-    venue_address:    initial?.venue_address     ?? "",
-    akad_date:        initial?.akad_date         ?? "",
-    akad_time:        initial?.akad_time         ?? "08:00",
-    akad_venue_name:  initial?.akad_venue_name   ?? "",
-    akad_venue_address: initial?.akad_venue_address ?? "",
-    dresscode:        initial?.dresscode         ?? "",
-    custom_message:   initial?.custom_message    ?? "",
-    cover_image_url:  initial?.cover_image_url   ?? "",
-    music_url:        initial?.music_url         ?? "",
-    gallery_url_1:    initial?.gallery_url_1     ?? "",
-    gallery_url_2:    initial?.gallery_url_2     ?? "",
-    gallery_url_3:    initial?.gallery_url_3     ?? "",
-    bank_accounts:    initial?.bank_accounts     ?? [],
-    slug:             initial?.slug              ?? "",
-    is_published:     initial?.is_published      ?? false,
+    template_id:        initial?.template_id        ?? "",
+    bride_name:         initial?.bride_name          ?? "",
+    bride_title:        initial?.bride_title         ?? "",
+    bride_father_name:  initial?.bride_father_name   ?? "",
+    bride_mother_name:  initial?.bride_mother_name   ?? "",
+    bride_instagram:    initial?.bride_instagram     ?? "",
+    groom_name:         initial?.groom_name          ?? "",
+    groom_title:        initial?.groom_title         ?? "",
+    groom_father_name:  initial?.groom_father_name   ?? "",
+    groom_mother_name:  initial?.groom_mother_name   ?? "",
+    groom_instagram:    initial?.groom_instagram     ?? "",
+    event_date:         initial?.event_date          ?? "",
+    event_time:         initial?.event_time          ?? "10:00",
+    venue_name:         initial?.venue_name          ?? "",
+    venue_address:      initial?.venue_address       ?? "",
+    akad_date:          initial?.akad_date           ?? "",
+    akad_time:          initial?.akad_time           ?? "08:00",
+    akad_venue_name:    initial?.akad_venue_name     ?? "",
+    akad_venue_address: initial?.akad_venue_address  ?? "",
+    dresscode:          initial?.dresscode           ?? "",
+    custom_message:     initial?.custom_message      ?? "",
+    cover_image_url:    initial?.cover_image_url     ?? "",
+    music_url:          initial?.music_url           ?? "",
+    gallery_url_1:      initial?.gallery_url_1       ?? "",
+    gallery_url_2:      initial?.gallery_url_2       ?? "",
+    gallery_url_3:      initial?.gallery_url_3       ?? "",
+    bank_accounts:      initial?.bank_accounts       ?? [],
+    gift_address:       initial?.gift_address        ?? "",
+    owner_whatsapp:     initial?.owner_whatsapp      ?? "",
+    slug:               initial?.slug                ?? "",
+    is_published:       initial?.is_published        ?? false,
   });
   const [slugManual, setSlugManual] = useState(!!initial?.slug);
   const [showAkad, setShowAkad] = useState(!!initial?.akad_date);
@@ -129,7 +142,6 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
 
   function toggleAkad() {
     if (showAkad) {
-      // Clear akad fields when toggled off
       setValues((v) => ({ ...v, akad_date: "", akad_time: "08:00", akad_venue_name: "", akad_venue_address: "" }));
     }
     setShowAkad((s) => !s);
@@ -143,9 +155,15 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     set("bank_accounts", values.bank_accounts.filter((_, idx) => idx !== i));
   }
 
-  function updateBank(i: number, key: keyof BankAccount, val: string) {
+  function updateBank(i: number, key: keyof Omit<BankAccount, "qris_url">, val: string) {
     set("bank_accounts", values.bank_accounts.map((acc, idx) =>
       idx === i ? { ...acc, [key]: val } : acc
+    ));
+  }
+
+  function updateBankQris(i: number, url: string) {
+    set("bank_accounts", values.bank_accounts.map((acc, idx) =>
+      idx === i ? { ...acc, qris_url: url || undefined } : acc
     ));
   }
 
@@ -217,6 +235,17 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Gelar Mempelai Wanita">
+          <input type="text" value={values.bride_title} onChange={(e) => set("bride_title", e.target.value)}
+            placeholder="cth. S.E., M.M." />
+        </Field>
+        <Field label="Gelar Mempelai Pria">
+          <input type="text" value={values.groom_title} onChange={(e) => set("groom_title", e.target.value)}
+            placeholder="cth. S.T., M.Kom." />
+        </Field>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Ayah Mempelai Wanita">
           <input type="text" value={values.bride_father_name} onChange={(e) => set("bride_father_name", e.target.value)}
             placeholder="cth. Bapak Hendra" />
@@ -235,6 +264,17 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
         <Field label="Ibu Mempelai Pria">
           <input type="text" value={values.groom_mother_name} onChange={(e) => set("groom_mother_name", e.target.value)}
             placeholder="cth. Ibu Wati" />
+        </Field>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Instagram Mempelai Wanita">
+          <input type="text" value={values.bride_instagram} onChange={(e) => set("bride_instagram", e.target.value)}
+            placeholder="cth. @gabrielatri (opsional)" />
+        </Field>
+        <Field label="Instagram Mempelai Pria">
+          <input type="text" value={values.groom_instagram} onChange={(e) => set("groom_instagram", e.target.value)}
+            placeholder="cth. @rosandifl (opsional)" />
         </Field>
       </div>
 
@@ -432,6 +472,27 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                 />
               </div>
             </div>
+
+            {/* QRIS upload */}
+            <div className="flex items-center gap-3">
+              <QrCode className="h-4 w-4 flex-shrink-0" style={{ color: "var(--muted-foreground)" }} />
+              <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>QRIS (opsional)</p>
+              <div className="h-14 w-14 flex-shrink-0">
+                <FileUploadField
+                  label="QRIS"
+                  icon={<QrCode className="h-3.5 w-3.5" />}
+                  accept={COVER_ACCEPT}
+                  maxBytes={COVER_MAX_BYTES}
+                  currentUrl={acc.qris_url ?? ""}
+                  hint=""
+                  bucket="covers"
+                  upload={uploadGallery}
+                  onUploaded={(url) => updateBankQris(i, url)}
+                  onClear={() => updateBankQris(i, "")}
+                  compact
+                />
+              </div>
+            </div>
           </div>
         ))}
 
@@ -452,6 +513,23 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
           </p>
         )}
       </div>
+
+      <Field label="Alamat Pengiriman Hadiah (opsional)">
+        <textarea value={values.gift_address} onChange={(e) => set("gift_address", e.target.value)}
+          placeholder="cth. Jl. Merpati No.10, Kebayoran Baru, Jakarta Selatan 12345"
+          rows={2} className="resize-none" />
+      </Field>
+
+      {/* ── Kontak ───────────────────────────────────────────── */}
+      <FormSection title="Kontak" />
+
+      <Field label="Nomor WhatsApp Owner (untuk konfirmasi tamu)">
+        <input type="tel" value={values.owner_whatsapp} onChange={(e) => set("owner_whatsapp", e.target.value)}
+          placeholder="cth. 081234567890" />
+        <p className="mt-1 text-xs" style={{ color: "var(--muted-foreground)" }}>
+          Tamu bisa konfirmasi langsung ke nomor ini setelah mengisi RSVP.
+        </p>
+      </Field>
 
       {/* ── Pengaturan ───────────────────────────────────────── */}
       <FormSection title="Pengaturan" />
@@ -597,7 +675,7 @@ function FileUploadField({
                 ? <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--primary)" }} />
                 : <Upload className="h-4 w-4" style={{ color: "var(--muted-foreground)" }} />
               }
-              <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>Foto {label.split(" ")[1]}</span>
+              <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>{label}</span>
             </div>
           )}
         </div>

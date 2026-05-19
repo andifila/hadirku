@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Calendar, Clock, Heart, Loader2, CheckCircle,
   Phone, MessageSquare, User, Music, Music2, Mail, Shirt,
-  CreditCard, Copy, Check,
+  CreditCard, Copy, Check, CalendarPlus, QrCode, Users, Package,
 } from "lucide-react";
 import {
   getInvitationBySlug,
@@ -18,7 +18,25 @@ import {
 import { submitRsvp } from "@/lib/supabase/rsvp";
 import { cn } from "@/lib/utils";
 
-// ─── WhatsApp ─────────────────────────────────────────────────────────────────
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
+function WhatsAppIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+    </svg>
+  );
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function generateWhatsAppLink(guestName: string, invitationUrl: string): string {
   const name = guestName || "Tamu Undangan";
@@ -26,21 +44,53 @@ function generateWhatsAppLink(guestName: string, invitationUrl: string): string 
   return `https://wa.me/?text=${encodeURIComponent(msg)}`;
 }
 
-function WhatsAppIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-  );
+function igHandle(raw: string): string {
+  return raw.replace(/^@/, "");
+}
+
+function makeGoogleCalUrl(title: string, date: string, time: string, venueName: string, venueAddress: string): string {
+  const [y, mo, d] = date.split("-");
+  const [h, m] = time.split(":");
+  const start = `${y}${mo}${d}T${h}${m}00`;
+  const endH = String((parseInt(h) + 2) % 24).padStart(2, "0");
+  const end = `${y}${mo}${d}T${endH}${m}00`;
+  const loc = encodeURIComponent(`${venueName} ${venueAddress}`);
+  const txt = encodeURIComponent(title);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${txt}&dates=${start}/${end}&location=${loc}`;
+}
+
+function downloadIcal(title: string, date: string, time: string, venueName: string, venueAddress: string) {
+  const [y, mo, d] = date.split("-");
+  const [h, m] = time.split(":");
+  const startDt = `${y}${mo}${d}T${h}${m}00`;
+  const endH = String((parseInt(h) + 2) % 24).padStart(2, "0");
+  const endDt = `${y}${mo}${d}T${endH}${m}00`;
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Wedding Invite//EN",
+    "BEGIN:VEVENT",
+    `DTSTART;TZID=Asia/Jakarta:${startDt}`,
+    `DTEND;TZID=Asia/Jakarta:${endDt}`,
+    `SUMMARY:${title}`,
+    `LOCATION:${venueName} ${venueAddress}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+  const blob = new Blob([ics], { type: "text/calendar" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${title.replace(/\s+/g, "-").toLowerCase()}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export default function InvitePage() {
   return (
-    <Suspense
-      fallback={<EnvelopeSkeleton />}
-    >
+    <Suspense fallback={<EnvelopeSkeleton />}>
       <InviteContent />
     </Suspense>
   );
@@ -110,10 +160,7 @@ function InviteContent() {
 
   if (notFound || !invite) {
     return (
-      <div
-        className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center"
-        style={{ background: "var(--muted)" }}
-      >
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4 text-center" style={{ background: "var(--muted)" }}>
         <p className="text-lg" style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}>
           Undangan tidak ditemukan
         </p>
@@ -127,10 +174,7 @@ function InviteContent() {
   return (
     <>
       {isPreview && (
-        <div
-          className="fixed left-0 right-0 top-0 z-[70] px-4 py-2 text-center text-xs font-medium"
-          style={{ background: "#fef3c7", color: "#92400e", fontFamily: "var(--font-inter)" }}
-        >
+        <div className="fixed left-0 right-0 top-0 z-[70] px-4 py-2 text-center text-xs font-medium" style={{ background: "#fef3c7", color: "#92400e", fontFamily: "var(--font-inter)" }}>
           Mode Preview — undangan belum dipublikasikan
         </div>
       )}
@@ -175,13 +219,7 @@ const TEMPLATE_THEMES: Record<string, { primary: string; muted: string; border: 
 
 // ─── Envelope Cover ───────────────────────────────────────────────────────────
 
-function EnvelopeCover({
-  invite, guestName, onOpen,
-}: {
-  invite: PublicInvitation;
-  guestName: string;
-  onOpen: () => void;
-}) {
+function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation; guestName: string; onOpen: () => void }) {
   const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
   const inviteUrl = typeof window !== "undefined" ? window.location.href : "";
   const displayName = guestName ? `Bapak/Ibu ${guestName}` : "Tamu Undangan";
@@ -258,13 +296,7 @@ function EnvelopeCover({
         <button
           onClick={onOpen}
           className="flex w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-xl active:scale-[0.98]"
-          style={{
-            background: theme.primary,
-            color: "#fff",
-            fontFamily: "var(--font-inter)",
-            minHeight: 56,
-            boxShadow: `0 8px 32px -8px ${theme.primary}88`,
-          }}
+          style={{ background: theme.primary, color: "#fff", fontFamily: "var(--font-inter)", minHeight: 56, boxShadow: `0 8px 32px -8px ${theme.primary}88` }}
         >
           <Mail className="h-5 w-5" />
           Buka Undangan
@@ -292,9 +324,7 @@ function EnvelopeCover({
 
 // ─── Invitation View ──────────────────────────────────────────────────────────
 
-function InvitationView({
-  invite, guestName, messages, onRsvpSuccess, autoPlay,
-}: {
+function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }: {
   invite: PublicInvitation;
   guestName: string;
   messages: GuestMessage[];
@@ -343,7 +373,6 @@ function InvitationView({
   const galleryUrls = [invite.gallery_url_1, invite.gallery_url_2, invite.gallery_url_3].filter(Boolean) as string[];
   const bankAccounts = invite.bank_accounts ?? [];
 
-  // Akad info
   const hasAkad = !!invite.akad_date;
   let akadDay = "", akadDayName = "", akadMonth = "", akadYear = "", akadTime = "";
   if (hasAkad) {
@@ -354,6 +383,9 @@ function InvitationView({
     akadYear = String(akadDate.getFullYear());
     akadTime = invite.akad_time ? formatTime(invite.akad_time) : "";
   }
+
+  const hasBrideIg = !!invite.bride_instagram;
+  const hasGroomIg = !!invite.groom_instagram;
 
   return (
     <main
@@ -424,12 +456,28 @@ function InvitationView({
             <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
               {invite.bride_name}
             </h1>
+            {invite.bride_title && (
+              <p className="mt-1 text-sm font-medium" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
+                {invite.bride_title}
+              </p>
+            )}
             {(invite.bride_father_name || invite.bride_mother_name) && (
-              <p className="mt-1.5 text-xs" style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              <p className="mt-1 text-xs" style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Putri dari {invite.bride_father_name && `Bp. ${invite.bride_father_name}`}
                 {invite.bride_father_name && invite.bride_mother_name && " & "}
                 {invite.bride_mother_name && `Ibu ${invite.bride_mother_name}`}
               </p>
+            )}
+            {hasBrideIg && (
+              <a
+                href={`https://instagram.com/${igHandle(invite.bride_instagram!)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="mt-2 flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70"
+                style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}
+              >
+                <InstagramIcon className="h-3.5 w-3.5" />
+                @{igHandle(invite.bride_instagram!)}
+              </a>
             )}
           </motion.div>
 
@@ -442,12 +490,28 @@ function InvitationView({
             <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
               {invite.groom_name}
             </h1>
+            {invite.groom_title && (
+              <p className="mt-1 text-sm font-medium" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
+                {invite.groom_title}
+              </p>
+            )}
             {(invite.groom_father_name || invite.groom_mother_name) && (
-              <p className="mt-1.5 text-xs" style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              <p className="mt-1 text-xs" style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Putra dari {invite.groom_father_name && `Bp. ${invite.groom_father_name}`}
                 {invite.groom_father_name && invite.groom_mother_name && " & "}
                 {invite.groom_mother_name && `Ibu ${invite.groom_mother_name}`}
               </p>
+            )}
+            {hasGroomIg && (
+              <a
+                href={`https://instagram.com/${igHandle(invite.groom_instagram!)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="mt-2 flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70"
+                style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}
+              >
+                <InstagramIcon className="h-3.5 w-3.5" />
+                @{igHandle(invite.groom_instagram!)}
+              </a>
             )}
           </motion.div>
 
@@ -495,7 +559,7 @@ function InvitationView({
             <div className="mx-auto max-w-xl">
               <SectionTitle>Akad Nikah</SectionTitle>
               <div className="mt-8 flex flex-col gap-4">
-                <DetailRow icon={<Calendar className="h-5 w-5" style={{ color: "var(--primary)" }} />} label="Hari &amp; Tanggal" value={`${akadDayName}, ${akadDay} ${akadMonth} ${akadYear}`} />
+                <DetailRow icon={<Calendar className="h-5 w-5" style={{ color: "var(--primary)" }} />} label="Hari & Tanggal" value={`${akadDayName}, ${akadDay} ${akadMonth} ${akadYear}`} />
                 {akadTime && <DetailRow icon={<Clock className="h-5 w-5" style={{ color: "var(--primary)" }} />} label="Waktu" value={akadTime} />}
                 <div className="flex gap-4 rounded-xl p-4" style={{ background: "var(--muted)", border: "1px solid var(--border)" }}>
                   <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: "var(--primary)" }} />
@@ -524,6 +588,15 @@ function InvitationView({
                   <MapPin className="h-4 w-4" />
                   Buka Google Maps — Akad
                 </a>
+                {invite.akad_date && invite.akad_time && (
+                  <CalendarButtons
+                    title={`Akad Nikah ${invite.bride_name} & ${invite.groom_name}`}
+                    date={invite.akad_date}
+                    time={invite.akad_time}
+                    venueName={invite.akad_venue_name ?? ""}
+                    venueAddress={invite.akad_venue_address ?? ""}
+                  />
+                )}
               </div>
             </div>
           </section>
@@ -536,7 +609,7 @@ function InvitationView({
           <div className="mx-auto max-w-xl">
             <SectionTitle>{hasAkad ? "Resepsi" : "Waktu & Tempat"}</SectionTitle>
             <div className="mt-8 flex flex-col gap-4">
-              <DetailRow icon={<Calendar className="h-5 w-5" style={{ color: "var(--primary)" }} />} label="Hari &amp; Tanggal" value={`${dayName}, ${day} ${month} ${year}`} />
+              <DetailRow icon={<Calendar className="h-5 w-5" style={{ color: "var(--primary)" }} />} label="Hari & Tanggal" value={`${dayName}, ${day} ${month} ${year}`} />
               <DetailRow icon={<Clock className="h-5 w-5" style={{ color: "var(--primary)" }} />} label="Waktu" value={formatTime(invite.event_time)} />
               <div className="flex gap-4 rounded-xl p-4 transition-shadow hover:shadow-md" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
                 <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: "var(--primary)" }} />
@@ -547,7 +620,6 @@ function InvitationView({
                 </div>
               </div>
 
-              {/* Dresscode badge */}
               {invite.dresscode && (
                 <div className="flex items-center gap-2 rounded-xl px-4 py-3" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
                   <Shirt className="h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
@@ -573,6 +645,13 @@ function InvitationView({
                 <MapPin className="h-4 w-4" />
                 Buka Google Maps
               </a>
+              <CalendarButtons
+                title={`Resepsi Pernikahan ${invite.bride_name} & ${invite.groom_name}`}
+                date={invite.event_date}
+                time={invite.event_time}
+                venueName={invite.venue_name}
+                venueAddress={invite.venue_address}
+              />
             </div>
           </div>
         </section>
@@ -649,7 +728,7 @@ function InvitationView({
       </FadeSection>
 
       {/* ── Hadiah & Angpao ──────────────────────────────────── */}
-      {bankAccounts.length > 0 && (
+      {(bankAccounts.length > 0 || invite.gift_address) && (
         <FadeSection>
           <section className="px-6 py-16" style={{ background: "var(--muted)" }}>
             <div className="mx-auto max-w-xl">
@@ -657,11 +736,30 @@ function InvitationView({
               <p className="mt-3 text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Tanpa mengurangi rasa hormat, bagi yang ingin memberikan hadiah, dapat melalui:
               </p>
-              <div className="mt-6 flex flex-col gap-3">
-                {bankAccounts.map((acc, i) => (
-                  <BankCard key={i} bank={acc.bank} accountName={acc.account_name} accountNumber={acc.account_number} />
-                ))}
-              </div>
+
+              {bankAccounts.length > 0 && (
+                <div className="mt-6 flex flex-col gap-3">
+                  {bankAccounts.map((acc, i) => (
+                    <BankCard
+                      key={i}
+                      bank={acc.bank}
+                      accountName={acc.account_name}
+                      accountNumber={acc.account_number}
+                      qrisUrl={acc.qris_url}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {invite.gift_address && (
+                <div className="mt-4 flex gap-3 rounded-xl p-4" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
+                  <Package className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: "var(--primary)" }} />
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Alamat Pengiriman Hadiah</p>
+                    <p className="mt-1 text-sm leading-relaxed" style={{ fontFamily: "var(--font-inter)" }}>{invite.gift_address}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         </FadeSection>
@@ -670,7 +768,7 @@ function InvitationView({
       {/* ── RSVP ─────────────────────────────────────────────── */}
       <FadeSection>
         <RsvpSection
-          invitationId={invite.id}
+          invite={invite}
           guestName={guestName}
           inviteUrl={typeof window !== "undefined" ? window.location.href : ""}
           onSuccess={onRsvpSuccess}
@@ -718,6 +816,34 @@ function InvitationView({
         <p className="mt-2 text-xs uppercase tracking-widest" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
           {day} {month} {year}
         </p>
+
+        {(hasBrideIg || hasGroomIg) && (
+          <div className="mt-5 flex items-center justify-center gap-3">
+            {hasBrideIg && (
+              <a
+                href={`https://instagram.com/${igHandle(invite.bride_instagram!)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-all hover:opacity-70"
+                style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
+              >
+                <InstagramIcon className="h-3.5 w-3.5" style={{ color: "var(--primary)" } as React.CSSProperties} />
+                @{igHandle(invite.bride_instagram!)}
+              </a>
+            )}
+            {hasGroomIg && (
+              <a
+                href={`https://instagram.com/${igHandle(invite.groom_instagram!)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-all hover:opacity-70"
+                style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
+              >
+                <InstagramIcon className="h-3.5 w-3.5" style={{ color: "var(--primary)" } as React.CSSProperties} />
+                @{igHandle(invite.groom_instagram!)}
+              </a>
+            )}
+          </div>
+        )}
+
         <div className="mx-auto mt-6 h-px w-16" style={{ background: "var(--border)" }} />
         <p className="mt-4 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
           Dibuat dengan ❤️ menggunakan Wedding Invite
@@ -727,17 +853,48 @@ function InvitationView({
   );
 }
 
+// ─── Calendar Buttons ─────────────────────────────────────────────────────────
+
+function CalendarButtons({ title, date, time, venueName, venueAddress }: {
+  title: string; date: string; time: string; venueName: string; venueAddress: string;
+}) {
+  return (
+    <div className="flex gap-2">
+      <a
+        href={makeGoogleCalUrl(title, date, time, venueName, venueAddress)}
+        target="_blank" rel="noopener noreferrer"
+        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium transition-all hover:opacity-80"
+        style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
+      >
+        <CalendarPlus className="h-3.5 w-3.5" style={{ color: "var(--primary)" }} />
+        Google Calendar
+      </a>
+      <button
+        type="button"
+        onClick={() => downloadIcal(title, date, time, venueName, venueAddress)}
+        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium transition-all hover:opacity-80"
+        style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
+      >
+        <CalendarPlus className="h-3.5 w-3.5" style={{ color: "var(--primary)" }} />
+        iCal / Kalender
+      </button>
+    </div>
+  );
+}
+
 // ─── Bank Card ────────────────────────────────────────────────────────────────
 
-function BankCard({ bank, accountName, accountNumber }: { bank: string; accountName: string; accountNumber: string }) {
+function BankCard({ bank, accountName, accountNumber, qrisUrl }: {
+  bank: string; accountName: string; accountNumber: string; qrisUrl?: string;
+}) {
   const [copied, setCopied] = useState(false);
+  const [showQris, setShowQris] = useState(false);
 
   function handleCopy() {
     navigator.clipboard.writeText(accountNumber).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => {
-      // fallback
       const el = document.createElement("textarea");
       el.value = accountNumber;
       document.body.appendChild(el);
@@ -750,23 +907,45 @@ function BankCard({ bank, accountName, accountNumber }: { bank: string; accountN
   }
 
   return (
-    <div className="flex items-center gap-4 rounded-xl p-4" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--muted)" }}>
-        <CreditCard className="h-5 w-5" style={{ color: "var(--primary)" }} />
+    <div className="overflow-hidden rounded-xl" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
+      <div className="flex items-center gap-4 p-4">
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--muted)" }}>
+          <CreditCard className="h-5 w-5" style={{ color: "var(--primary)" }} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>{bank}</p>
+          <p className="text-lg font-bold tracking-widest" style={{ fontFamily: "var(--font-inter)" }}>{accountNumber}</p>
+          <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{accountName}</p>
+        </div>
+        <div className="flex flex-shrink-0 items-center gap-2">
+          {qrisUrl && (
+            <button
+              onClick={() => setShowQris(!showQris)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg transition-all hover:opacity-70 active:scale-95"
+              style={{ background: showQris ? "var(--primary)" : "var(--muted)", color: showQris ? "#fff" : "var(--primary)" }}
+              aria-label="Lihat QRIS"
+            >
+              <QrCode className="h-4 w-4" />
+            </button>
+          )}
+          <button
+            onClick={handleCopy}
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-all hover:opacity-70 active:scale-95"
+            style={{ background: "var(--muted)", color: copied ? "#16a34a" : "var(--muted-foreground)" }}
+            aria-label="Salin nomor rekening"
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>{bank}</p>
-        <p className="text-lg font-bold tracking-widest" style={{ fontFamily: "var(--font-inter)" }}>{accountNumber}</p>
-        <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{accountName}</p>
-      </div>
-      <button
-        onClick={handleCopy}
-        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-all hover:opacity-70 active:scale-95"
-        style={{ background: "var(--muted)", color: copied ? "#16a34a" : "var(--muted-foreground)" }}
-        aria-label="Salin nomor rekening"
-      >
-        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      </button>
+      {qrisUrl && showQris && (
+        <div className="border-t px-6 pb-6 pt-4" style={{ borderColor: "var(--border)" }}>
+          <img src={qrisUrl} alt="QRIS" className="mx-auto max-h-64 w-auto rounded-xl object-contain" />
+          <p className="mt-2 text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+            Scan QRIS untuk transfer
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -775,13 +954,14 @@ function BankCard({ bank, accountName, accountNumber }: { bank: string; accountN
 
 type RsvpState = "idle" | "submitting" | "done" | "error" | "already_submitted";
 
-function RsvpSection({ invitationId, guestName, inviteUrl, onSuccess }: {
-  invitationId: string; guestName: string; inviteUrl: string; onSuccess: () => void;
+function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
+  invite: PublicInvitation; guestName: string; inviteUrl: string; onSuccess: () => void;
 }) {
-  const storageKey = `rsvp_${invitationId}`;
+  const storageKey = `rsvp_${invite.id}`;
   const [name, setName] = useState(guestName);
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"attending" | "not_attending">("attending");
+  const [guestCount, setGuestCount] = useState(1);
   const [message, setMessage] = useState("");
   const [state, setState] = useState<RsvpState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -805,7 +985,14 @@ function RsvpSection({ invitationId, guestName, inviteUrl, onSuccess }: {
     setState("submitting");
     setErrorMsg("");
     try {
-      await submitRsvp({ invitation_id: invitationId, name, phone, rsvp_status: status, message });
+      await submitRsvp({
+        invitation_id: invite.id,
+        name,
+        phone,
+        rsvp_status: status,
+        message,
+        guest_count: status === "attending" ? guestCount : undefined,
+      });
       try { localStorage.setItem(storageKey, "1"); } catch { /* private mode */ }
       setState("done");
       onSuccess();
@@ -819,6 +1006,7 @@ function RsvpSection({ invitationId, guestName, inviteUrl, onSuccess }: {
     }
   }
 
+  const ownerWa = invite.owner_whatsapp?.replace(/\D/g, "");
   const isDone = state === "done" || state === "already_submitted";
 
   return (
@@ -841,18 +1029,31 @@ function RsvpSection({ invitationId, guestName, inviteUrl, onSuccess }: {
                   {state === "already_submitted"
                     ? "Anda sebelumnya telah mengisi konfirmasi kehadiran."
                     : status === "attending"
-                      ? "Terima kasih, konfirmasi berhasil! Kami menantikan kehadiran Anda 🎉"
+                      ? `Terima kasih! Kami menantikan kehadiran Anda${guestCount > 1 ? ` bersama ${guestCount} orang` : ""}. 🎉`
                       : "Terima kasih, konfirmasi berhasil!"}
                 </p>
               </div>
-              {inviteUrl && (
-                <a href={generateWhatsAppLink(guestName, inviteUrl)} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
-                  style={{ background: "#25D366", color: "#fff", fontFamily: "var(--font-inter)" }}>
-                  <WhatsAppIcon className="h-4 w-4" />
-                  Bagikan via WhatsApp
-                </a>
-              )}
+              <div className="flex flex-col items-center gap-3">
+                {ownerWa && state === "done" && (
+                  <a
+                    href={`https://wa.me/${ownerWa}?text=${encodeURIComponent(`Halo, saya ${name}. Saya ingin mengkonfirmasi ${status === "attending" ? `kehadiran saya (${guestCount} orang) 🎉` : "bahwa saya tidak bisa hadir"} pada acara pernikahan Anda. Terima kasih!`)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: "#25D366", color: "#fff", fontFamily: "var(--font-inter)" }}
+                  >
+                    <WhatsAppIcon className="h-4 w-4" />
+                    Konfirmasi via WhatsApp
+                  </a>
+                )}
+                {inviteUrl && (
+                  <a href={generateWhatsAppLink(guestName, inviteUrl)} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: "var(--muted)", color: "var(--foreground)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}>
+                    <WhatsAppIcon className="h-4 w-4" style={{ color: "#25D366" } as React.CSSProperties} />
+                    Bagikan Undangan
+                  </a>
+                )}
+              </div>
             </motion.div>
           ) : (
             <motion.form key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
@@ -881,6 +1082,29 @@ function RsvpSection({ invitationId, guestName, inviteUrl, onSuccess }: {
                   style={{ fontFamily: "var(--font-inter)" }} />
               </FormField>
 
+              {status === "attending" && (
+                <div className="flex items-center gap-4 rounded-xl px-4 py-3.5" style={{ background: "var(--muted)", border: "1px solid var(--border)" }}>
+                  <Users className="h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
+                  <div className="flex flex-1 flex-col gap-0.5">
+                    <p className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Jumlah Tamu</p>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Berapa orang yang akan hadir?</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button type="button" onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold transition-all hover:opacity-70 active:scale-95"
+                      style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
+                      −
+                    </button>
+                    <span className="w-5 text-center text-base font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{guestCount}</span>
+                    <button type="button" onClick={() => setGuestCount(Math.min(20, guestCount + 1))}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold transition-all hover:opacity-70 active:scale-95"
+                      style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-col gap-1">
                 <FormField icon={<Phone className="h-4 w-4" />} label="No. WhatsApp (opsional)">
                   <input type="tel" value={phone}
@@ -892,7 +1116,7 @@ function RsvpSection({ invitationId, guestName, inviteUrl, onSuccess }: {
                 {phoneError && <p className="text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>{phoneError}</p>}
               </div>
 
-              <FormField icon={<MessageSquare className="h-4 w-4" />} label="Ucapan &amp; Doa (opsional)">
+              <FormField icon={<MessageSquare className="h-4 w-4" />} label="Ucapan & Doa (opsional)">
                 <textarea value={message} onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tulis ucapan atau doa untuk pasangan..."
                   rows={3} className="w-full resize-none bg-transparent py-0.5 text-sm outline-none placeholder:opacity-50"
@@ -913,6 +1137,18 @@ function RsvpSection({ invitationId, guestName, inviteUrl, onSuccess }: {
               >
                 {state === "submitting" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Kirim Konfirmasi"}
               </button>
+
+              {ownerWa && (
+                <a
+                  href={`https://wa.me/${ownerWa}?text=${encodeURIComponent(`Halo, saya ${name || "..."} ingin mengkonfirmasi kehadiran pada acara pernikahan Anda. 🙏`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
+                  style={{ background: "#25D366", color: "#fff", fontFamily: "var(--font-inter)" }}
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                  Konfirmasi via WhatsApp
+                </a>
+              )}
             </motion.form>
           )}
         </AnimatePresence>
