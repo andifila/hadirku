@@ -28,13 +28,6 @@ const RSVP = {
   pending:       { label: "Belum",       color: "#d97706", bg: "#fffbeb" },
 } as const;
 
-const NAV = [
-  { icon: LayoutDashboard, label: "Dashboard",  href: "/dashboard", active: true  },
-  { icon: FileText,        label: "Undangan",   href: "/dashboard", active: false },
-  { icon: Users,           label: "Tamu",       href: "/dashboard", active: false },
-  { icon: BarChart3,       label: "Statistik",  href: "/dashboard", active: false },
-  { icon: Settings,        label: "Pengaturan", href: "/dashboard", active: false },
-];
 
 // ─── Sidebar ───────────────────────────────────────────────────────────────────
 
@@ -42,11 +35,21 @@ function Sidebar({
   userEmail,
   onSignOut,
   onClose,
+  invitationId,
 }: {
   userEmail: string;
   onSignOut: () => void;
   onClose?: () => void;
+  invitationId?: string | null;
 }) {
+  const navItems = [
+    { icon: LayoutDashboard, label: "Dashboard",  href: "/dashboard",                                              active: true  },
+    { icon: FileText,        label: "Undangan",   href: invitationId ? `/dashboard/edit?id=${invitationId}` : "/dashboard/new", active: false },
+    { icon: Users,           label: "Tamu",       href: "/dashboard",                                              active: false },
+    { icon: BarChart3,       label: "Statistik",  href: "/dashboard",                                              active: false },
+    { icon: Settings,        label: "Pengaturan", href: "/dashboard",                                              active: false },
+  ];
+
   return (
     <aside
       className="flex h-full w-60 flex-col"
@@ -76,35 +79,33 @@ function Sidebar({
 
       {/* Nav */}
       <nav className="flex-1 space-y-0.5 px-3">
-        {NAV.map((item) => (
-          <Link key={item.label} href={item.href} onClick={onClose} className="block">
-            <motion.div
-              animate={{ backgroundColor: item.active ? "#f3f0eb" : "rgba(0,0,0,0)" }}
-              whileHover={{ x: 2, backgroundColor: "#f3f0eb" }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
-              style={{
-                color: item.active ? "var(--primary)" : "var(--muted-foreground)",
-                fontFamily: "var(--font-inter)",
-              }}
-            >
+        {navItems.map((item) => (
+          <MotionLink
+            key={item.label}
+            href={item.href}
+            onClick={onClose}
+            animate={{ backgroundColor: item.active ? "#f3f0eb" : "rgba(0,0,0,0)" }}
+            whileHover={{ x: 2, backgroundColor: "#f3f0eb" }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium"
+            style={{
+              color: item.active ? "var(--primary)" : "var(--muted-foreground)",
+              fontFamily: "var(--font-inter)",
+            }}
+          >
+            <span className="flex-shrink-0">
+              <item.icon className="h-4 w-4" />
+            </span>
+            <span className="flex-1">{item.label}</span>
+            {item.active && (
               <motion.span
-                animate={{ color: item.active ? "var(--primary)" : "var(--muted-foreground)" }}
-                className="flex-shrink-0"
-              >
-                <item.icon className="h-4 w-4" />
-              </motion.span>
-              <span className="flex-1">{item.label}</span>
-              {item.active && (
-                <motion.span
-                  layoutId="nav-active-dot"
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ background: "var(--primary)" }}
-                />
-              )}
-            </motion.div>
-          </Link>
+                layoutId="nav-active-dot"
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ background: "var(--primary)" }}
+              />
+            )}
+          </MotionLink>
         ))}
       </nav>
 
@@ -234,7 +235,7 @@ export default function DashboardPage() {
 
       {/* ── Desktop Sidebar ── */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} />
+        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={invitationId} />
       </div>
 
       {/* ── Mobile Sidebar Drawer ── */}
@@ -261,6 +262,7 @@ export default function DashboardPage() {
                 userEmail={user?.email ?? ""}
                 onSignOut={signOut}
                 onClose={() => setSidebarOpen(false)}
+                invitationId={invitationId}
               />
             </motion.div>
           </>
@@ -536,40 +538,6 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* RSVP stats bar */}
-                  <div
-                    className="relative grid grid-cols-3"
-                    style={{
-                      borderTop: "1px solid rgba(255,255,255,0.12)",
-                      background: "rgba(0,0,0,0.3)",
-                      backdropFilter: "blur(8px)",
-                    }}
-                  >
-                    {[
-                      { label: "Hadir",       value: attending,    color: "#86efac" },
-                      { label: "Tidak Hadir", value: notAttending, color: "#fca5a5" },
-                      { label: "Belum",       value: pending,      color: "#fde68a" },
-                    ].map((s, i) => (
-                      <div
-                        key={s.label}
-                        className="flex flex-col items-center gap-0.5 py-4"
-                        style={{ borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.1)" : undefined }}
-                      >
-                        <span
-                          className="text-2xl font-bold tabular-nums"
-                          style={{ fontFamily: "var(--font-playfair)", color: s.color }}
-                        >
-                          {s.value}
-                        </span>
-                        <span
-                          className="text-xs"
-                          style={{ color: "rgba(255,255,255,0.65)", fontFamily: "var(--font-inter)" }}
-                        >
-                          {s.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
 
                 {/* ── Quick Stats ── */}
