@@ -98,20 +98,12 @@ export default function NewInvitationPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
       >
-        <div
-          className="rounded-2xl p-6"
-          style={{
-            background: "var(--background)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          <InvitationForm
-            submitting={submitting}
-            error={error}
-            onSubmit={handleSubmit}
-            submitLabel="Buat Undangan"
-          />
-        </div>
+        <InvitationForm
+          submitting={submitting}
+          error={error}
+          onSubmit={handleSubmit}
+          submitLabel="Buat Undangan"
+        />
       </motion.main>
     </div>
   );

@@ -193,21 +193,13 @@ function EditContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: "easeOut" }}
       >
-        <div
-          className="rounded-2xl p-6"
-          style={{
-            background: "var(--background)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          <InvitationForm
-            initial={initial}
-            submitting={submitting}
-            error={error}
-            onSubmit={handleSubmit}
-            submitLabel="Simpan Perubahan"
-          />
-        </div>
+        <InvitationForm
+          initial={initial}
+          submitting={submitting}
+          error={error}
+          onSubmit={handleSubmit}
+          submitLabel="Simpan Perubahan"
+        />
       </motion.main>
     </div>
   );
