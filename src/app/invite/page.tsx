@@ -209,12 +209,12 @@ function InviteContent() {
   );
 }
 
-const TEMPLATE_THEMES: Record<string, { primary: string; muted: string; border: string }> = {
-  "garden-bloom":   { primary: "#4a7c59", muted: "#e8f4e8", border: "#c5dfc5" },
-  "rustic-gold":    { primary: "#b08d57", muted: "#f3f0eb", border: "#e8e2d9" },
-  "modern-minimal": { primary: "#1a1a1a", muted: "#f5f5f5", border: "#e0e0e0" },
-  "royal-elegance": { primary: "#6b35a3", muted: "#f5f0fa", border: "#d4b8f0" },
-  "floral-dream":   { primary: "#c06080", muted: "#fdf0f5", border: "#f0c0d0" },
+const TEMPLATE_THEMES: Record<string, { primary: string; muted: string; border: string; gradient: string }> = {
+  "garden-bloom":   { primary: "#4a7c59", muted: "#e8f4e8", border: "#c5dfc5", gradient: "linear-gradient(135deg, #4a7c59 0%, #3a6347 100%)" },
+  "rustic-gold":    { primary: "#b08d57", muted: "#f3f0eb", border: "#e8e2d9", gradient: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)" },
+  "modern-minimal": { primary: "#1a1a1a", muted: "#f5f5f5", border: "#e0e0e0", gradient: "linear-gradient(135deg, #333333 0%, #1a1a1a 100%)" },
+  "royal-elegance": { primary: "#6b35a3", muted: "#f5f0fa", border: "#d4b8f0", gradient: "linear-gradient(135deg, #6b35a3 0%, #582d8a 100%)" },
+  "floral-dream":   { primary: "#c06080", muted: "#fdf0f5", border: "#f0c0d0", gradient: "linear-gradient(135deg, #c06080 0%, #a84e6b 100%)" },
 };
 
 // ─── Envelope Cover ───────────────────────────────────────────────────────────
@@ -298,14 +298,17 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
         transition={{ delay: 0.45, duration: 0.45 }}
         className="mt-5 w-full max-w-sm"
       >
-        <button
+        <motion.button
           onClick={onOpen}
-          className="flex w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold transition-all duration-200 hover:brightness-110 hover:shadow-xl active:scale-[0.98]"
-          style={{ background: theme.primary, color: "#fff", fontFamily: "var(--font-inter)", minHeight: 56, boxShadow: `0 8px 32px -8px ${theme.primary}88` }}
+          whileHover={{ scale: 1.02, boxShadow: `0 12px 40px -8px ${theme.primary}aa` }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          className="flex w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold"
+          style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)", minHeight: 56, boxShadow: `0 8px 32px -8px ${theme.primary}88` }}
         >
           <Mail className="h-5 w-5" />
           Buka Undangan
-        </button>
+        </motion.button>
       </motion.div>
 
       {inviteUrl && (
@@ -316,8 +319,10 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.85 }}
-          className="mt-3 flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-medium shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
-          style={{ background: "#25D366", color: "#fff", fontFamily: "var(--font-inter)" }}
+          whileHover={{ scale: 1.04, boxShadow: "0 6px 20px rgba(37,211,102,0.4)" }}
+          whileTap={{ scale: 0.97 }}
+          className="mt-3 flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-medium shadow-sm"
+          style={{ background: "linear-gradient(135deg, #25D366 0%, #1fb855 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
         >
           <WhatsAppIcon className="h-4 w-4" />
           Bagikan via WhatsApp
@@ -417,14 +422,17 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               style={{ background: "var(--primary)" }}
             />
           )}
-          <button
+          <motion.button
             onClick={toggleMusic}
-            className="relative flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:opacity-80 active:scale-95"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            className="relative flex h-12 w-12 items-center justify-center rounded-full shadow-lg"
             style={{ background: "var(--primary)", color: "#fff" }}
             aria-label={musicPlaying ? "Pause musik" : "Putar musik"}
           >
             {musicPlaying ? <Music className="h-5 w-5" /> : <Music2 className="h-5 w-5" />}
-          </button>
+          </motion.button>
         </div>
       )}
 
@@ -600,21 +608,24 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 </div>
               </div>
               <div className="mt-6 flex flex-col gap-3">
-                <div className="overflow-hidden rounded-xl" style={{ height: 140, pointerEvents: "none" }}>
+                <div className="overflow-hidden rounded-xl" style={{ height: 160, pointerEvents: "none" }}>
                   <iframe
                     src={`https://maps.google.com/maps?q=${encodeURIComponent(`${invite.akad_venue_name} ${invite.akad_venue_address ?? ""}`)}&output=embed&z=15`}
-                    width="100%" height="140" style={{ border: 0 }} loading="lazy" aria-hidden="true"
+                    width="100%" height="160" style={{ border: 0 }} loading="lazy" aria-hidden="true"
                   />
                 </div>
-                <a
+                <motion.a
                   href={`https://maps.google.com?q=${encodeURIComponent(`${invite.akad_venue_name} ${invite.akad_venue_address ?? ""}`)}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition-all hover:brightness-110 hover:shadow-lg active:scale-[0.98]"
-                  style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)" }}
+                  whileHover={{ scale: 1.02, boxShadow: `0 4px 18px ${theme.primary}55` }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium"
+                  style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)" }}
                 >
                   <MapPin className="h-4 w-4" />
                   Buka Google Maps — Akad
-                </a>
+                </motion.a>
                 {invite.akad_date && invite.akad_time && (
                   <CalendarButtons
                     title={`Akad Nikah ${invite.bride_name} & ${invite.groom_name}`}
@@ -663,15 +674,18 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   width="100%" height="160" style={{ border: 0 }} loading="lazy" aria-hidden="true"
                 />
               </div>
-              <a
+              <motion.a
                 href={`https://maps.google.com?q=${encodeURIComponent(invite.venue_name + " " + invite.venue_address)}`}
                 target="_blank" rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition-all hover:brightness-110 hover:shadow-lg active:scale-[0.98]"
-                style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)" }}
+                whileHover={{ scale: 1.02, boxShadow: `0 4px 18px ${theme.primary}55` }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium"
+                style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)" }}
               >
                 <MapPin className="h-4 w-4" />
                 Buka Google Maps
-              </a>
+              </motion.a>
               <CalendarButtons
                 title={`Resepsi Pernikahan ${invite.bride_name} & ${invite.groom_name}`}
                 date={invite.event_date}
@@ -851,7 +865,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                           fontFamily: "var(--font-inter)",
                         }}
                       >
-                        {m.rsvp_status === "attending" ? "Hadir ✓" : "Tidak Hadir"}
+                        {m.rsvp_status === "attending" ? "Hadir ✓" : m.rsvp_status === "not_attending" ? "Tidak Hadir" : "—"}
                       </span>
                     </div>
                     <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", fontStyle: "italic" }}>
@@ -917,24 +931,30 @@ function CalendarButtons({ title, date, time, venueName, venueAddress }: {
 }) {
   return (
     <div className="flex gap-2">
-      <a
+      <motion.a
         href={makeGoogleCalUrl(title, date, time, venueName, venueAddress)}
         target="_blank" rel="noopener noreferrer"
-        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium transition-all hover:opacity-80"
+        whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
+        whileTap={{ scale: 0.97 }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium"
         style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
       >
         <CalendarPlus className="h-3.5 w-3.5" style={{ color: "var(--primary)" }} />
         Google Calendar
-      </a>
-      <button
+      </motion.a>
+      <motion.button
         type="button"
         onClick={() => downloadIcal(title, date, time, venueName, venueAddress)}
-        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium transition-all hover:opacity-80"
+        whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
+        whileTap={{ scale: 0.97 }}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium"
         style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
       >
         <CalendarPlus className="h-3.5 w-3.5" style={{ color: "var(--primary)" }} />
         iCal / Kalender
-      </button>
+      </motion.button>
     </div>
   );
 }
@@ -976,23 +996,29 @@ function BankCard({ bank, accountName, accountNumber, qrisUrl }: {
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
           {qrisUrl && (
-            <button
+            <motion.button
               onClick={() => setShowQris(!showQris)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg transition-all hover:opacity-70 active:scale-95"
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
+              className="flex h-8 w-8 items-center justify-center rounded-lg"
               style={{ background: showQris ? "var(--primary)" : "var(--muted)", color: showQris ? "#fff" : "var(--primary)" }}
               aria-label="Lihat QRIS"
             >
               <QrCode className="h-4 w-4" />
-            </button>
+            </motion.button>
           )}
-          <button
+          <motion.button
             onClick={handleCopy}
-            className="flex h-8 w-8 items-center justify-center rounded-lg transition-all hover:opacity-70 active:scale-95"
+            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            className="flex h-8 w-8 items-center justify-center rounded-lg"
             style={{ background: "var(--muted)", color: copied ? "#16a34a" : "var(--muted-foreground)" }}
             aria-label="Salin nomor rekening"
           >
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          </button>
+          </motion.button>
         </div>
       </div>
       {qrisUrl && showQris && (
@@ -1015,6 +1041,7 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
   invite: PublicInvitation; guestName: string; inviteUrl: string; onSuccess: () => void;
 }) {
   const storageKey = `rsvp_${invite.id}`;
+  const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
   const [name, setName] = useState(guestName);
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"attending" | "not_attending">("attending");
@@ -1092,23 +1119,29 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
               </div>
               <div className="flex flex-col items-center gap-3">
                 {ownerWa && state === "done" && (
-                  <a
+                  <motion.a
                     href={`https://wa.me/${ownerWa}?text=${encodeURIComponent(`Halo, saya ${name}. Saya ingin mengkonfirmasi ${status === "attending" ? `kehadiran saya (${guestCount} orang) 🎉` : "bahwa saya tidak bisa hadir"} pada acara pernikahan Anda. Terima kasih!`)}`}
                     target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: "#25D366", color: "#fff", fontFamily: "var(--font-inter)" }}
+                    whileHover={{ scale: 1.03, boxShadow: "0 6px 20px rgba(37,211,102,0.38)" }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium"
+                    style={{ background: "linear-gradient(135deg, #25D366 0%, #1fb855 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
                   >
                     <WhatsAppIcon className="h-4 w-4" />
                     Konfirmasi via WhatsApp
-                  </a>
+                  </motion.a>
                 )}
                 {inviteUrl && (
-                  <a href={generateWhatsAppLink(guestName, inviteUrl)} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
+                  <motion.a href={generateWhatsAppLink(guestName, inviteUrl)} target="_blank" rel="noopener noreferrer"
+                    whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium"
                     style={{ background: "var(--muted)", color: "var(--foreground)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}>
                     <WhatsAppIcon className="h-4 w-4" style={{ color: "#25D366" } as React.CSSProperties} />
                     Bagikan Undangan
-                  </a>
+                  </motion.a>
                 )}
               </div>
             </motion.div>
@@ -1119,16 +1152,19 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
                   { val: "attending",     label: "Hadir ✓" },
                   { val: "not_attending", label: "Tidak Hadir" },
                 ] as const).map((opt) => (
-                  <button
+                  <motion.button
                     key={opt.val} type="button" onClick={() => setStatus(opt.val)}
-                    className={cn("rounded-xl py-3.5 text-sm font-medium transition-all active:scale-[0.98]")}
+                    whileHover={status !== opt.val ? { scale: 1.03 } : undefined}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className={cn("rounded-xl py-3.5 text-sm font-medium")}
                     style={{
-                      background: status === opt.val ? "var(--primary)" : "var(--muted)",
+                      background: status === opt.val ? theme.gradient : "var(--muted)",
                       color: status === opt.val ? "#fff" : "var(--muted-foreground)",
                       fontFamily: "var(--font-inter)",
-                      border: status === opt.val ? "1px solid var(--primary)" : "1px solid var(--border)",
+                      border: status === opt.val ? `1px solid ${theme.primary}` : "1px solid var(--border)",
                     }}
-                  >{opt.label}</button>
+                  >{opt.label}</motion.button>
                 ))}
               </div>
 
@@ -1147,17 +1183,23 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
                     <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Berapa orang yang akan hadir?</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button type="button" onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold transition-all hover:opacity-70 active:scale-95"
+                    <motion.button type="button" onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.88 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold"
                       style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
                       −
-                    </button>
+                    </motion.button>
                     <span className="w-5 text-center text-base font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{guestCount}</span>
-                    <button type="button" onClick={() => setGuestCount(Math.min(20, guestCount + 1))}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold transition-all hover:opacity-70 active:scale-95"
+                    <motion.button type="button" onClick={() => setGuestCount(Math.min(20, guestCount + 1))}
+                      whileHover={{ scale: 1.15 }}
+                      whileTap={{ scale: 0.88 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold"
                       style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
                       +
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
               )}
@@ -1186,25 +1228,31 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
                 </p>
               )}
 
-              <button
+              <motion.button
                 type="submit"
                 disabled={state === "submitting" || !name.trim()}
-                className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition-all duration-200 hover:brightness-110 hover:shadow-lg disabled:opacity-60 active:scale-[0.98]"
-                style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)" }}
+                whileHover={state !== "submitting" && !!name.trim() ? { scale: 1.02, boxShadow: `0 4px 18px ${theme.primary}55` } : undefined}
+                whileTap={state !== "submitting" && !!name.trim() ? { scale: 0.98 } : undefined}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)" }}
               >
                 {state === "submitting" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Kirim Konfirmasi"}
-              </button>
+              </motion.button>
 
               {ownerWa && (
-                <a
+                <motion.a
                   href={`https://wa.me/${ownerWa}?text=${encodeURIComponent(`Halo, saya ${name || "..."} ingin mengkonfirmasi kehadiran pada acara pernikahan Anda. 🙏`)}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition-all hover:opacity-90 active:scale-[0.98]"
-                  style={{ background: "#25D366", color: "#fff", fontFamily: "var(--font-inter)" }}
+                  whileHover={{ scale: 1.02, boxShadow: "0 6px 20px rgba(37,211,102,0.38)" }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium"
+                  style={{ background: "linear-gradient(135deg, #25D366 0%, #1fb855 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   Konfirmasi via WhatsApp
-                </a>
+                </motion.a>
               )}
             </motion.form>
           )}
@@ -1221,7 +1269,7 @@ function FormField({ icon, label, required, children }: { icon: React.ReactNode;
   return (
     <div
       className="flex gap-3 rounded-xl px-4 py-3.5 transition-all duration-150"
-      style={{ background: "var(--muted)", border: focused ? "1.5px solid var(--primary)" : "1px solid var(--border)", boxShadow: focused ? "0 0 0 3px rgba(0,0,0,0.07)" : "none" }}
+      style={{ background: "var(--muted)", border: focused ? "1.5px solid var(--primary)" : "1px solid var(--border)", boxShadow: focused ? "0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent)" : "none" }}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
     >

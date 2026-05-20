@@ -146,13 +146,15 @@ export default function LoginPage() {
                     </span>
                   </p>
                 </div>
-                <button
+                <motion.button
                   onClick={() => setFormState("idle")}
+                  whileHover={{ opacity: 0.65 }}
+                  whileTap={{ scale: 0.97 }}
                   className="text-sm underline underline-offset-4"
                   style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
                 >
                   Gunakan email lain
-                </button>
+                </motion.button>
               </motion.div>
             ) : (
               <motion.form
@@ -222,15 +224,18 @@ export default function LoginPage() {
                   )}
                 </AnimatePresence>
 
-                <button
+                <motion.button
                   type="submit"
                   disabled={formState === "loading" || !email.trim()}
+                  whileHover={formState !== "loading" && !!email.trim() ? { scale: 1.02, boxShadow: "0 4px 18px rgba(176,141,87,0.4)" } : undefined}
+                  whileTap={formState !== "loading" && !!email.trim() ? { scale: 0.98 } : undefined}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
                   className={cn(
-                    "flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-all",
+                    "flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium",
                     "disabled:opacity-60 disabled:cursor-not-allowed"
                   )}
                   style={{
-                    background: "var(--primary)",
+                    background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)",
                     color: "var(--primary-foreground)",
                     fontFamily: "var(--font-inter)",
                   }}
@@ -243,7 +248,7 @@ export default function LoginPage() {
                       <ArrowRight className="h-4 w-4" />
                     </>
                   )}
-                </button>
+                </motion.button>
               </motion.form>
             )}
           </AnimatePresence>
