@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import InvitationForm, {
   type FormValues,
@@ -144,13 +145,15 @@ function EditContent() {
         <p style={{ fontFamily: "var(--font-inter)" }}>
           Undangan tidak ditemukan.
         </p>
-        <button
+        <motion.button
           onClick={() => router.push("/dashboard")}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           className="text-sm underline"
           style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
         >
           Kembali ke dashboard
-        </button>
+        </motion.button>
       </div>
     );
   }
@@ -165,13 +168,16 @@ function EditContent() {
         }}
       >
         <div className="mx-auto flex max-w-2xl items-center gap-3">
-          <button
+          <motion.button
             onClick={() => router.push("/dashboard")}
-            className="rounded-lg p-2 transition-colors hover:opacity-70"
+            whileHover={{ scale: 1.12, x: -2 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            className="rounded-lg p-2"
             style={{ color: "var(--muted-foreground)" }}
           >
             <ArrowLeft className="h-4 w-4" />
-          </button>
+          </motion.button>
           <h1
             className="text-base font-semibold"
             style={{ fontFamily: "var(--font-playfair)" }}
@@ -181,7 +187,12 @@ function EditContent() {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-2xl px-4 py-8">
+      <motion.main
+        className="mx-auto max-w-2xl px-4 py-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+      >
         <div
           className="rounded-2xl p-6"
           style={{
@@ -197,7 +208,7 @@ function EditContent() {
             submitLabel="Simpan Perubahan"
           />
         </div>
-      </main>
+      </motion.main>
     </div>
   );
 }

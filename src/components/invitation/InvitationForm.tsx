@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { Loader2, Image, Music, Upload, X, CheckCircle2, Plus, Trash2, QrCode } from "lucide-react";
 import {
   getTemplates,
@@ -186,7 +187,13 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     : false;
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <motion.form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
 
       {/* ── Tema ─────────────────────────────────────────────── */}
       <FormSection title="Tema" />
@@ -195,11 +202,14 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
           const colors = TEMPLATE_COLORS[t.slug] ?? { primary: "#b08d57", muted: "#f3f0eb" };
           const selected = values.template_id === t.id;
           return (
-            <button
+            <motion.button
               key={t.id}
               type="button"
               onClick={() => set("template_id", t.id)}
-              className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all"
+              whileHover={!selected ? { scale: 1.03 } : undefined}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left"
               style={{
                 background: selected ? colors.muted : "var(--muted)",
                 border: selected ? `2px solid ${colors.primary}` : "1px solid var(--border)",
@@ -215,7 +225,7 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                   Pro
                 </span>
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -306,19 +316,22 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
       <FormSection title="Akad Nikah" />
 
       <div className="flex items-center gap-3">
-        <button
+        <motion.button
           type="button"
           role="switch"
           aria-checked={showAkad}
           onClick={toggleAkad}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
           className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
           style={{ background: showAkad ? "var(--primary)" : "var(--border)" }}
         >
-          <span
-            className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
-            style={{ transform: showAkad ? "translateX(20px)" : "translateX(2px)" }}
+          <motion.span
+            className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow"
+            animate={{ x: showAkad ? 20 : 2 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
-        </button>
+        </motion.button>
         <p className="text-sm" style={{ fontFamily: "var(--font-inter)", color: "var(--muted-foreground)" }}>
           {showAkad ? "Tampilkan section Akad Nikah" : "Tambah informasi Akad Nikah"}
         </p>
@@ -427,14 +440,17 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
               <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Rekening {i + 1}
               </p>
-              <button
+              <motion.button
                 type="button"
                 onClick={() => removeBank(i)}
-                className="rounded-lg p-1 transition-opacity hover:opacity-70"
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                className="rounded-lg p-1"
                 style={{ color: "#dc2626" }}
               >
                 <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              </motion.button>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="flex flex-col gap-1.5">
@@ -442,7 +458,7 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                 <select
                   value={acc.bank}
                   onChange={(e) => updateBank(i, "bank", e.target.value)}
-                  className="rounded-lg px-3 py-2 text-sm"
+                  className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
                   style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
                 >
                   <option value="">Pilih bank...</option>
@@ -456,7 +472,7 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                   value={acc.account_name}
                   onChange={(e) => updateBank(i, "account_name", e.target.value)}
                   placeholder="cth. Gabriela Tri"
-                  className="rounded-lg px-3 py-2 text-sm"
+                  className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
                   style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
                 />
               </div>
@@ -467,7 +483,7 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                   value={acc.account_number}
                   onChange={(e) => updateBank(i, "account_number", e.target.value)}
                   placeholder="cth. 1234567890"
-                  className="rounded-lg px-3 py-2 text-sm"
+                  className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
                   style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
                 />
               </div>
@@ -497,15 +513,18 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
         ))}
 
         {values.bank_accounts.length < 4 && (
-          <button
+          <motion.button
             type="button"
             onClick={addBank}
-            className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm transition-all hover:opacity-80"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm"
             style={{ background: "var(--muted)", border: "1px dashed var(--border)", color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
           >
             <Plus className="h-4 w-4" />
             Tambah rekening / e-wallet
-          </button>
+          </motion.button>
         )}
         {values.bank_accounts.length === 0 && (
           <p className="text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
@@ -550,19 +569,22 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
       </Field>
 
       <div className="flex items-center gap-3">
-        <button
+        <motion.button
           type="button"
           role="switch"
           aria-checked={values.is_published}
           onClick={() => set("is_published", !values.is_published)}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
           className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
           style={{ background: values.is_published ? "var(--primary)" : "var(--border)" }}
         >
-          <span
-            className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform"
-            style={{ transform: values.is_published ? "translateX(20px)" : "translateX(2px)" }}
+          <motion.span
+            className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow"
+            animate={{ x: values.is_published ? 20 : 2 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           />
-        </button>
+        </motion.button>
         <div>
           <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>
             {values.is_published ? "Dipublikasikan" : "Draft"}
@@ -579,15 +601,18 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
         </p>
       )}
 
-      <button
+      <motion.button
         type="submit"
         disabled={submitting || !values.template_id || !values.bride_name || !values.groom_name || slugReserved}
-        className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium transition-all disabled:opacity-60"
-        style={{ background: "var(--primary)", color: "var(--primary-foreground)", fontFamily: "var(--font-inter)" }}
+        whileHover={!submitting && !!values.bride_name && !!values.groom_name && !slugReserved ? { scale: 1.02, boxShadow: "0 4px 18px rgba(176,141,87,0.4)" } : undefined}
+        whileTap={!submitting ? { scale: 0.98 } : undefined}
+        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{ background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)", color: "var(--primary-foreground)", fontFamily: "var(--font-inter)" }}
       >
         {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : submitLabel}
-      </button>
-    </form>
+      </motion.button>
+    </motion.form>
   );
 }
 
@@ -660,14 +685,17 @@ function FileUploadField({
           {hasFile ? (
             <>
               <img src={currentUrl} alt="" className="h-full w-full object-cover" />
-              <button
+              <motion.button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleClear(); }}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 18 }}
                 className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full"
                 style={{ background: "rgba(0,0,0,0.6)", color: "#fff" }}
               >
                 <X className="h-3 w-3" />
-              </button>
+              </motion.button>
             </>
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-1">
@@ -699,17 +727,28 @@ function FileUploadField({
             <p className="flex-1 truncate text-sm">{currentUrl.split("/").pop()?.split("?")[0] ?? "file"}</p>
             <div className="flex flex-shrink-0 items-center gap-2">
               <CheckCircle2 className="h-4 w-4" style={{ color: "#16a34a" }} />
-              <button type="button" onClick={handleClear} className="rounded-lg p-1 hover:opacity-70" style={{ color: "var(--muted-foreground)" }} aria-label="Hapus">
+              <motion.button
+                type="button"
+                onClick={handleClear}
+                whileHover={{ scale: 1.15, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                style={{ color: "var(--muted-foreground)" }}
+                aria-label="Hapus"
+              >
                 <X className="h-4 w-4" />
-              </button>
+              </motion.button>
             </div>
           </div>
         ) : (
-          <button
+          <motion.button
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={uploadState === "uploading"}
-            className="flex w-full items-center gap-3 px-4 py-3 transition-colors hover:opacity-80 disabled:opacity-60"
+            whileHover={uploadState !== "uploading" ? { scale: 1.01 } : undefined}
+            whileTap={uploadState !== "uploading" ? { scale: 0.99 } : undefined}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className="flex w-full items-center gap-3 px-4 py-3 disabled:opacity-60"
           >
             {uploadState === "uploading"
               ? <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" style={{ color: "var(--primary)" }} />
@@ -718,7 +757,7 @@ function FileUploadField({
             <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>
               {uploadState === "uploading" ? "Mengupload..." : "Pilih file..."}
             </span>
-          </button>
+          </motion.button>
         )}
       </div>
       {hint && <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{hint}</p>}
@@ -743,6 +782,7 @@ function FormSection({ title }: { title: string }) {
 }
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+  const [focused, setFocused] = useState(false);
   return (
     <div className="flex flex-col gap-1.5">
       <label className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
@@ -750,8 +790,15 @@ function Field({ label, required, children }: { label: string; required?: boolea
         {required && <span style={{ color: "var(--primary)" }}>*</span>}
       </label>
       <div
-        className="rounded-xl px-4 py-3 [&_input]:w-full [&_input]:bg-transparent [&_input]:text-sm [&_input]:outline-none [&_textarea]:w-full [&_textarea]:bg-transparent [&_textarea]:text-sm [&_textarea]:outline-none"
-        style={{ background: "var(--muted)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
+        className="rounded-xl px-4 py-3 transition-shadow duration-150 [&_input]:w-full [&_input]:bg-transparent [&_input]:text-sm [&_input]:outline-none [&_textarea]:w-full [&_textarea]:bg-transparent [&_textarea]:text-sm [&_textarea]:outline-none"
+        style={{
+          background: "var(--muted)",
+          border: focused ? "1.5px solid var(--primary)" : "1px solid var(--border)",
+          boxShadow: focused ? "0 0 0 3px rgba(176,141,87,0.18)" : "none",
+          fontFamily: "var(--font-inter)",
+        }}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       >
         {children}
       </div>
