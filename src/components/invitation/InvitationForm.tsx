@@ -20,6 +20,8 @@ import {
 } from "@/lib/supabase/storage";
 import type { BankAccount } from "@/lib/supabase/types";
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
 const TEMPLATE_COLORS: Record<string, { primary: string; muted: string }> = {
   "garden-bloom":   { primary: "#4a7c59", muted: "#e8f4e8" },
   "rustic-gold":    { primary: "#b08d57", muted: "#f3f0eb" },
@@ -31,6 +33,16 @@ const TEMPLATE_COLORS: Record<string, { primary: string; muted: string }> = {
 const RESERVED_SLUGS = ["dashboard", "login", "auth", "invite", "api", "admin", "new", "edit"];
 
 const COMMON_BANKS = ["BCA", "BNI", "BRI", "Mandiri", "CIMB Niaga", "GoPay", "OVO", "DANA", "ShopeePay", "Lainnya"];
+
+const TABS = [
+  { key: "mempelai",   label: "Mempelai"   },
+  { key: "acara",      label: "Acara"      },
+  { key: "konten",     label: "Konten"     },
+  { key: "pengaturan", label: "Pengaturan" },
+] as const;
+type TabKey = typeof TABS[number]["key"];
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export type FormValues = {
   template_id: string;
@@ -74,8 +86,16 @@ type Props = {
   submitLabel: string;
 };
 
+// ─── InvitationForm ───────────────────────────────────────────────────────────
+
 export default function InvitationForm({ initial, submitting, error, onSubmit, submitLabel }: Props) {
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templates,   setTemplates]   = useState<Template[]>([]);
+  const [activeTab,   setActiveTab]   = useState<TabKey>("mempelai");
+  const [slideDir,    setSlideDir]    = useState(0);
+  const [localError,  setLocalError]  = useState("");
+  const [showAkad,    setShowAkad]    = useState(!!initial?.akad_date);
+  const [slugManual,  setSlugManual]  = useState(!!initial?.slug);
+
   const [values, setValues] = useState<FormValues>({
     template_id:        initial?.template_id        ?? "",
     bride_name:         initial?.bride_name          ?? "",
@@ -109,8 +129,6 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     slug:               initial?.slug                ?? "",
     is_published:       initial?.is_published        ?? false,
   });
-  const [slugManual, setSlugManual] = useState(!!initial?.slug);
-  const [showAkad,   setShowAkad]   = useState(!!initial?.akad_date);
 
   useEffect(() => {
     getTemplates().then((t) => {
@@ -133,6 +151,13 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     });
   }
 
+  function switchTab(key: TabKey) {
+    const prevIdx = TABS.findIndex((t) => t.key === activeTab);
+    const nextIdx = TABS.findIndex((t) => t.key === key);
+    setSlideDir(nextIdx >= prevIdx ? 1 : -1);
+    setActiveTab(key);
+  }
+
   function toggleAkad() {
     if (showAkad) {
       setValues((v) => ({ ...v, akad_date: "", akad_time: "08:00", akad_venue_name: "", akad_venue_address: "" }));
@@ -143,25 +168,34 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
   function addBank() {
     set("bank_accounts", [...values.bank_accounts, { bank: "", account_name: "", account_number: "" }]);
   }
-
   function removeBank(i: number) {
     set("bank_accounts", values.bank_accounts.filter((_, idx) => idx !== i));
   }
-
   function updateBank(i: number, key: keyof Omit<BankAccount, "qris_url">, val: string) {
-    set("bank_accounts", values.bank_accounts.map((acc, idx) =>
-      idx === i ? { ...acc, [key]: val } : acc
-    ));
+    set("bank_accounts", values.bank_accounts.map((acc, idx) => idx === i ? { ...acc, [key]: val } : acc));
   }
-
   function updateBankQris(i: number, url: string) {
-    set("bank_accounts", values.bank_accounts.map((acc, idx) =>
-      idx === i ? { ...acc, qris_url: url || undefined } : acc
-    ));
+    set("bank_accounts", values.bank_accounts.map((acc, idx) => idx === i ? { ...acc, qris_url: url || undefined } : acc));
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setLocalError("");
+    if (!values.template_id || !values.bride_name || !values.groom_name) {
+      setLocalError("Lengkapi nama mempelai terlebih dahulu.");
+      switchTab("mempelai");
+      return;
+    }
+    if (!values.event_date || !values.event_time || !values.venue_name || !values.venue_address) {
+      setLocalError("Lengkapi informasi acara terlebih dahulu.");
+      switchTab("acara");
+      return;
+    }
+    if (slugReserved) {
+      setLocalError("Slug tidak valid. Ganti dengan nama lain.");
+      switchTab("pengaturan");
+      return;
+    }
     onSubmit(values);
   }
 
@@ -173,449 +207,498 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     );
   }
 
-  const slugReserved = RESERVED_SLUGS.includes(values.slug);
-  const isPastDate   = values.event_date
+  const slugReserved  = RESERVED_SLUGS.includes(values.slug);
+  const isPastDate    = values.event_date
     ? new Date(values.event_date) < new Date(new Date().toDateString())
     : false;
+
+  const tabIncomplete: Record<TabKey, boolean> = {
+    mempelai:   !values.template_id || !values.bride_name || !values.groom_name,
+    acara:      !values.event_date || !values.event_time || !values.venue_name || !values.venue_address,
+    konten:     false,
+    pengaturan: slugReserved,
+  };
+
+  const displayError = localError || error;
 
   return (
     <motion.form
       onSubmit={handleSubmit}
+      noValidate
       className="flex flex-col gap-5"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
 
-      {/* ── Tema ─────────────────────────────────────────────── */}
-      <SectionCard title="Tema">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {templates.map((t) => {
-            const colors  = TEMPLATE_COLORS[t.slug] ?? { primary: "#b08d57", muted: "#f3f0eb" };
-            const selected = values.template_id === t.id;
-            return (
-              <motion.button
-                key={t.id}
-                type="button"
-                onClick={() => set("template_id", t.id)}
-                whileHover={!selected ? { scale: 1.03 } : undefined}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left"
-                style={{
-                  background: selected ? colors.muted : "var(--muted)",
-                  border: selected ? `2px solid ${colors.primary}` : "1px solid var(--border)",
-                  fontFamily: "var(--font-inter)",
-                }}
-              >
-                <div className="h-5 w-5 flex-shrink-0 rounded-full" style={{ background: colors.primary }} />
-                <span className="flex-1 text-xs font-medium" style={{ color: selected ? colors.primary : "var(--foreground)" }}>
-                  {t.name}
-                </span>
-                {t.is_premium && (
-                  <span className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold" style={{ background: colors.primary, color: "#fff" }}>
-                    Pro
-                  </span>
-                )}
-              </motion.button>
-            );
-          })}
-        </div>
-      </SectionCard>
-
-      {/* ── Mempelai ─────────────────────────────────────────── */}
-      <SectionCard title="Mempelai">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Nama Mempelai Wanita" required>
-            <input type="text" value={values.bride_name} onChange={(e) => set("bride_name", e.target.value)}
-              placeholder="cth. Gabriela" required />
-          </Field>
-          <Field label="Nama Mempelai Pria" required>
-            <input type="text" value={values.groom_name} onChange={(e) => set("groom_name", e.target.value)}
-              placeholder="cth. Rosandi" required />
-          </Field>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Gelar Mempelai Wanita">
-            <input type="text" value={values.bride_title} onChange={(e) => set("bride_title", e.target.value)}
-              placeholder="cth. S.E., M.M." />
-          </Field>
-          <Field label="Gelar Mempelai Pria">
-            <input type="text" value={values.groom_title} onChange={(e) => set("groom_title", e.target.value)}
-              placeholder="cth. S.T., M.Kom." />
-          </Field>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Ayah Mempelai Wanita">
-            <input type="text" value={values.bride_father_name} onChange={(e) => set("bride_father_name", e.target.value)}
-              placeholder="cth. Bapak Hendra" />
-          </Field>
-          <Field label="Ibu Mempelai Wanita">
-            <input type="text" value={values.bride_mother_name} onChange={(e) => set("bride_mother_name", e.target.value)}
-              placeholder="cth. Ibu Sari" />
-          </Field>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Ayah Mempelai Pria">
-            <input type="text" value={values.groom_father_name} onChange={(e) => set("groom_father_name", e.target.value)}
-              placeholder="cth. Bapak Dodi" />
-          </Field>
-          <Field label="Ibu Mempelai Pria">
-            <input type="text" value={values.groom_mother_name} onChange={(e) => set("groom_mother_name", e.target.value)}
-              placeholder="cth. Ibu Wati" />
-          </Field>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Instagram Mempelai Wanita">
-            <div className="flex items-center gap-1.5">
-              <span className="flex-shrink-0 select-none text-sm" style={{ color: "var(--muted-foreground)" }}>@</span>
-              <input
-                type="text"
-                value={values.bride_instagram.replace(/^@/, "")}
-                onChange={(e) => set("bride_instagram", e.target.value.replace(/^@/, ""))}
-                placeholder="gabrielatri (opsional)"
-              />
-            </div>
-          </Field>
-          <Field label="Instagram Mempelai Pria">
-            <div className="flex items-center gap-1.5">
-              <span className="flex-shrink-0 select-none text-sm" style={{ color: "var(--muted-foreground)" }}>@</span>
-              <input
-                type="text"
-                value={values.groom_instagram.replace(/^@/, "")}
-                onChange={(e) => set("groom_instagram", e.target.value.replace(/^@/, ""))}
-                placeholder="rosandifl (opsional)"
-              />
-            </div>
-          </Field>
-        </div>
-      </SectionCard>
-
-      {/* ── Resepsi ───────────────────────────────────────────── */}
-      <SectionCard title="Resepsi">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-1">
-            <Field label="Tanggal Resepsi" required>
-              <input type="date" value={values.event_date} onChange={(e) => set("event_date", e.target.value)} required />
-            </Field>
-            {isPastDate && (
-              <p className="text-xs" style={{ color: "#d97706", fontFamily: "var(--font-inter)" }}>
-                ⚠️ Tanggal ini sudah lewat.
-              </p>
-            )}
-          </div>
-          <Field label="Waktu Resepsi" required>
-            <input type="time" value={values.event_time} onChange={(e) => set("event_time", e.target.value)} required />
-          </Field>
-        </div>
-
-        <Field label="Nama Venue Resepsi" required>
-          <input type="text" value={values.venue_name} onChange={(e) => set("venue_name", e.target.value)}
-            placeholder="cth. Grand Ballroom Hotel Mulia" required />
-        </Field>
-        <Field label="Alamat Venue Resepsi" required>
-          <textarea value={values.venue_address} onChange={(e) => set("venue_address", e.target.value)}
-            placeholder="cth. Jl. Asia Afrika No.8, Senayan, Jakarta" rows={2} required className="resize-none" />
-        </Field>
-      </SectionCard>
-
-      {/* ── Akad Nikah ───────────────────────────────────────── */}
-      <SectionCard title="Akad Nikah">
-        <div className="flex items-center gap-3">
-          <motion.button
-            type="button"
-            role="switch"
-            aria-checked={showAkad}
-            onClick={toggleAkad}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
-            style={{ background: showAkad ? "var(--primary)" : "var(--border)" }}
-          >
-            <motion.span
-              className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow"
-              animate={{ x: showAkad ? 20 : 2 }}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          </motion.button>
-          <p className="text-sm" style={{ fontFamily: "var(--font-inter)", color: "var(--muted-foreground)" }}>
-            {showAkad ? "Sembunyikan section Akad Nikah" : "Tampilkan section Akad Nikah"}
-          </p>
-        </div>
-
-        <AnimatePresence>
-          {showAkad && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.22, ease: "easeInOut" }}
-              className="flex flex-col gap-4 overflow-hidden"
-            >
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Tanggal Akad">
-                  <input type="date" value={values.akad_date} onChange={(e) => set("akad_date", e.target.value)} />
-                </Field>
-                <Field label="Waktu Akad">
-                  <input type="time" value={values.akad_time} onChange={(e) => set("akad_time", e.target.value)} />
-                </Field>
-              </div>
-              <Field label="Nama Venue Akad">
-                <input type="text" value={values.akad_venue_name} onChange={(e) => set("akad_venue_name", e.target.value)}
-                  placeholder="cth. Masjid Al-Falah" />
-              </Field>
-              <Field label="Alamat Venue Akad">
-                <textarea value={values.akad_venue_address} onChange={(e) => set("akad_venue_address", e.target.value)}
-                  placeholder="cth. Jl. Sudirman No.1, Jakarta" rows={2} className="resize-none" />
-              </Field>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </SectionCard>
-
-      {/* ── Konten ───────────────────────────────────────────── */}
-      <SectionCard title="Konten">
-        <Field label="Dresscode (opsional)">
-          <input type="text" value={values.dresscode} onChange={(e) => set("dresscode", e.target.value)}
-            placeholder="cth. Pastel / Semi-formal" />
-        </Field>
-        <Field label="Ayat / Kutipan (opsional)">
-          <textarea value={values.custom_message} onChange={(e) => set("custom_message", e.target.value)}
-            placeholder={'cth. "Dan di antara tanda-tanda kekuasaan-Nya..." (QS. Ar-Rum: 21)'}
-            rows={3} className="resize-none" />
-        </Field>
-      </SectionCard>
-
-      {/* ── Media ────────────────────────────────────────────── */}
-      <SectionCard title="Media">
-        <FileUploadField
-          label="Foto Cover (opsional)"
-          icon={<Image className="h-4 w-4" />}
-          accept={COVER_ACCEPT}
-          maxBytes={COVER_MAX_BYTES}
-          currentUrl={values.cover_image_url}
-          hint="JPEG / PNG / WebP — maks. 5 MB"
-          bucket="covers"
-          upload={uploadCover}
-          onUploaded={(url) => set("cover_image_url", url)}
-          onClear={() => set("cover_image_url", "")}
-        />
-
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-            Galeri Foto (opsional, maks. 3)
-          </p>
-          <div className="grid grid-cols-3 gap-2">
-            {(["gallery_url_1", "gallery_url_2", "gallery_url_3"] as const).map((key, i) => (
-              <FileUploadField
-                key={key}
-                label={`Foto ${i + 1}`}
-                icon={<Image className="h-3.5 w-3.5" />}
-                accept={COVER_ACCEPT}
-                maxBytes={COVER_MAX_BYTES}
-                currentUrl={values[key]}
-                hint=""
-                bucket="covers"
-                upload={uploadGallery}
-                onUploaded={(url) => set(key, url)}
-                onClear={() => set(key, "")}
-                compact
-              />
-            ))}
-          </div>
-          <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>JPEG / PNG / WebP — maks. 5 MB per foto</p>
-        </div>
-
-        <FileUploadField
-          label="Musik Latar (opsional)"
-          icon={<Music className="h-4 w-4" />}
-          accept={MUSIC_ACCEPT}
-          maxBytes={MUSIC_MAX_BYTES}
-          currentUrl={values.music_url}
-          hint="MP3 — maks. 8 MB"
-          bucket="music"
-          upload={uploadMusic}
-          onUploaded={(url) => set("music_url", url)}
-          onClear={() => set("music_url", "")}
-        />
-      </SectionCard>
-
-      {/* ── Rekening / Angpao ────────────────────────────────── */}
-      <SectionCard title="Rekening & Angpao">
-        <div className="flex flex-col gap-3">
-          {values.bank_accounts.map((acc, i) => (
-            <div
-              key={i}
-              className="flex flex-col gap-3 rounded-xl p-4"
-              style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                  Rekening {i + 1}
-                </p>
-                <motion.button
-                  type="button"
-                  onClick={() => removeBank(i)}
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.88 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 18 }}
-                  className="rounded-lg p-1"
-                  style={{ color: "#dc2626" }}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </motion.button>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Bank</label>
-                  <select
-                    value={acc.bank}
-                    onChange={(e) => updateBank(i, "bank", e.target.value)}
-                    className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
-                    style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
-                  >
-                    <option value="">Pilih bank...</option>
-                    {COMMON_BANKS.map((b) => <option key={b} value={b}>{b}</option>)}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Nama Pemilik</label>
-                  <input
-                    type="text"
-                    value={acc.account_name}
-                    onChange={(e) => updateBank(i, "account_name", e.target.value)}
-                    placeholder="cth. Gabriela Tri"
-                    className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
-                    style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Nomor Rekening</label>
-                  <input
-                    type="text"
-                    value={acc.account_number}
-                    onChange={(e) => updateBank(i, "account_number", e.target.value)}
-                    placeholder="cth. 1234567890"
-                    className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
-                    style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
-                  />
-                </div>
-              </div>
-
-              {/* QRIS upload */}
-              <div className="flex items-center gap-3">
-                <QrCode className="h-4 w-4 flex-shrink-0" style={{ color: "var(--muted-foreground)" }} />
-                <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>QRIS (opsional)</p>
-                <div className="h-14 w-14 flex-shrink-0">
-                  <FileUploadField
-                    label="QRIS"
-                    icon={<QrCode className="h-3.5 w-3.5" />}
-                    accept={COVER_ACCEPT}
-                    maxBytes={COVER_MAX_BYTES}
-                    currentUrl={acc.qris_url ?? ""}
-                    hint=""
-                    bucket="covers"
-                    upload={uploadGallery}
-                    onUploaded={(url) => updateBankQris(i, url)}
-                    onClear={() => updateBankQris(i, "")}
-                    compact
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {values.bank_accounts.length < 4 && (
+      {/* ── Tab bar ───────────────────────────────────────────── */}
+      <div
+        className="flex gap-1 overflow-x-auto rounded-2xl p-1"
+        style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
+      >
+        {TABS.map((t) => {
+          const isActive = activeTab === t.key;
+          const hasIssue = tabIncomplete[t.key];
+          return (
             <motion.button
+              key={t.key}
               type="button"
-              onClick={addBank}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm"
-              style={{ background: "var(--muted)", border: "1px dashed var(--border)", color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+              onClick={() => switchTab(t.key)}
+              whileTap={{ scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="relative flex flex-1 flex-shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-2 py-2.5 text-xs font-medium"
+              style={{
+                color: isActive ? "var(--primary-foreground)" : "var(--muted-foreground)",
+                fontFamily: "var(--font-inter)",
+              }}
             >
-              <Plus className="h-4 w-4" />
-              Tambah rekening / e-wallet
+              {isActive && (
+                <motion.div
+                  layoutId="tab-active-bg"
+                  className="absolute inset-0 rounded-xl"
+                  style={{ background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                />
+              )}
+              <span className="relative z-10">{t.label}</span>
+              {hasIssue && !isActive && (
+                <span
+                  className="relative z-10 h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                  style={{ background: "#f87171" }}
+                />
+              )}
             </motion.button>
+          );
+        })}
+      </div>
+
+      {/* ── Tab content ───────────────────────────────────────── */}
+      <AnimatePresence mode="wait" custom={slideDir}>
+        <motion.div
+          key={activeTab}
+          custom={slideDir}
+          variants={{
+            enter:  (dir: number) => ({ opacity: 0, x: dir * 24 }),
+            center: { opacity: 1, x: 0 },
+            exit:   (dir: number) => ({ opacity: 0, x: -dir * 24 }),
+          }}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="flex flex-col gap-5"
+        >
+
+          {/* ── Tab: Mempelai ──────────────────────────────────── */}
+          {activeTab === "mempelai" && (
+            <>
+              <SectionCard title="Tema">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {templates.map((t) => {
+                    const colors   = TEMPLATE_COLORS[t.slug] ?? { primary: "#b08d57", muted: "#f3f0eb" };
+                    const selected = values.template_id === t.id;
+                    return (
+                      <motion.button
+                        key={t.id}
+                        type="button"
+                        onClick={() => set("template_id", t.id)}
+                        whileHover={!selected ? { scale: 1.03 } : undefined}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left"
+                        style={{
+                          background: selected ? colors.muted : "var(--muted)",
+                          border: selected ? `2px solid ${colors.primary}` : "1px solid var(--border)",
+                          fontFamily: "var(--font-inter)",
+                        }}
+                      >
+                        <div className="h-5 w-5 flex-shrink-0 rounded-full" style={{ background: colors.primary }} />
+                        <span className="flex-1 text-xs font-medium" style={{ color: selected ? colors.primary : "var(--foreground)" }}>
+                          {t.name}
+                        </span>
+                        {t.is_premium && (
+                          <span className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold" style={{ background: colors.primary, color: "#fff" }}>
+                            Pro
+                          </span>
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Mempelai">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Nama Mempelai Wanita" required>
+                    <input type="text" value={values.bride_name} onChange={(e) => set("bride_name", e.target.value)} placeholder="cth. Gabriela" />
+                  </Field>
+                  <Field label="Nama Mempelai Pria" required>
+                    <input type="text" value={values.groom_name} onChange={(e) => set("groom_name", e.target.value)} placeholder="cth. Rosandi" />
+                  </Field>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Gelar Mempelai Wanita">
+                    <input type="text" value={values.bride_title} onChange={(e) => set("bride_title", e.target.value)} placeholder="cth. S.E., M.M." />
+                  </Field>
+                  <Field label="Gelar Mempelai Pria">
+                    <input type="text" value={values.groom_title} onChange={(e) => set("groom_title", e.target.value)} placeholder="cth. S.T., M.Kom." />
+                  </Field>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Ayah Mempelai Wanita">
+                    <input type="text" value={values.bride_father_name} onChange={(e) => set("bride_father_name", e.target.value)} placeholder="cth. Bapak Hendra" />
+                  </Field>
+                  <Field label="Ibu Mempelai Wanita">
+                    <input type="text" value={values.bride_mother_name} onChange={(e) => set("bride_mother_name", e.target.value)} placeholder="cth. Ibu Sari" />
+                  </Field>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Ayah Mempelai Pria">
+                    <input type="text" value={values.groom_father_name} onChange={(e) => set("groom_father_name", e.target.value)} placeholder="cth. Bapak Dodi" />
+                  </Field>
+                  <Field label="Ibu Mempelai Pria">
+                    <input type="text" value={values.groom_mother_name} onChange={(e) => set("groom_mother_name", e.target.value)} placeholder="cth. Ibu Wati" />
+                  </Field>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Instagram Mempelai Wanita">
+                    <div className="flex items-center gap-1.5">
+                      <span className="flex-shrink-0 select-none text-sm" style={{ color: "var(--muted-foreground)" }}>@</span>
+                      <input type="text" value={values.bride_instagram.replace(/^@/, "")}
+                        onChange={(e) => set("bride_instagram", e.target.value.replace(/^@/, ""))}
+                        placeholder="gabrielatri (opsional)" />
+                    </div>
+                  </Field>
+                  <Field label="Instagram Mempelai Pria">
+                    <div className="flex items-center gap-1.5">
+                      <span className="flex-shrink-0 select-none text-sm" style={{ color: "var(--muted-foreground)" }}>@</span>
+                      <input type="text" value={values.groom_instagram.replace(/^@/, "")}
+                        onChange={(e) => set("groom_instagram", e.target.value.replace(/^@/, ""))}
+                        placeholder="rosandifl (opsional)" />
+                    </div>
+                  </Field>
+                </div>
+              </SectionCard>
+            </>
           )}
-          {values.bank_accounts.length === 0 && (
-            <p className="text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Opsional — tambahkan jika ingin tamu mengirim hadiah digital.
-            </p>
+
+          {/* ── Tab: Acara ─────────────────────────────────────── */}
+          {activeTab === "acara" && (
+            <>
+              <SectionCard title="Resepsi">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex flex-col gap-1">
+                    <Field label="Tanggal Resepsi" required>
+                      <input type="date" value={values.event_date} onChange={(e) => set("event_date", e.target.value)} />
+                    </Field>
+                    {isPastDate && (
+                      <p className="text-xs" style={{ color: "#d97706", fontFamily: "var(--font-inter)" }}>⚠️ Tanggal ini sudah lewat.</p>
+                    )}
+                  </div>
+                  <Field label="Waktu Resepsi" required>
+                    <input type="time" value={values.event_time} onChange={(e) => set("event_time", e.target.value)} />
+                  </Field>
+                </div>
+                <Field label="Nama Venue Resepsi" required>
+                  <input type="text" value={values.venue_name} onChange={(e) => set("venue_name", e.target.value)} placeholder="cth. Grand Ballroom Hotel Mulia" />
+                </Field>
+                <Field label="Alamat Venue Resepsi" required>
+                  <textarea value={values.venue_address} onChange={(e) => set("venue_address", e.target.value)}
+                    placeholder="cth. Jl. Asia Afrika No.8, Senayan, Jakarta" rows={2} className="resize-none" />
+                </Field>
+              </SectionCard>
+
+              <SectionCard title="Akad Nikah">
+                <div className="flex items-center gap-3">
+                  <motion.button
+                    type="button"
+                    role="switch"
+                    aria-checked={showAkad}
+                    onClick={toggleAkad}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
+                    style={{ background: showAkad ? "var(--primary)" : "var(--border)" }}
+                  >
+                    <motion.span
+                      className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow"
+                      animate={{ x: showAkad ? 20 : 2 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  </motion.button>
+                  <p className="text-sm" style={{ fontFamily: "var(--font-inter)", color: "var(--muted-foreground)" }}>
+                    {showAkad ? "Sembunyikan section Akad Nikah" : "Tampilkan section Akad Nikah"}
+                  </p>
+                </div>
+                <AnimatePresence>
+                  {showAkad && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.22, ease: "easeInOut" }}
+                      className="flex flex-col gap-4 overflow-hidden"
+                    >
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <Field label="Tanggal Akad">
+                          <input type="date" value={values.akad_date} onChange={(e) => set("akad_date", e.target.value)} />
+                        </Field>
+                        <Field label="Waktu Akad">
+                          <input type="time" value={values.akad_time} onChange={(e) => set("akad_time", e.target.value)} />
+                        </Field>
+                      </div>
+                      <Field label="Nama Venue Akad">
+                        <input type="text" value={values.akad_venue_name} onChange={(e) => set("akad_venue_name", e.target.value)} placeholder="cth. Masjid Al-Falah" />
+                      </Field>
+                      <Field label="Alamat Venue Akad">
+                        <textarea value={values.akad_venue_address} onChange={(e) => set("akad_venue_address", e.target.value)}
+                          placeholder="cth. Jl. Sudirman No.1, Jakarta" rows={2} className="resize-none" />
+                      </Field>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </SectionCard>
+            </>
           )}
-        </div>
 
-        <Field label="Alamat Pengiriman Hadiah (opsional)">
-          <textarea value={values.gift_address} onChange={(e) => set("gift_address", e.target.value)}
-            placeholder="cth. Jl. Merpati No.10, Kebayoran Baru, Jakarta Selatan 12345"
-            rows={2} className="resize-none" />
-        </Field>
-      </SectionCard>
+          {/* ── Tab: Konten ────────────────────────────────────── */}
+          {activeTab === "konten" && (
+            <>
+              <SectionCard title="Konten">
+                <Field label="Dresscode (opsional)">
+                  <input type="text" value={values.dresscode} onChange={(e) => set("dresscode", e.target.value)} placeholder="cth. Pastel / Semi-formal" />
+                </Field>
+                <Field label="Ayat / Kutipan (opsional)">
+                  <textarea value={values.custom_message} onChange={(e) => set("custom_message", e.target.value)}
+                    placeholder={'cth. "Dan di antara tanda-tanda kekuasaan-Nya..." (QS. Ar-Rum: 21)'}
+                    rows={3} className="resize-none" />
+                </Field>
+              </SectionCard>
 
-      {/* ── Kontak ───────────────────────────────────────────── */}
-      <SectionCard title="Kontak">
-        <div className="flex flex-col gap-1.5">
-          <Field label="Nomor WhatsApp Owner (untuk konfirmasi tamu)">
-            <input type="tel" value={values.owner_whatsapp} onChange={(e) => set("owner_whatsapp", e.target.value)}
-              placeholder="cth. 081234567890" />
-          </Field>
-          <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-            Tamu bisa konfirmasi langsung ke nomor ini setelah mengisi RSVP.
-          </p>
-        </div>
-      </SectionCard>
-
-      {/* ── Pengaturan ───────────────────────────────────────── */}
-      <SectionCard title="Pengaturan">
-        <div className="flex flex-col gap-1.5">
-          <Field label="Link Undangan (slug)">
-            <input
-              type="text"
-              value={values.slug}
-              onChange={(e) => { setSlugManual(true); set("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-")); }}
-              placeholder="cth. rosandi-gabriela-2025"
-            />
-          </Field>
-          {values.slug && !slugReserved && <SlugPreview slug={values.slug} />}
-          {slugReserved && (
-            <p className="text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>
-              Slug ini tidak bisa dipakai. Gunakan nama lain.
-            </p>
+              <SectionCard title="Media">
+                <FileUploadField
+                  label="Foto Cover (opsional)"
+                  icon={<Image className="h-4 w-4" />}
+                  accept={COVER_ACCEPT}
+                  maxBytes={COVER_MAX_BYTES}
+                  currentUrl={values.cover_image_url}
+                  hint="JPEG / PNG / WebP — maks. 5 MB"
+                  bucket="covers"
+                  upload={uploadCover}
+                  onUploaded={(url) => set("cover_image_url", url)}
+                  onClear={() => set("cover_image_url", "")}
+                />
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                    Galeri Foto (opsional, maks. 3)
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["gallery_url_1", "gallery_url_2", "gallery_url_3"] as const).map((key, i) => (
+                      <FileUploadField
+                        key={key}
+                        label={`Foto ${i + 1}`}
+                        icon={<Image className="h-3.5 w-3.5" />}
+                        accept={COVER_ACCEPT}
+                        maxBytes={COVER_MAX_BYTES}
+                        currentUrl={values[key]}
+                        hint=""
+                        bucket="covers"
+                        upload={uploadGallery}
+                        onUploaded={(url) => set(key, url)}
+                        onClear={() => set(key, "")}
+                        compact
+                      />
+                    ))}
+                  </div>
+                  <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>JPEG / PNG / WebP — maks. 5 MB per foto</p>
+                </div>
+                <FileUploadField
+                  label="Musik Latar (opsional)"
+                  icon={<Music className="h-4 w-4" />}
+                  accept={MUSIC_ACCEPT}
+                  maxBytes={MUSIC_MAX_BYTES}
+                  currentUrl={values.music_url}
+                  hint="MP3 — maks. 8 MB"
+                  bucket="music"
+                  upload={uploadMusic}
+                  onUploaded={(url) => set("music_url", url)}
+                  onClear={() => set("music_url", "")}
+                />
+              </SectionCard>
+            </>
           )}
-        </div>
 
-        <div className="flex items-center gap-3">
-          <motion.button
-            type="button"
-            role="switch"
-            aria-checked={values.is_published}
-            onClick={() => set("is_published", !values.is_published)}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
-            style={{ background: values.is_published ? "var(--primary)" : "var(--border)" }}
-          >
-            <motion.span
-              className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow"
-              animate={{ x: values.is_published ? 20 : 2 }}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            />
-          </motion.button>
-          <div>
-            <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>
-              {values.is_published ? "Dipublikasikan" : "Draft"}
-            </p>
-            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              {values.is_published ? "Tamu bisa mengakses undangan." : "Hanya Anda yang bisa melihat undangan ini."}
-            </p>
-          </div>
-        </div>
-      </SectionCard>
+          {/* ── Tab: Pengaturan ────────────────────────────────── */}
+          {activeTab === "pengaturan" && (
+            <>
+              <SectionCard title="Rekening & Angpao">
+                <div className="flex flex-col gap-3">
+                  {values.bank_accounts.map((acc, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col gap-3 rounded-xl p-4"
+                      style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                          Rekening {i + 1}
+                        </p>
+                        <motion.button
+                          type="button"
+                          onClick={() => removeBank(i)}
+                          whileHover={{ scale: 1.15 }}
+                          whileTap={{ scale: 0.88 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                          className="rounded-lg p-1"
+                          style={{ color: "#dc2626" }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </motion.button>
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Bank</label>
+                          <select
+                            value={acc.bank}
+                            onChange={(e) => updateBank(i, "bank", e.target.value)}
+                            className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
+                            style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
+                          >
+                            <option value="">Pilih bank...</option>
+                            {COMMON_BANKS.map((b) => <option key={b} value={b}>{b}</option>)}
+                          </select>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Nama Pemilik</label>
+                          <input
+                            type="text"
+                            value={acc.account_name}
+                            onChange={(e) => updateBank(i, "account_name", e.target.value)}
+                            placeholder="cth. Gabriela Tri"
+                            className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
+                            style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Nomor Rekening</label>
+                          <input
+                            type="text"
+                            value={acc.account_number}
+                            onChange={(e) => updateBank(i, "account_number", e.target.value)}
+                            placeholder="cth. 1234567890"
+                            className="rounded-lg px-3 py-2 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
+                            style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <QrCode className="h-4 w-4 flex-shrink-0" style={{ color: "var(--muted-foreground)" }} />
+                        <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>QRIS (opsional)</p>
+                        <div className="h-14 w-14 flex-shrink-0">
+                          <FileUploadField
+                            label="QRIS"
+                            icon={<QrCode className="h-3.5 w-3.5" />}
+                            accept={COVER_ACCEPT}
+                            maxBytes={COVER_MAX_BYTES}
+                            currentUrl={acc.qris_url ?? ""}
+                            hint=""
+                            bucket="covers"
+                            upload={uploadGallery}
+                            onUploaded={(url) => updateBankQris(i, url)}
+                            onClear={() => updateBankQris(i, "")}
+                            compact
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {values.bank_accounts.length < 4 && (
+                    <motion.button
+                      type="button"
+                      onClick={addBank}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm"
+                      style={{ background: "var(--muted)", border: "1px dashed var(--border)", color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Tambah rekening / e-wallet
+                    </motion.button>
+                  )}
+                  {values.bank_accounts.length === 0 && (
+                    <p className="text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                      Opsional — tambahkan jika ingin tamu mengirim hadiah digital.
+                    </p>
+                  )}
+                </div>
+                <Field label="Alamat Pengiriman Hadiah (opsional)">
+                  <textarea value={values.gift_address} onChange={(e) => set("gift_address", e.target.value)}
+                    placeholder="cth. Jl. Merpati No.10, Kebayoran Baru, Jakarta Selatan 12345"
+                    rows={2} className="resize-none" />
+                </Field>
+              </SectionCard>
+
+              <SectionCard title="Kontak">
+                <div className="flex flex-col gap-1.5">
+                  <Field label="Nomor WhatsApp Owner (untuk konfirmasi tamu)">
+                    <input type="tel" value={values.owner_whatsapp} onChange={(e) => set("owner_whatsapp", e.target.value)} placeholder="cth. 081234567890" />
+                  </Field>
+                  <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                    Tamu bisa konfirmasi langsung ke nomor ini setelah mengisi RSVP.
+                  </p>
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Pengaturan">
+                <div className="flex flex-col gap-1.5">
+                  <Field label="Link Undangan (slug)">
+                    <input
+                      type="text"
+                      value={values.slug}
+                      onChange={(e) => { setSlugManual(true); set("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-")); }}
+                      placeholder="cth. rosandi-gabriela-2025"
+                    />
+                  </Field>
+                  {values.slug && !slugReserved && <SlugPreview slug={values.slug} />}
+                  {slugReserved && (
+                    <p className="text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>
+                      Slug ini tidak bisa dipakai. Gunakan nama lain.
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <motion.button
+                    type="button"
+                    role="switch"
+                    aria-checked={values.is_published}
+                    onClick={() => set("is_published", !values.is_published)}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
+                    style={{ background: values.is_published ? "var(--primary)" : "var(--border)" }}
+                  >
+                    <motion.span
+                      className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow"
+                      animate={{ x: values.is_published ? 20 : 2 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  </motion.button>
+                  <div>
+                    <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>
+                      {values.is_published ? "Dipublikasikan" : "Draft"}
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                      {values.is_published ? "Tamu bisa mengakses undangan." : "Hanya Anda yang bisa melihat undangan ini."}
+                    </p>
+                  </div>
+                </div>
+              </SectionCard>
+            </>
+          )}
+
+        </motion.div>
+      </AnimatePresence>
 
       {/* ── Sticky submit bar ─────────────────────────────────── */}
       <div
@@ -628,15 +711,24 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
         }}
       >
         <div className="flex flex-col gap-3 px-5 py-4">
-          {error && (
-            <p className="rounded-xl px-4 py-3 text-sm" style={{ background: "#fef2f2", color: "#dc2626", fontFamily: "var(--font-inter)" }}>
-              {error}
-            </p>
-          )}
+          <AnimatePresence>
+            {displayError && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.15 }}
+                className="overflow-hidden rounded-xl px-4 py-3 text-sm"
+                style={{ background: "#fef2f2", color: "#dc2626", fontFamily: "var(--font-inter)" }}
+              >
+                {displayError}
+              </motion.p>
+            )}
+          </AnimatePresence>
           <motion.button
             type="submit"
-            disabled={submitting || !values.template_id || !values.bride_name || !values.groom_name || slugReserved}
-            whileHover={!submitting && !!values.bride_name && !!values.groom_name && !slugReserved ? { scale: 1.02, boxShadow: "0 4px 18px rgba(176,141,87,0.4)" } : undefined}
+            disabled={submitting}
+            whileHover={!submitting ? { scale: 1.02, boxShadow: "0 4px 18px rgba(176,141,87,0.4)" } : undefined}
             whileTap={!submitting ? { scale: 0.98 } : undefined}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
             className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
@@ -858,7 +950,7 @@ function FileUploadField({
   );
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── SectionCard ──────────────────────────────────────────────────────────────
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -884,6 +976,8 @@ function SectionCard({ title, children }: { title: string; children: React.React
     </div>
   );
 }
+
+// ─── Field ────────────────────────────────────────────────────────────────────
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   const [focused, setFocused] = useState(false);
