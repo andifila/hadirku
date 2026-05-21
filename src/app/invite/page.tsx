@@ -451,7 +451,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.25, duration: 0.5 }}
-                className="mb-14 flex flex-col items-center gap-1"
+                className="mb-14 flex flex-col items-center gap-2"
               >
                 <p className="text-[9px] uppercase tracking-[0.45em]"
                   style={{ color: hasCover ? "rgba(255,255,255,0.55)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
@@ -465,16 +465,22 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
             )}
 
             {/* Bride name */}
-            <h1 className="text-5xl font-bold leading-none sm:text-6xl"
-              style={{ color: hasCover ? "#fff" : "var(--foreground)", fontFamily: "var(--font-playfair)" }}>
+            <h1 style={{
+              color: hasCover ? "#fff" : "var(--foreground)",
+              fontFamily: "var(--font-playfair)",
+              fontSize: "clamp(2.9rem, 12.5vw, 3.75rem)",
+              fontWeight: 700,
+              lineHeight: 1,
+              letterSpacing: "-0.01em",
+            }}>
               <LetterReveal text={invite.bride_name} delay={0.38} />
             </h1>
 
-            {/* & separator with expanding lines */}
+            {/* separator */}
             <motion.div
-              initial={{ opacity: 0, scaleX: 0 }}
-              animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ delay: 0.7, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.68, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="my-7 flex items-center gap-5"
             >
               <div className="h-px w-12"
@@ -487,10 +493,16 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
             </motion.div>
 
             {/* Groom name */}
-            <h1 className="text-5xl font-bold leading-none sm:text-6xl"
-              style={{ color: hasCover ? "#fff" : "var(--foreground)", fontFamily: "var(--font-playfair)" }}>
+            <h2 style={{
+              color: hasCover ? "#fff" : "var(--foreground)",
+              fontFamily: "var(--font-playfair)",
+              fontSize: "clamp(2.9rem, 12.5vw, 3.75rem)",
+              fontWeight: 700,
+              lineHeight: 1,
+              letterSpacing: "-0.01em",
+            }}>
               <LetterReveal text={invite.groom_name} delay={0.75} />
-            </h1>
+            </h2>
 
             {/* Date — minimal, caption-weight */}
             <motion.p
@@ -527,7 +539,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Quote / Custom Message ─────────────────────────── */}
       {invite.custom_message && (
         <RevealSection>
-          <section className="px-6 py-28"
+          <section className="px-6 py-32"
             style={{ background: `color-mix(in srgb, var(--primary) 5%, var(--background))` }}>
             <div className="mx-auto max-w-sm">
               <motion.p
@@ -535,8 +547,13 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="text-2xl leading-[1.75] sm:text-3xl"
-                style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)", fontStyle: "italic" }}
+                className="leading-[1.8]"
+                style={{
+                  fontFamily: "var(--font-playfair)",
+                  color: "var(--foreground)",
+                  fontStyle: "italic",
+                  fontSize: "clamp(1.4rem, 5.5vw, 1.875rem)",
+                }}
               >
                 &ldquo;{invite.custom_message}&rdquo;
               </motion.p>
@@ -590,7 +607,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   }}>
                     {akadDay}
                   </p>
-                  <p className="mt-1 text-2xl tracking-[0.06em]"
+                  <p className="mt-1 text-2xl tracking-[0.03em]"
                     style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}>
                     {akadMonth} {akadYear}
                   </p>
@@ -692,7 +709,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 }}>
                   {day}
                 </p>
-                <p className="mt-1 text-2xl tracking-[0.06em]"
+                <p className="mt-1 text-2xl tracking-[0.03em]"
                   style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}>
                   {month} {year}
                 </p>
@@ -994,12 +1011,12 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Footer ────────────────────────────────────────── */}
       <footer className="px-6 pb-16 pt-20 text-center" style={{ backgroundColor: "var(--background)" }}>
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.7 }}
           className="text-2xl font-bold"
-          style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}
+          style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)", letterSpacing: "-0.005em" }}
         >
           {invite.bride_name} &amp; {invite.groom_name}
         </motion.p>
@@ -1232,12 +1249,16 @@ function RsvpSection({ invite, guestName, onSuccess }: {
             Konfirmasi Kehadiran
           </motion.p>
           <motion.h2
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-3 text-3xl font-bold leading-tight sm:text-4xl"
-            style={{ fontFamily: "var(--font-playfair)" }}
+            transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-3 font-bold"
+            style={{
+              fontFamily: "var(--font-playfair)",
+              fontSize: "clamp(1.75rem, 7vw, 2.25rem)",
+              lineHeight: 1.18,
+            }}
           >
             Beri tahu kami<br />
             kehadiranmu
