@@ -2,14 +2,15 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 import InvitationForm, {
   type FormValues,
 } from "@/components/invitation/InvitationForm";
 import {
   getInvitationById,
   updateInvitation,
+  deleteInvitation,
 } from "@/lib/supabase/invitation-crud";
 
 export default function EditInvitationPage() {
@@ -38,6 +39,8 @@ function EditContent() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -83,6 +86,17 @@ function EditContent() {
       setLoading(false);
     });
   }, [id]);
+
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      await deleteInvitation(id);
+      router.push("/dashboard");
+    } catch {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  }
 
   async function handleSubmit(values: FormValues) {
     setSubmitting(true);
@@ -200,6 +214,73 @@ function EditContent() {
           onSubmit={handleSubmit}
           submitLabel="Simpan Perubahan"
         />
+
+        {/* Danger zone */}
+        <div
+          className="mt-8 rounded-2xl p-5"
+          style={{ border: "1px solid #fecaca", background: "#fef2f2" }}
+        >
+          <p className="text-sm font-semibold" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>
+            Zona Berbahaya
+          </p>
+          <p className="mt-1 text-xs" style={{ color: "#b91c1c", fontFamily: "var(--font-inter)" }}>
+            Menghapus undangan akan menghapus semua data tamu secara permanen.
+          </p>
+          <AnimatePresence mode="wait">
+            {!showDeleteConfirm ? (
+              <motion.button
+                key="btn"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowDeleteConfirm(true)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                className="mt-4 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium"
+                style={{
+                  background: "#dc2626",
+                  color: "#fff",
+                  fontFamily: "var(--font-inter)",
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+                Hapus Undangan
+              </motion.button>
+            ) : (
+              <motion.div
+                key="confirm"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-4 flex flex-wrap items-center gap-2"
+              >
+                <span className="text-sm" style={{ color: "#7f1d1d", fontFamily: "var(--font-inter)" }}>
+                  Yakin ingin menghapus?
+                </span>
+                <motion.button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-60"
+                  style={{ background: "#dc2626", color: "#fff", fontFamily: "var(--font-inter)" }}
+                >
+                  {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                  Ya, Hapus
+                </motion.button>
+                <motion.button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-xl px-4 py-2 text-sm font-medium"
+                  style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)", color: "var(--foreground)" }}
+                >
+                  Batal
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.main>
     </div>
   );

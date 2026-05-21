@@ -45,14 +45,14 @@ export function Sidebar({
     {
       icon: BarChart3,
       label: "Statistik",
-      href: "/dashboard",
-      active: false,
+      href: "/dashboard/stats",
+      active: pathname === "/dashboard/stats",
     },
     {
       icon: Settings,
       label: "Pengaturan",
-      href: "/dashboard",
-      active: false,
+      href: "/dashboard/settings",
+      active: pathname === "/dashboard/settings",
     },
   ];
 

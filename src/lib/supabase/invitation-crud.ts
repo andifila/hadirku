@@ -56,6 +56,12 @@ export async function getInvitationById(id: string): Promise<Invitation | null> 
   return data;
 }
 
+export async function deleteInvitation(id: string): Promise<void> {
+  await supabase.from("guests").delete().eq("invitation_id", id);
+  const { error } = await supabase.from("invitations").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export function generateSlug(bride: string, groom: string): string {
   const clean = (s: string) =>
     s
