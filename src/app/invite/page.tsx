@@ -6,7 +6,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import {
   MapPin, Clock, Heart, Loader2, CheckCircle,
   Phone, MessageSquare, User, Music, Music2, Mail, Shirt,
-  CreditCard, Copy, Check, CalendarPlus, QrCode, Users, Package,
+  CreditCard, Copy, Check, QrCode, Users, Package,
 } from "lucide-react";
 import {
   getInvitationBySlug,
@@ -46,44 +46,6 @@ function generateWhatsAppLink(guestName: string, invitationUrl: string): string 
 
 function igHandle(raw: string): string {
   return raw.replace(/^@/, "");
-}
-
-function makeGoogleCalUrl(title: string, date: string, time: string, venueName: string, venueAddress: string): string {
-  const [y, mo, d] = date.split("-");
-  const [h, m] = time.split(":");
-  const start = `${y}${mo}${d}T${h}${m}00`;
-  const endH = String((parseInt(h) + 2) % 24).padStart(2, "0");
-  const end = `${y}${mo}${d}T${endH}${m}00`;
-  const loc = encodeURIComponent(`${venueName} ${venueAddress}`);
-  const txt = encodeURIComponent(title);
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${txt}&dates=${start}/${end}&location=${loc}`;
-}
-
-function downloadIcal(title: string, date: string, time: string, venueName: string, venueAddress: string) {
-  const [y, mo, d] = date.split("-");
-  const [h, m] = time.split(":");
-  const startDt = `${y}${mo}${d}T${h}${m}00`;
-  const endH = String((parseInt(h) + 2) % 24).padStart(2, "0");
-  const endDt = `${y}${mo}${d}T${endH}${m}00`;
-  const ics = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Wedding Invite//EN",
-    "BEGIN:VEVENT",
-    `DTSTART;TZID=Asia/Jakarta:${startDt}`,
-    `DTEND;TZID=Asia/Jakarta:${endDt}`,
-    `SUMMARY:${title}`,
-    `LOCATION:${venueName} ${venueAddress}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
-  const blob = new Blob([ics], { type: "text/calendar" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${title.replace(/\s+/g, "-").toLowerCase()}.ics`;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -311,23 +273,6 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
         </motion.button>
       </motion.div>
 
-      {inviteUrl && (
-        <motion.a
-          href={generateWhatsAppLink(guestName, inviteUrl)}
-          target="_blank"
-          rel="noopener noreferrer"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.85 }}
-          whileHover={{ scale: 1.04, boxShadow: "0 6px 20px rgba(37,211,102,0.4)" }}
-          whileTap={{ scale: 0.97 }}
-          className="mt-3 flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-medium shadow-sm"
-          style={{ background: "linear-gradient(135deg, #25D366 0%, #1fb855 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
-        >
-          <WhatsAppIcon className="h-4 w-4" />
-          Bagikan via WhatsApp
-        </motion.a>
-      )}
     </div>
   );
 }
@@ -645,15 +590,6 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   <MapPin className="h-4 w-4" />
                   Buka Google Maps — Akad
                 </motion.a>
-                {invite.akad_date && invite.akad_time && (
-                  <CalendarButtons
-                    title={`Akad Nikah ${invite.bride_name} & ${invite.groom_name}`}
-                    date={invite.akad_date}
-                    time={invite.akad_time}
-                    venueName={invite.akad_venue_name ?? ""}
-                    venueAddress={invite.akad_venue_address ?? ""}
-                  />
-                )}
               </div>
             </div>
           </section>
@@ -720,13 +656,6 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 <MapPin className="h-4 w-4" />
                 Buka Google Maps
               </motion.a>
-              <CalendarButtons
-                title={`Resepsi Pernikahan ${invite.bride_name} & ${invite.groom_name}`}
-                date={invite.event_date}
-                time={invite.event_time}
-                venueName={invite.venue_name}
-                venueAddress={invite.venue_address}
-              />
             </div>
           </div>
         </section>
@@ -1023,41 +952,6 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         </p>
       </footer>
     </main>
-  );
-}
-
-// ─── Calendar Buttons ─────────────────────────────────────────────────────────
-
-function CalendarButtons({ title, date, time, venueName, venueAddress }: {
-  title: string; date: string; time: string; venueName: string; venueAddress: string;
-}) {
-  return (
-    <div className="flex gap-2">
-      <motion.a
-        href={makeGoogleCalUrl(title, date, time, venueName, venueAddress)}
-        target="_blank" rel="noopener noreferrer"
-        whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
-        whileTap={{ scale: 0.97 }}
-        transition={{ type: "spring", stiffness: 400, damping: 20 }}
-        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium"
-        style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
-      >
-        <CalendarPlus className="h-3.5 w-3.5" style={{ color: "var(--primary)" }} />
-        Google Calendar
-      </motion.a>
-      <motion.button
-        type="button"
-        onClick={() => downloadIcal(title, date, time, venueName, venueAddress)}
-        whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
-        whileTap={{ scale: 0.97 }}
-        transition={{ type: "spring", stiffness: 400, damping: 20 }}
-        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-medium"
-        style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
-      >
-        <CalendarPlus className="h-3.5 w-3.5" style={{ color: "var(--primary)" }} />
-        iCal / Kalender
-      </motion.button>
-    </div>
   );
 }
 
