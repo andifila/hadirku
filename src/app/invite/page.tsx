@@ -1492,20 +1492,24 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <motion.div
-        initial={{ scaleX: 0, opacity: 0 }}
-        whileInView={{ scaleX: 1, opacity: 1 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="h-px w-8"
-        style={{ background: "var(--primary)", transformOrigin: "center" }}
+        style={{ background: "var(--primary)" }}
       />
       <motion.h2
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-        className="text-3xl font-bold sm:text-4xl"
-        style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}
+        className="font-bold"
+        style={{
+          fontFamily: "var(--font-playfair)",
+          color: "var(--foreground)",
+          fontSize: "clamp(1.875rem, 7vw, 2.25rem)",
+        }}
       >
         {children}
       </motion.h2>
@@ -1515,7 +1519,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 // ─── ConfettiBurst ────────────────────────────────────────────────────────────
 
-const CONFETTI_COLORS = ["#b08d57", "#c06080", "#4a7c59", "#6b35a3", "#e8c98a", "#f8f4ee", "#d4b8f0", "#c5dfc5"];
+const CONFETTI_COLORS = ["#b08d57", "#c5a46d", "#4a7c59", "#7a9e87", "#e8c98a", "#f8f4ee", "#d4c99a", "#a8c4b0"];
 
 function ConfettiBurst({ onComplete }: { onComplete: () => void }) {
   const particles = Array.from({ length: 64 }, (_, i) => {
