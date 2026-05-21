@@ -186,7 +186,7 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-xs"
       >
         <motion.div
@@ -244,15 +244,16 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
       >
         <motion.button
           onClick={onOpen}
-          whileHover={{ opacity: 0.85 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.02, boxShadow: `0 8px 28px -6px ${theme.primary}88` }}
+          whileTap={{ scale: 0.97 }}
           transition={{ duration: 0.15 }}
           className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium"
           style={{
-            background: theme.primary,
+            background: theme.gradient,
             color: "#fff",
             fontFamily: "var(--font-inter)",
-            borderRadius: 0,
+            borderRadius: 6,
+            boxShadow: `0 4px 20px -6px ${theme.primary}66`,
           }}
         >
           Buka Undangan
@@ -354,8 +355,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           )}
           <motion.button
             onClick={toggleMusic}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
             className="relative flex h-11 w-11 items-center justify-center rounded-full shadow-lg"
             style={{ background: "var(--primary)", color: "#fff" }}
@@ -390,13 +391,13 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         <HeroOrnament color={theme.primary} />
 
         <motion.div
-          initial={{ opacity: 0, y: 36 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-10 flex flex-col items-center text-center"
         >
           {displayName && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.8 }}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.6 }}
               className="mb-12 flex flex-col items-center gap-1.5">
               <p className="text-[9px] uppercase tracking-[0.4em]" style={{ color: hasCover ? "rgba(255,255,255,0.6)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Kepada Yth.
@@ -408,7 +409,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
             </motion.div>
           )}
 
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35, duration: 0.8 }}
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35, duration: 0.6 }}
             className="mb-5 text-[9px] uppercase tracking-[0.4em]"
             style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
             Undangan Pernikahan
@@ -485,13 +486,13 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
             )}
           </div>
 
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.95, duration: 0.8 }}
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.95, duration: 0.6 }}
             className="mt-8 max-w-[260px] text-sm leading-loose"
             style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-playfair)", fontStyle: "italic" }}>
             Dengan penuh kebahagiaan, kami mengundang kehadiran Anda
           </motion.p>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.8 }}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.6 }}
             className="mt-7 flex items-center gap-4">
             <div className="h-px w-10" style={{ background: hasCover ? "rgba(255,255,255,0.3)" : "var(--border)" }} />
             <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
@@ -501,7 +502,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           </motion.div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.8 }}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.6 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2">
           <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
             className="flex flex-col items-center gap-1.5">
@@ -514,13 +515,13 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Quote ────────────────────────────────────────────── */}
       {invite.custom_message && (
         <FadeSection>
-          <section className="px-6 py-24 text-center" style={{ backgroundColor: "var(--background)" }}>
+          <section className="px-6 py-24 text-center" style={{ background: `color-mix(in srgb, var(--primary) 5%, var(--background))` }}>
             <div className="mx-auto max-w-md">
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="text-2xl leading-[1.7] sm:text-3xl"
                 style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)", fontStyle: "italic" }}
               >
@@ -542,7 +543,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="text-center"
                 >
                   <p style={{
@@ -602,11 +603,11 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   <motion.a
                     href={`https://maps.google.com?q=${encodeURIComponent(`${invite.akad_venue_name} ${invite.akad_venue_address ?? ""}`)}`}
                     target="_blank" rel="noopener noreferrer"
-                    whileHover={{ opacity: 0.85 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.02, boxShadow: `0 6px 24px -6px ${theme.primary}88` }}
+                    whileTap={{ scale: 0.97 }}
                     transition={{ duration: 0.15 }}
                     className="flex items-center justify-center gap-2 py-3.5 text-[10px] uppercase tracking-[0.2em] font-medium"
-                    style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 4 }}
+                    style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 6, boxShadow: `0 4px 16px -6px ${theme.primary}55` }}
                   >
                     <MapPin className="h-3.5 w-3.5" />
                     Buka Peta — Akad
@@ -628,7 +629,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="text-center"
               >
                 <p style={{
@@ -686,11 +687,11 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 <motion.a
                   href={`https://maps.google.com?q=${encodeURIComponent(invite.venue_name + " " + invite.venue_address)}`}
                   target="_blank" rel="noopener noreferrer"
-                  whileHover={{ opacity: 0.85 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.02, boxShadow: `0 6px 24px -6px ${theme.primary}88` }}
+                  whileTap={{ scale: 0.97 }}
                   transition={{ duration: 0.15 }}
                   className="flex items-center justify-center gap-2 py-3.5 text-[10px] uppercase tracking-[0.2em] font-medium"
-                  style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 4 }}
+                  style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 6, boxShadow: `0 4px 16px -6px ${theme.primary}55` }}
                 >
                   <MapPin className="h-3.5 w-3.5" />
                   Buka Google Maps
@@ -713,7 +714,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true, margin: "-40px" }}
-                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="grid gap-2"
                     style={{ gridTemplateColumns: "2fr 1fr", gridTemplateRows: "200px 200px" }}
                   >
@@ -747,7 +748,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                       initial={{ opacity: 0, y: 24 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                       className="flex-1 overflow-hidden"
                       style={{ height: 320, borderRadius: 6 }}
                     >
@@ -769,7 +770,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     className="aspect-video overflow-hidden"
                     style={{ borderRadius: 6 }}
                   >
@@ -1000,14 +1001,14 @@ function BankCard({ bank, accountName, accountNumber, qrisUrl, isLast }: {
           {qrisUrl && (
             <motion.button
               onClick={() => setShowQris(!showQris)}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
               className="flex h-8 w-8 items-center justify-center"
               style={{
                 background: showQris ? "var(--primary)" : "transparent",
                 border: `1px solid ${showQris ? "var(--primary)" : "var(--border)"}`,
-                borderRadius: 4,
+                borderRadius: 6,
                 color: showQris ? "#fff" : "var(--muted-foreground)",
               }}
               aria-label="Lihat QRIS"
@@ -1017,14 +1018,14 @@ function BankCard({ bank, accountName, accountNumber, qrisUrl, isLast }: {
           )}
           <motion.button
             onClick={handleCopy}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
             className="flex h-8 w-8 items-center justify-center"
             style={{
               background: "transparent",
               border: `1px solid ${copied ? "#16a34a" : "var(--border)"}`,
-              borderRadius: 4,
+              borderRadius: 6,
               color: copied ? "#16a34a" : "var(--muted-foreground)",
             }}
             aria-label="Salin nomor rekening"
@@ -1186,11 +1187,11 @@ function RsvpSection({ invite, guestName, onSuccess }: {
                     <motion.button
                       type="button"
                       onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
-                      whileTap={{ scale: 0.88 }}
+                      whileTap={{ scale: 0.97 }}
                       className="flex h-7 w-7 items-center justify-center text-base"
                       style={{
                         border: "1px solid var(--border)",
-                        borderRadius: 4,
+                        borderRadius: 6,
                         color: "var(--muted-foreground)",
                         background: "transparent",
                       }}
@@ -1201,11 +1202,11 @@ function RsvpSection({ invite, guestName, onSuccess }: {
                     <motion.button
                       type="button"
                       onClick={() => setGuestCount(Math.min(20, guestCount + 1))}
-                      whileTap={{ scale: 0.88 }}
+                      whileTap={{ scale: 0.97 }}
                       className="flex h-7 w-7 items-center justify-center text-base"
                       style={{
                         border: "1px solid var(--border)",
-                        borderRadius: 4,
+                        borderRadius: 6,
                         color: "var(--muted-foreground)",
                         background: "transparent",
                       }}
@@ -1246,11 +1247,11 @@ function RsvpSection({ invite, guestName, onSuccess }: {
               <motion.button
                 type="submit"
                 disabled={state === "submitting" || !name.trim()}
-                whileHover={state !== "submitting" && !!name.trim() ? { opacity: 0.85 } : undefined}
-                whileTap={state !== "submitting" && !!name.trim() ? { scale: 0.99 } : undefined}
+                whileHover={state !== "submitting" && !!name.trim() ? { scale: 1.02, boxShadow: `0 6px 24px -6px ${theme.primary}88` } : undefined}
+                whileTap={state !== "submitting" && !!name.trim() ? { scale: 0.97 } : undefined}
                 transition={{ duration: 0.15 }}
                 className="mt-8 flex w-full items-center justify-center py-4 text-[10px] uppercase tracking-[0.25em] font-medium disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: theme.primary, color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 4 }}
+                style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 6, boxShadow: `0 4px 16px -6px ${theme.primary}55` }}
               >
                 {state === "submitting"
                   ? <Loader2 className="h-4 w-4 animate-spin" />
@@ -1315,10 +1316,10 @@ function HeroOrnament({ color }: { color: string }) {
 function FadeSection({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 32 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
