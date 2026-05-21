@@ -414,20 +414,19 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${invite.cover_image_url})`, y: coverParallaxY, scale: 1.08 }}
             />
+            {/* Tonal overlay — protects text readability */}
             <div className="absolute inset-0"
-              style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.52) 60%, rgba(0,0,0,0.7) 100%)" }} />
+              style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.42) 55%, rgba(0,0,0,0.65) 85%, rgba(0,0,0,0.72) 100%)" }} />
+            {/* Atmospheric bleed — photo world dissolves into paper world at the bottom */}
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[2]"
+              style={{ height: 160, background: "linear-gradient(to bottom, transparent, var(--background))" }} />
           </>
         ) : (
           <>
             <div className="absolute inset-0"
               style={{ background: `linear-gradient(160deg, ${theme.muted} 0%, #f9f7f3 50%, ${theme.muted} 100%)` }} />
             <div className="absolute inset-0"
-              style={{ background: "radial-gradient(ellipse 80% 70% at 50% 35%, rgba(255,255,255,0.9), transparent)" }} />
-            <div className="pointer-events-none absolute" style={{
-              width: 500, height: 500, borderRadius: "50%",
-              background: `radial-gradient(circle, ${theme.primary}18 0%, transparent 65%)`,
-              top: "-12%", left: "-18%", filter: "blur(48px)",
-            }} />
+              style={{ background: "radial-gradient(ellipse 70% 60% at 50% 30%, rgba(255,255,255,0.85), transparent)" }} />
           </>
         )}
 
@@ -439,9 +438,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           className="relative z-10 flex flex-col items-center px-6 text-center"
         >
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center"
           >
             {displayName && (
@@ -529,10 +528,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
             style={{ background: `color-mix(in srgb, var(--primary) 5%, var(--background))` }}>
             <div className="mx-auto max-w-sm">
               <motion.p
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                 className="text-2xl leading-[1.75] sm:text-3xl"
                 style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)", fontStyle: "italic" }}
               >
@@ -602,10 +601,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
                 {/* Venue info — left-aligned */}
                 <motion.div
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                   className="space-y-2"
                 >
                   {akadTime && (
@@ -704,10 +703,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
               {/* Venue info — right-aligned */}
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
                 className="space-y-2"
               >
                 <p className="text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
@@ -1541,10 +1540,10 @@ function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
       {text.split("").map((char, i) => (
         <motion.span
           key={i}
-          initial={{ opacity: 0, y: 24, rotateX: -50 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ duration: 0.45, delay: delay + i * 0.055, ease: [0.22, 1, 0.36, 1] }}
-          style={{ display: "inline-block", transformOrigin: "bottom center" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: delay + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+          style={{ display: "inline-block" }}
         >
           {char === " " ? " " : char}
         </motion.span>
