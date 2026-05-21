@@ -5,7 +5,7 @@ function getRedirectUrl() {
   const base = isProd
     ? "https://andifila.github.io/invitation-wedding"
     : "http://localhost:3000";
-  return `${base}/auth/callback`;
+  return `${base}/auth/callback/`;
 }
 
 export async function signInWithMagicLink(email: string) {
