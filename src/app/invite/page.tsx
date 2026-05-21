@@ -20,14 +20,6 @@ import { cn } from "@/lib/utils";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
-function WhatsAppIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return (
-    <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-  );
-}
-
 function InstagramIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
@@ -55,21 +47,21 @@ export default function InvitePage() {
 function EnvelopeSkeleton() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12 animate-pulse" style={{ background: "#f3f0eb" }}>
-      <div className="w-full max-w-sm rounded-3xl px-8 py-10" style={{ background: "#fffdf9", border: "1px solid #e8e2d9" }}>
-        <div className="mb-8 mx-auto h-2.5 w-40 rounded-full" style={{ background: "#e8e2d9" }} />
-        <div className="mb-2 mx-auto h-2 w-20 rounded-full" style={{ background: "#e8e2d9" }} />
-        <div className="mb-6 mx-auto h-7 w-56 rounded-full" style={{ background: "#e8e2d9" }} />
+      <div className="w-full max-w-xs px-10 py-14" style={{ background: "#fffdf9", border: "1px solid #e8e2d9" }}>
+        <div className="mb-10 mx-auto h-2 w-32" style={{ background: "#e8e2d9" }} />
+        <div className="mb-2 mx-auto h-1.5 w-16" style={{ background: "#e8e2d9" }} />
+        <div className="mb-6 mx-auto h-8 w-52" style={{ background: "#e8e2d9" }} />
         <div className="mb-6 flex items-center gap-3">
           <div className="h-px flex-1" style={{ background: "#e8e2d9" }} />
-          <div className="h-4 w-4 rounded-full" style={{ background: "#e8e2d9" }} />
+          <div className="h-1 w-1 rounded-full" style={{ background: "#e8e2d9" }} />
           <div className="h-px flex-1" style={{ background: "#e8e2d9" }} />
         </div>
-        <div className="mb-1 mx-auto h-2 w-12 rounded-full" style={{ background: "#e8e2d9" }} />
-        <div className="mb-1 mx-auto h-5 w-44 rounded-full" style={{ background: "#e8e2d9" }} />
-        <div className="mx-auto h-5 w-44 rounded-full" style={{ background: "#e8e2d9" }} />
-        <div className="mt-4 mx-auto h-2 w-36 rounded-full" style={{ background: "#e8e2d9" }} />
+        <div className="mb-1 mx-auto h-1.5 w-10" style={{ background: "#e8e2d9" }} />
+        <div className="mb-1 mx-auto h-7 w-44" style={{ background: "#e8e2d9" }} />
+        <div className="mx-auto h-7 w-44" style={{ background: "#e8e2d9" }} />
+        <div className="mt-5 mx-auto h-1.5 w-32" style={{ background: "#e8e2d9" }} />
       </div>
-      <div className="mt-5 h-14 w-full max-w-sm rounded-2xl" style={{ background: "#d4c8b5" }} />
+      <div className="mt-5 h-12 w-full max-w-xs" style={{ background: "#d4c8b5" }} />
     </div>
   );
 }
@@ -101,7 +93,6 @@ function InviteContent() {
       .finally(() => setLoading(false));
   }, [slug, isPreview]);
 
-  // Lock body scroll while envelope is visible — prevents iOS Safari touch fall-through
   useEffect(() => {
     if (!invite || opened) return;
     const prev = document.body.style.overflow;
@@ -140,7 +131,7 @@ function InviteContent() {
           <motion.div
             key="envelope"
             className={`fixed inset-0 z-[60]${isPreview ? " pt-8" : ""}`}
-            exit={{ opacity: 0, transition: { duration: 0.4, ease: "easeInOut" } }}
+            exit={{ opacity: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
           >
             <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => { setOpened(true); setShowConfetti(true); }} />
           </motion.div>
@@ -153,9 +144,9 @@ function InviteContent() {
 
       {opened && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.1 }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
           <InvitationView
             invite={invite}
@@ -182,7 +173,6 @@ const TEMPLATE_THEMES: Record<string, { primary: string; muted: string; border: 
 
 function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation; guestName: string; onOpen: () => void }) {
   const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
-  const inviteUrl = typeof window !== "undefined" ? window.location.href : "";
   const displayName = guestName ? `Bapak/Ibu ${guestName}` : "Tamu Undangan";
 
   const eventDate = new Date(invite.event_date);
@@ -194,84 +184,80 @@ function EnvelopeCover({ invite, guestName, onOpen }: { invite: PublicInvitation
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12" style={{ background: theme.muted }}>
       <motion.div
-        initial={{ opacity: 0, y: 32 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-sm"
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-xs"
       >
         <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         >
-        <div
-          className="relative overflow-hidden rounded-3xl px-8 py-10"
-          style={{
-            background: "linear-gradient(160deg, #fffdf9 0%, #f8f4ee 100%)",
-            border: `1px solid ${theme.border}`,
-            boxShadow: "0 32px 80px -20px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.75)",
-          }}
-        >
-          <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden preserveAspectRatio="none">
-            <line x1="0" y1="0" x2="50%" y2="40%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
-            <line x1="100%" y1="0" x2="50%" y2="40%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
-            <line x1="0" y1="100%" x2="50%" y2="60%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
-            <line x1="100%" y1="100%" x2="50%" y2="60%" stroke={theme.primary} strokeWidth="1" opacity="0.07" />
-          </svg>
-
-          <p className="mb-8 text-center text-[10px] uppercase tracking-[0.35em]" style={{ color: theme.primary, fontFamily: "var(--font-inter)" }}>
-            ✦ &nbsp; Undangan Pernikahan &nbsp; ✦
-          </p>
-
-          <div className="mb-6 text-center">
-            <p className="mb-1.5 text-xs uppercase tracking-widest" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Kepada Yth.
+          <div
+            className="relative overflow-hidden px-10 py-14"
+            style={{
+              background: "linear-gradient(160deg, #fffdf9 0%, #f8f4ee 100%)",
+              border: `1px solid ${theme.border}`,
+              boxShadow: "0 40px 100px -24px rgba(0,0,0,0.16), 0 0 0 1px rgba(255,255,255,0.8)",
+            }}
+          >
+            <p className="mb-10 text-center text-[9px] uppercase tracking-[0.4em]" style={{ color: theme.primary, fontFamily: "var(--font-inter)" }}>
+              Undangan Pernikahan
             </p>
-            <p className="text-2xl font-bold leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
-              {displayName}
+
+            <div className="mb-7 text-center">
+              <p className="mb-1 text-[9px] uppercase tracking-[0.3em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                Kepada Yth.
+              </p>
+              <p className="text-[22px] font-bold leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
+                {displayName}
+              </p>
+            </div>
+
+            <div className="mb-7 flex items-center gap-3">
+              <div className="h-px flex-1" style={{ background: theme.border }} />
+              <div className="h-1 w-1 rounded-full" style={{ background: theme.primary }} />
+              <div className="h-px flex-1" style={{ background: theme.border }} />
+            </div>
+
+            <div className="text-center">
+              <p className="mb-2 text-[9px] uppercase tracking-[0.3em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                Dari
+              </p>
+              <p className="text-xl font-semibold leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>{invite.bride_name}</p>
+              <p className="my-1.5 text-[10px] tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>&amp;</p>
+              <p className="text-xl font-semibold leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>{invite.groom_name}</p>
+            </div>
+
+            <p className="mt-6 text-center text-[10px] tracking-wide" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              {dayName}, {day} {month} {year}
             </p>
           </div>
-
-          <div className="mb-6 flex items-center gap-3">
-            <div className="h-px flex-1" style={{ background: theme.border }} />
-            <Heart className="h-4 w-4 flex-shrink-0" style={{ color: theme.primary }} fill={theme.primary} />
-            <div className="h-px flex-1" style={{ background: theme.border }} />
-          </div>
-
-          <div className="text-center">
-            <p className="mb-2 text-[10px] uppercase tracking-widest" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Dari
-            </p>
-            <p className="text-xl font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{invite.bride_name}</p>
-            <p className="my-1 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>&amp;</p>
-            <p className="text-xl font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{invite.groom_name}</p>
-          </div>
-
-          <p className="mt-4 text-center text-xs tracking-wide" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-            {dayName}, {day} {month} {year}
-          </p>
-        </div>
         </motion.div>
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45, duration: 0.45 }}
-        className="mt-5 w-full max-w-sm"
+        transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="mt-5 w-full max-w-xs"
       >
         <motion.button
           onClick={onOpen}
-          whileHover={{ scale: 1.02, boxShadow: `0 12px 40px -8px ${theme.primary}aa` }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          className="flex w-full items-center justify-center gap-3 rounded-2xl text-base font-semibold"
-          style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)", minHeight: 56, boxShadow: `0 8px 32px -8px ${theme.primary}88` }}
+          whileHover={{ opacity: 0.85 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.15 }}
+          className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium"
+          style={{
+            background: theme.primary,
+            color: "#fff",
+            fontFamily: "var(--font-inter)",
+            borderRadius: 0,
+          }}
         >
-          <Mail className="h-5 w-5" />
           Buka Undangan
         </motion.button>
       </motion.div>
-
     </div>
   );
 }
@@ -299,7 +285,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const coverParallaxY = useTransform(heroScroll, [0, 1], ["0%", "25%"]);
+  const coverParallaxY = useTransform(heroScroll, [0, 1], ["0%", "30%"]);
 
   useEffect(() => {
     const interval = setInterval(() => setTimeLeft(getTimeLeft(eventDate)), 1000);
@@ -361,21 +347,21 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           {musicPlaying && (
             <motion.div
               className="absolute inset-0 rounded-full"
-              animate={{ scale: [1, 1.9], opacity: [0.5, 0] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
+              animate={{ scale: [1, 2], opacity: [0.4, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
               style={{ background: "var(--primary)" }}
             />
           )}
           <motion.button
             onClick={toggleMusic}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="relative flex h-12 w-12 items-center justify-center rounded-full shadow-lg"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className="relative flex h-11 w-11 items-center justify-center rounded-full shadow-lg"
             style={{ background: "var(--primary)", color: "#fff" }}
             aria-label={musicPlaying ? "Pause musik" : "Putar musik"}
           >
-            {musicPlaying ? <Music className="h-5 w-5" /> : <Music2 className="h-5 w-5" />}
+            {musicPlaying ? <Music className="h-4 w-4" /> : <Music2 className="h-4 w-4" />}
           </motion.button>
         </div>
       )}
@@ -383,7 +369,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section
         ref={heroRef}
-        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16"
+        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-20"
         style={{ background: hasCover ? "transparent" : "var(--muted)" }}
       >
         {hasCover ? (
@@ -392,56 +378,54 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${invite.cover_image_url})`, y: coverParallaxY }}
             />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 100%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.6) 100%)" }} />
           </>
         ) : (
           <>
             <div className="absolute inset-0" style={{ background: `linear-gradient(140deg, ${theme.muted} 0%, #fffdf9 52%, ${theme.muted} 100%)` }} />
-            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 80% 65% at 50% 28%, rgba(255,255,255,0.9), transparent)" }} />
-            <div className="pointer-events-none absolute" style={{ width: 340, height: 340, borderRadius: "50%", background: `radial-gradient(circle, ${theme.primary}30 0%, transparent 68%)`, top: "-10%", left: "-14%", filter: "blur(28px)" }} />
-            <div className="pointer-events-none absolute" style={{ width: 240, height: 240, borderRadius: "50%", background: `radial-gradient(circle, ${theme.primary}22 0%, transparent 68%)`, top: "52%", right: "-9%", filter: "blur(20px)" }} />
-            <div className="pointer-events-none absolute" style={{ width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle, ${theme.primary}1a 0%, transparent 68%)`, bottom: "12%", left: "18%", filter: "blur(16px)" }} />
-            <div className="pointer-events-none absolute" style={{ width: 160, height: 160, borderRadius: "50%", background: `radial-gradient(circle, ${theme.primary}14 0%, transparent 68%)`, top: "30%", right: "22%", filter: "blur(14px)" }} />
-            <FloatingPetals color={theme.primary} />
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 30%, rgba(255,255,255,0.95), transparent)" }} />
+            <div className="pointer-events-none absolute" style={{ width: 420, height: 420, borderRadius: "50%", background: `radial-gradient(circle, ${theme.primary}22 0%, transparent 65%)`, top: "-8%", left: "-16%", filter: "blur(40px)" }} />
           </>
         )}
-        <Ornament color={theme.primary} />
+        <HeroOrnament color={theme.primary} />
 
         <motion.div
-          initial={{ opacity: 0, y: 32 }}
+          initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-10 flex flex-col items-center text-center"
         >
           {displayName && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mb-8 flex flex-col items-center gap-1">
-              <p className="text-xs uppercase tracking-widest" style={{ color: hasCover ? "rgba(255,255,255,0.75)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.8 }}
+              className="mb-12 flex flex-col items-center gap-1.5">
+              <p className="text-[9px] uppercase tracking-[0.4em]" style={{ color: hasCover ? "rgba(255,255,255,0.6)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Kepada Yth.
               </p>
-              <p className="text-xl font-semibold" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
+              <p className="text-lg font-medium italic" style={{ color: hasCover ? "rgba(255,255,255,0.95)" : "var(--foreground)", fontFamily: "var(--font-playfair)" }}>
                 {displayName}
               </p>
+              <div className="mt-1.5 h-px w-10" style={{ background: hasCover ? "rgba(255,255,255,0.25)" : "var(--border)" }} />
             </motion.div>
           )}
 
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-            className="mb-3 text-xs uppercase tracking-[0.3em]"
-            style={{ color: hasCover ? "rgba(255,255,255,0.85)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35, duration: 0.8 }}
+            className="mb-5 text-[9px] uppercase tracking-[0.4em]"
+            style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
             Undangan Pernikahan
           </motion.p>
 
           {/* Bride */}
           <div className="flex flex-col items-center">
-            <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
+            <h1 className="text-5xl font-bold leading-none sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
               <LetterReveal text={invite.bride_name} delay={0.5} />
             </h1>
             {invite.bride_title && (
-              <p className="mt-1 text-sm font-medium" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
+              <p className="mt-2 text-xs font-medium tracking-wider uppercase" style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
                 {invite.bride_title}
               </p>
             )}
             {(invite.bride_father_name || invite.bride_mother_name) && (
-              <p className="mt-1 text-xs" style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: hasCover ? "rgba(255,255,255,0.55)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Putri dari {invite.bride_father_name && `Bp. ${invite.bride_father_name}`}
                 {invite.bride_father_name && invite.bride_mother_name && " & "}
                 {invite.bride_mother_name && `Ibu ${invite.bride_mother_name}`}
@@ -451,36 +435,38 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               <a
                 href={`https://instagram.com/${igHandle(invite.bride_instagram!)}`}
                 target="_blank" rel="noopener noreferrer"
-                className="mt-2 flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70"
-                style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}
+                className="mt-2 flex items-center gap-1.5 text-[10px] transition-opacity hover:opacity-60"
+                style={{ color: hasCover ? "rgba(255,255,255,0.55)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
               >
-                <InstagramIcon className="h-3.5 w-3.5" />
+                <InstagramIcon className="h-3 w-3" />
                 @{igHandle(invite.bride_instagram!)}
               </a>
             )}
           </div>
 
-          <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7, type: "spring", stiffness: 200 }} className="my-5">
-            <motion.div
-              animate={{ scale: [1, 1.2, 1, 1.2, 1] }}
-              transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
-            >
-              <Heart className="h-8 w-8" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)" }} fill="currentColor" />
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ delay: 0.75, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="my-8 flex items-center gap-5"
+          >
+            <div className="h-px w-14" style={{ background: hasCover ? "rgba(255,255,255,0.25)" : "var(--border)" }} />
+            <Heart className="h-5 w-5 flex-shrink-0" style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)" }} fill="currentColor" />
+            <div className="h-px w-14" style={{ background: hasCover ? "rgba(255,255,255,0.25)" : "var(--border)" }} />
           </motion.div>
 
           {/* Groom */}
           <div className="flex flex-col items-center">
-            <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
+            <h1 className="text-5xl font-bold leading-none sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
               <LetterReveal text={invite.groom_name} delay={0.82} />
             </h1>
             {invite.groom_title && (
-              <p className="mt-1 text-sm font-medium" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
+              <p className="mt-2 text-xs font-medium tracking-wider uppercase" style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
                 {invite.groom_title}
               </p>
             )}
             {(invite.groom_father_name || invite.groom_mother_name) && (
-              <p className="mt-1 text-xs" style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: hasCover ? "rgba(255,255,255,0.55)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Putra dari {invite.groom_father_name && `Bp. ${invite.groom_father_name}`}
                 {invite.groom_father_name && invite.groom_mother_name && " & "}
                 {invite.groom_mother_name && `Ibu ${invite.groom_mother_name}`}
@@ -490,34 +476,37 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               <a
                 href={`https://instagram.com/${igHandle(invite.groom_instagram!)}`}
                 target="_blank" rel="noopener noreferrer"
-                className="mt-2 flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70"
-                style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontFamily: "var(--font-inter)" }}
+                className="mt-2 flex items-center gap-1.5 text-[10px] transition-opacity hover:opacity-60"
+                style={{ color: hasCover ? "rgba(255,255,255,0.55)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
               >
-                <InstagramIcon className="h-3.5 w-3.5" />
+                <InstagramIcon className="h-3 w-3" />
                 @{igHandle(invite.groom_instagram!)}
               </a>
             )}
           </div>
 
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.95 }}
-            className="mt-6 max-w-xs text-sm leading-relaxed"
-            style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--muted-foreground)", fontFamily: "var(--font-playfair)", fontStyle: "italic" }}>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.95, duration: 0.8 }}
+            className="mt-8 max-w-[260px] text-sm leading-loose"
+            style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--muted-foreground)", fontFamily: "var(--font-playfair)", fontStyle: "italic" }}>
             Dengan penuh kebahagiaan, kami mengundang kehadiran Anda
           </motion.p>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.05 }} className="mt-6 flex items-center gap-3">
-            <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.5)" : "var(--primary)", opacity: 0.6 }} />
-            <p className="text-sm uppercase tracking-widest" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.8 }}
+            className="mt-7 flex items-center gap-4">
+            <div className="h-px w-10" style={{ background: hasCover ? "rgba(255,255,255,0.3)" : "var(--border)" }} />
+            <p className="text-[10px] uppercase tracking-[0.25em]" style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
               {dayName}, {day} {month} {year}
             </p>
-            <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.5)" : "var(--primary)", opacity: 0.6 }} />
+            <div className="h-px w-10" style={{ background: hasCover ? "rgba(255,255,255,0.3)" : "var(--border)" }} />
           </motion.div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4 }} className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }} className="flex flex-col items-center gap-1">
-            <div className="h-6 w-px" style={{ background: hasCover ? "rgba(255,255,255,0.6)" : "var(--primary)", opacity: 0.5 }} />
-            <div className="h-1.5 w-1.5 rounded-full" style={{ background: hasCover ? "rgba(255,255,255,0.6)" : "var(--primary)" }} />
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5, duration: 0.8 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-1.5">
+            <div className="h-8 w-px" style={{ background: hasCover ? "rgba(255,255,255,0.4)" : "var(--primary)", opacity: 0.5 }} />
+            <div className="h-1 w-1 rounded-full" style={{ background: hasCover ? "rgba(255,255,255,0.5)" : "var(--primary)" }} />
           </motion.div>
         </motion.div>
       </section>
@@ -525,61 +514,18 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Quote ────────────────────────────────────────────── */}
       {invite.custom_message && (
         <FadeSection>
-          <section className="relative overflow-hidden px-6 py-24 text-center" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
-            <div className="pointer-events-none absolute inset-0 opacity-[0.055]" aria-hidden>
-              <svg width="100%" height="100%">
-                <defs>
-                  <pattern id="batik-quote" x="0" y="0" width="56" height="56" patternUnits="userSpaceOnUse">
-                    <circle cx="28" cy="28" r="11" stroke={theme.primary} strokeWidth="1" fill="none" />
-                    <circle cx="28" cy="28" r="5.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
-                    <circle cx="0" cy="0" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
-                    <circle cx="56" cy="0" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
-                    <circle cx="0" cy="56" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
-                    <circle cx="56" cy="56" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
-                    <line x1="0" y1="28" x2="17" y2="28" stroke={theme.primary} strokeWidth="0.5" />
-                    <line x1="39" y1="28" x2="56" y2="28" stroke={theme.primary} strokeWidth="0.5" />
-                    <line x1="28" y1="0" x2="28" y2="17" stroke={theme.primary} strokeWidth="0.5" />
-                    <line x1="28" y1="39" x2="28" y2="56" stroke={theme.primary} strokeWidth="0.5" />
-                    <line x1="14" y1="14" x2="20" y2="20" stroke={theme.primary} strokeWidth="0.5" />
-                    <line x1="36" y1="14" x2="42" y2="20" stroke={theme.primary} strokeWidth="0.5" />
-                    <line x1="14" y1="42" x2="20" y2="36" stroke={theme.primary} strokeWidth="0.5" />
-                    <line x1="36" y1="42" x2="42" y2="36" stroke={theme.primary} strokeWidth="0.5" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#batik-quote)" />
-              </svg>
-            </div>
-            <div className="relative z-10 mx-auto max-w-lg">
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-                className="mb-4 text-5xl font-bold leading-none"
-                style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}
-              >
-                ❝
-              </motion.div>
+          <section className="px-6 py-24 text-center" style={{ backgroundColor: "var(--background)" }}>
+            <div className="mx-auto max-w-md">
               <motion.p
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: 0.12 }}
-                className="text-xl leading-relaxed sm:text-2xl"
+                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                className="text-2xl leading-[1.7] sm:text-3xl"
                 style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)", fontStyle: "italic" }}
               >
-                {invite.custom_message}
+                &ldquo;{invite.custom_message}&rdquo;
               </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.28 }}
-                className="mt-4 text-5xl font-bold leading-none"
-                style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}
-              >
-                ❞
-              </motion.div>
             </div>
           </section>
         </FadeSection>
@@ -588,61 +534,84 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Akad Nikah ───────────────────────────────────────── */}
       {hasAkad && invite.akad_venue_name && (
         <FadeSection>
-          <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(color-mix(in srgb, var(--primary) 14%, transparent) 2px, transparent 2px)", backgroundSize: "22px 22px" }}>
-            <div className="mx-auto max-w-xl">
+          <section className="px-6 py-20" style={{ backgroundColor: "var(--muted)" }}>
+            <div className="mx-auto max-w-sm">
               <SectionTitle>Akad Nikah</SectionTitle>
-              <div className="mt-10 overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
-                <div className="flex items-center gap-3 px-5 py-3.5" style={{ background: "var(--primary)" }}>
-                  <Heart className="h-4 w-4 flex-shrink-0" style={{ color: "rgba(255,255,255,0.85)" }} fill="rgba(255,255,255,0.85)" />
-                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.9)", fontFamily: "var(--font-inter)" }}>
-                    Akad Nikah
-                  </p>
-                </div>
-                <div className="grid" style={{ gridTemplateColumns: "100px 1fr", background: "var(--background)" }}>
-                  <div className="flex flex-col items-center justify-center gap-0.5 border-r p-4 text-center" style={{ borderColor: "var(--border)", background: "var(--muted)" }}>
-                    <p className="text-5xl font-bold leading-none" style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}>{akadDay}</p>
-                    <p className="mt-1.5 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>{akadMonth}</p>
-                    <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{akadYear}</p>
-                    <p className="mt-1 text-[10px] leading-snug" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{akadDayName}</p>
-                  </div>
-                  <div className="flex flex-col justify-center gap-3.5 p-5">
-                    {akadTime && (
-                      <div className="flex items-center gap-2.5">
-                        <Clock className="h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
-                        <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>{akadTime}</p>
-                      </div>
-                    )}
-                    <div className="flex items-start gap-2.5">
-                      <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
-                      <div>
-                        <p className="text-sm font-semibold leading-snug" style={{ fontFamily: "var(--font-inter)" }}>{invite.akad_venue_name}</p>
-                        {invite.akad_venue_address && (
-                          <p className="mt-0.5 text-xs leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{invite.akad_venue_address}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-col gap-3">
-                <div className="overflow-hidden rounded-xl" style={{ height: 160, pointerEvents: "none" }}>
-                  <iframe
-                    src={`https://maps.google.com/maps?q=${encodeURIComponent(`${invite.akad_venue_name} ${invite.akad_venue_address ?? ""}`)}&output=embed&z=15`}
-                    width="100%" height="160" style={{ border: 0 }} loading="lazy" aria-hidden="true"
-                  />
-                </div>
-                <motion.a
-                  href={`https://maps.google.com?q=${encodeURIComponent(`${invite.akad_venue_name} ${invite.akad_venue_address ?? ""}`)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  whileHover={{ scale: 1.02, boxShadow: `0 4px 18px ${theme.primary}55` }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium"
-                  style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)" }}
+              <div className="mt-14">
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  className="text-center"
                 >
-                  <MapPin className="h-4 w-4" />
-                  Buka Google Maps — Akad
-                </motion.a>
+                  <p style={{
+                    fontFamily: "var(--font-playfair)",
+                    color: "var(--primary)",
+                    fontSize: "5.5rem",
+                    lineHeight: 1,
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                  }}>{akadDay}</p>
+                  <p className="mt-1 text-xl tracking-[0.08em]" style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}>
+                    {akadMonth} {akadYear}
+                  </p>
+                  <p className="mt-2 text-[9px] uppercase tracking-[0.3em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                    {akadDayName}
+                  </p>
+                </motion.div>
+
+                <div className="my-10 flex items-center gap-4">
+                  <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+                  <div className="h-1 w-1 rounded-full" style={{ background: "var(--primary)" }} />
+                  <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                  className="space-y-3 text-center"
+                >
+                  {akadTime && (
+                    <p className="text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{akadTime}</p>
+                  )}
+                  <p className="text-xl font-semibold leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
+                    {invite.akad_venue_name}
+                  </p>
+                  {invite.akad_venue_address && (
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                      {invite.akad_venue_address}
+                    </p>
+                  )}
+                  {invite.dresscode && (
+                    <p className="pt-1 text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                      Dresscode — <span style={{ color: "var(--primary)", fontWeight: 600 }}>{invite.dresscode}</span>
+                    </p>
+                  )}
+                </motion.div>
+
+                <div className="mt-10 flex flex-col gap-3">
+                  <div className="overflow-hidden" style={{ height: 168, borderRadius: 8 }}>
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(`${invite.akad_venue_name} ${invite.akad_venue_address ?? ""}`)}&output=embed&z=15`}
+                      width="100%" height="168" style={{ border: 0 }} loading="lazy" aria-hidden="true"
+                    />
+                  </div>
+                  <motion.a
+                    href={`https://maps.google.com?q=${encodeURIComponent(`${invite.akad_venue_name} ${invite.akad_venue_address ?? ""}`)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    whileHover={{ opacity: 0.85 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex items-center justify-center gap-2 py-3.5 text-[10px] uppercase tracking-[0.2em] font-medium"
+                    style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 4 }}
+                  >
+                    <MapPin className="h-3.5 w-3.5" />
+                    Buka Peta — Akad
+                  </motion.a>
+                </div>
               </div>
             </div>
           </section>
@@ -651,64 +620,82 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
       {/* ── Resepsi ──────────────────────────────────────────── */}
       <FadeSection>
-        <section className="px-6 py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
-          <div className="mx-auto max-w-xl">
+        <section className="px-6 py-20" style={{ backgroundColor: hasAkad ? "var(--background)" : "var(--muted)" }}>
+          <div className="mx-auto max-w-sm">
             <SectionTitle>{hasAkad ? "Resepsi" : "Waktu & Tempat"}</SectionTitle>
-            <div className="mt-10 overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
-              <div className="flex items-center gap-3 px-5 py-3.5" style={{ background: "var(--primary)" }}>
-                <Heart className="h-4 w-4 flex-shrink-0" style={{ color: "rgba(255,255,255,0.85)" }} fill="rgba(255,255,255,0.85)" />
-                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.9)", fontFamily: "var(--font-inter)" }}>
-                  {hasAkad ? "Resepsi Pernikahan" : "Waktu & Tempat"}
-                </p>
-              </div>
-              <div className="grid" style={{ gridTemplateColumns: "100px 1fr", background: "var(--background)" }}>
-                <div className="flex flex-col items-center justify-center gap-0.5 border-r p-4 text-center" style={{ borderColor: "var(--border)", background: "var(--muted)" }}>
-                  <p className="text-5xl font-bold leading-none" style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}>{day}</p>
-                  <p className="mt-1.5 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>{month}</p>
-                  <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{year}</p>
-                  <p className="mt-1 text-[10px] leading-snug" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{dayName}</p>
-                </div>
-                <div className="flex flex-col justify-center gap-3.5 p-5">
-                  <div className="flex items-center gap-2.5">
-                    <Clock className="h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
-                    <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>{formatTime(invite.event_time)}</p>
-                  </div>
-                  <div className="flex items-start gap-2.5">
-                    <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
-                    <div>
-                      <p className="text-sm font-semibold leading-snug" style={{ fontFamily: "var(--font-inter)" }}>{invite.venue_name}</p>
-                      <p className="mt-0.5 text-xs leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{invite.venue_address}</p>
-                    </div>
-                  </div>
-                  {invite.dresscode && (
-                    <div className="flex items-center gap-2.5">
-                      <Shirt className="h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
-                      <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Dresscode</p>
-                      <p className="ml-auto text-sm font-semibold" style={{ fontFamily: "var(--font-inter)", color: "var(--primary)" }}>{invite.dresscode}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-col gap-3">
-              <div className="overflow-hidden rounded-xl" style={{ height: 160, pointerEvents: "none" }}>
-                <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(invite.venue_name + " " + invite.venue_address)}&output=embed&z=15`}
-                  width="100%" height="160" style={{ border: 0 }} loading="lazy" aria-hidden="true"
-                />
-              </div>
-              <motion.a
-                href={`https://maps.google.com?q=${encodeURIComponent(invite.venue_name + " " + invite.venue_address)}`}
-                target="_blank" rel="noopener noreferrer"
-                whileHover={{ scale: 1.02, boxShadow: `0 4px 18px ${theme.primary}55` }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium"
-                style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)" }}
+            <div className="mt-14">
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="text-center"
               >
-                <MapPin className="h-4 w-4" />
-                Buka Google Maps
-              </motion.a>
+                <p style={{
+                  fontFamily: "var(--font-playfair)",
+                  color: "var(--primary)",
+                  fontSize: "5.5rem",
+                  lineHeight: 1,
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                }}>{day}</p>
+                <p className="mt-1 text-xl tracking-[0.08em]" style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}>
+                  {month} {year}
+                </p>
+                <p className="mt-2 text-[9px] uppercase tracking-[0.3em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  {dayName}
+                </p>
+              </motion.div>
+
+              <div className="my-10 flex items-center gap-4">
+                <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+                <div className="h-1 w-1 rounded-full" style={{ background: "var(--primary)" }} />
+                <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-3 text-center"
+              >
+                <p className="text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  {formatTime(invite.event_time)}
+                </p>
+                <p className="text-xl font-semibold leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
+                  {invite.venue_name}
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  {invite.venue_address}
+                </p>
+                {invite.dresscode && !hasAkad && (
+                  <p className="pt-1 text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                    Dresscode — <span style={{ color: "var(--primary)", fontWeight: 600 }}>{invite.dresscode}</span>
+                  </p>
+                )}
+              </motion.div>
+
+              <div className="mt-10 flex flex-col gap-3">
+                <div className="overflow-hidden" style={{ height: 168, borderRadius: 8 }}>
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(invite.venue_name + " " + invite.venue_address)}&output=embed&z=15`}
+                    width="100%" height="168" style={{ border: 0 }} loading="lazy" aria-hidden="true"
+                  />
+                </div>
+                <motion.a
+                  href={`https://maps.google.com?q=${encodeURIComponent(invite.venue_name + " " + invite.venue_address)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  whileHover={{ opacity: 0.85 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex items-center justify-center gap-2 py-3.5 text-[10px] uppercase tracking-[0.2em] font-medium"
+                  style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 4 }}
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  Buka Google Maps
+                </motion.a>
+              </div>
             </div>
           </div>
         </section>
@@ -717,73 +704,76 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Galeri ───────────────────────────────────────────── */}
       {galleryUrls.length > 0 && (
         <FadeSection>
-          <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(color-mix(in srgb, var(--primary) 14%, transparent) 2px, transparent 2px)", backgroundSize: "22px 22px" }}>
+          <section className="px-4 py-20 sm:px-6" style={{ backgroundColor: hasAkad ? "var(--muted)" : "var(--background)" }}>
             <div className="mx-auto max-w-xl">
               <SectionTitle>Galeri</SectionTitle>
-              <div className="mt-10">
+              <div className="mt-12">
                 {galleryUrls.length === 3 ? (
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-60px" }}
-                    transition={{ duration: 0.6 }}
-                    className="grid gap-3"
-                    style={{ gridTemplateColumns: "2fr 1fr", gridTemplateRows: "180px 180px" }}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    className="grid gap-2"
+                    style={{ gridTemplateColumns: "2fr 1fr", gridTemplateRows: "200px 200px" }}
                   >
-                    <div className="row-span-2 overflow-hidden rounded-2xl">
-                      <img src={galleryUrls[0]} alt="Foto 1" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                    <div className="row-span-2 overflow-hidden" style={{ borderRadius: 6 }}>
+                      <img src={galleryUrls[0]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]" />
                     </div>
                     <motion.div
-                      initial={{ opacity: 0, x: 16 }}
+                      initial={{ opacity: 0, x: 20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: 0.15 }}
-                      className="overflow-hidden rounded-2xl"
+                      transition={{ duration: 0.6, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden"
+                      style={{ borderRadius: 6 }}
                     >
-                      <img src={galleryUrls[1]} alt="Foto 2" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                      <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]" />
                     </motion.div>
                     <motion.div
-                      initial={{ opacity: 0, x: 16 }}
+                      initial={{ opacity: 0, x: 20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: 0.28 }}
-                      className="overflow-hidden rounded-2xl"
+                      transition={{ duration: 0.6, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden"
+                      style={{ borderRadius: 6 }}
                     >
-                      <img src={galleryUrls[2]} alt="Foto 3" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                      <img src={galleryUrls[2]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]" />
                     </motion.div>
                   </motion.div>
                 ) : galleryUrls.length === 2 ? (
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-2">
                     <motion.div
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 24 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.55 }}
-                      className="flex-1 overflow-hidden rounded-2xl"
-                      style={{ height: 300 }}
+                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex-1 overflow-hidden"
+                      style={{ height: 320, borderRadius: 6 }}
                     >
-                      <img src={galleryUrls[0]} alt="Foto 1" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                      <img src={galleryUrls[0]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]" />
                     </motion.div>
                     <motion.div
-                      initial={{ opacity: 0, y: 36 }}
+                      initial={{ opacity: 0, y: 40 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.55, delay: 0.12 }}
-                      className="flex-1 overflow-hidden rounded-2xl"
-                      style={{ height: 300, marginTop: 40 }}
+                      transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex-1 overflow-hidden"
+                      style={{ height: 320, marginTop: 48, borderRadius: 6 }}
                     >
-                      <img src={galleryUrls[1]} alt="Foto 2" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                      <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]" />
                     </motion.div>
                   </div>
                 ) : (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.97 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="aspect-video overflow-hidden rounded-2xl"
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    className="aspect-video overflow-hidden"
+                    style={{ borderRadius: 6 }}
                   >
-                    <img src={galleryUrls[0]} alt="Foto 1" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                    <img src={galleryUrls[0]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.04]" />
                   </motion.div>
                 )}
               </div>
@@ -794,58 +784,51 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
       {/* ── Countdown ────────────────────────────────────────── */}
       <FadeSection>
-        <section className="relative overflow-hidden px-6 py-20 text-center" style={{ background: "var(--primary)" }}>
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]" aria-hidden>
-            <svg width="700" height="700" viewBox="0 0 200 200" fill="none">
-              <circle cx="100" cy="100" r="92" stroke="white" strokeWidth="0.5" />
-              <circle cx="100" cy="100" r="76" stroke="white" strokeWidth="0.5" />
-              <circle cx="100" cy="100" r="58" stroke="white" strokeWidth="0.5" />
+        <section className="relative overflow-hidden px-6 py-24 text-center" style={{ background: "var(--primary)" }}>
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
+            <svg width="600" height="600" viewBox="0 0 200 200" fill="none" opacity="0.05">
+              <circle cx="100" cy="100" r="90" stroke="white" strokeWidth="0.5" />
+              <circle cx="100" cy="100" r="65" stroke="white" strokeWidth="0.5" />
               <circle cx="100" cy="100" r="40" stroke="white" strokeWidth="0.5" />
-              <line x1="8" y1="100" x2="192" y2="100" stroke="white" strokeWidth="0.5" />
-              <line x1="100" y1="8" x2="100" y2="192" stroke="white" strokeWidth="0.5" />
+              <line x1="10" y1="100" x2="190" y2="100" stroke="white" strokeWidth="0.5" />
+              <line x1="100" y1="10" x2="100" y2="190" stroke="white" strokeWidth="0.5" />
             </svg>
           </div>
           <div className="relative z-10 mx-auto max-w-lg">
             {timeLeft ? (
               <>
-                <p className="mb-1 text-xs uppercase tracking-[0.35em]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "var(--font-inter)" }}>
+                <p className="mb-1 text-[9px] uppercase tracking-[0.4em]" style={{ color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-inter)" }}>
                   Menghitung Hari
                 </p>
-                <p className="mb-10 text-sm italic" style={{ color: "rgba(255,255,255,0.38)", fontFamily: "var(--font-playfair)" }}>
+                <p className="mb-12 text-xs italic" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-playfair)" }}>
                   {dayName}, {day} {month} {year}
                 </p>
-                <div className="grid grid-cols-4 gap-2 sm:gap-4">
+                <div className="flex items-end justify-center gap-1 sm:gap-2">
                   {[
                     { value: timeLeft.days,    label: "Hari" },
                     { value: timeLeft.hours,   label: "Jam" },
                     { value: timeLeft.minutes, label: "Menit" },
                     { value: timeLeft.seconds, label: "Detik" },
                   ].map((item, idx) => (
-                    <div key={item.label} className="flex flex-col items-center gap-2">
-                      <div
-                        className="relative flex w-full flex-col items-center justify-center rounded-2xl py-5 sm:py-7"
-                        style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.16)", backdropFilter: "blur(6px)" }}
-                      >
-                        {idx < 3 && (
-                          <div className="absolute -right-1.5 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-1">
-                            <div className="h-1 w-1 rounded-full" style={{ background: "rgba(255,255,255,0.35)" }} />
-                            <div className="h-1 w-1 rounded-full" style={{ background: "rgba(255,255,255,0.35)" }} />
-                          </div>
-                        )}
+                    <div key={item.label} className="flex items-end gap-1 sm:gap-2">
+                      <div className="flex flex-col items-center gap-2">
                         <motion.span
                           key={`${item.label}-${item.value}`}
-                          initial={{ opacity: 0, y: -10 }}
+                          initial={{ opacity: 0, y: -6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2 }}
+                          transition={{ duration: 0.18 }}
                           className="text-4xl font-bold leading-none sm:text-5xl"
                           style={{ fontFamily: "var(--font-playfair)", color: "#fff" }}
                         >
                           {String(item.value).padStart(2, "0")}
                         </motion.span>
+                        <span className="text-[8px] uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.38)", fontFamily: "var(--font-inter)" }}>
+                          {item.label}
+                        </span>
                       </div>
-                      <span className="text-[10px] uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-inter)" }}>
-                        {item.label}
-                      </span>
+                      {idx < 3 && (
+                        <span className="mb-7 text-2xl font-thin leading-none" style={{ color: "rgba(255,255,255,0.2)" }}>·</span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -853,8 +836,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
             ) : (
               <>
                 <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#fff" }}>Hari Istimewa</p>
-                <p className="mt-4 text-base leading-relaxed" style={{ fontFamily: "var(--font-playfair)", color: "rgba(255,255,255,0.65)", fontStyle: "italic" }}>
-                  Alhamdulillah, acara pernikahan telah berlangsung dengan lancar. 🙏<br />
+                <p className="mt-4 text-base leading-relaxed" style={{ fontFamily: "var(--font-playfair)", color: "rgba(255,255,255,0.6)", fontStyle: "italic" }}>
+                  Alhamdulillah, acara pernikahan telah berlangsung dengan lancar.<br />
                   Terima kasih atas doa dan kehadiran Anda.
                 </p>
               </>
@@ -866,31 +849,32 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Hadiah & Angpao ──────────────────────────────────── */}
       {(bankAccounts.length > 0 || invite.gift_address) && (
         <FadeSection>
-          <section className="px-6 py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
-            <div className="mx-auto max-w-xl">
+          <section className="px-6 py-20" style={{ backgroundColor: "var(--muted)" }}>
+            <div className="mx-auto max-w-sm">
               <SectionTitle>Hadiah &amp; Angpao</SectionTitle>
-              <p className="mt-3 text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                Tanpa mengurangi rasa hormat, bagi yang ingin memberikan hadiah, dapat melalui:
+              <p className="mt-4 text-center text-xs leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                Tanpa mengurangi rasa hormat, bagi yang ingin memberikan hadiah:
               </p>
 
               {bankAccounts.length > 0 && (
                 <motion.div
-                  className="mt-6 flex flex-col gap-3"
+                  className="mt-8"
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
+                  variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
                 >
                   {bankAccounts.map((acc, i) => (
                     <motion.div
                       key={i}
-                      variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
+                      variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } } }}
                     >
                       <BankCard
                         bank={acc.bank}
                         accountName={acc.account_name}
                         accountNumber={acc.account_number}
                         qrisUrl={acc.qris_url}
+                        isLast={i === bankAccounts.length - 1 && !invite.gift_address}
                       />
                     </motion.div>
                   ))}
@@ -898,10 +882,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               )}
 
               {invite.gift_address && (
-                <div className="mt-4 flex gap-3 rounded-xl p-4" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
-                  <Package className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: "var(--primary)" }} />
+                <div className="mt-4 flex gap-3 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
+                  <Package className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
                   <div>
-                    <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Alamat Pengiriman Hadiah</p>
+                    <p className="text-[9px] uppercase tracking-[0.25em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Alamat Pengiriman</p>
                     <p className="mt-1 text-sm leading-relaxed" style={{ fontFamily: "var(--font-inter)" }}>{invite.gift_address}</p>
                   </div>
                 </div>
@@ -923,8 +907,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Guest messages ───────────────────────────────────── */}
       {messages.length > 0 && (
         <FadeSection>
-          <section className="overflow-hidden py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
-            <div className="mb-10 text-center">
+          <section className="overflow-hidden py-20" style={{ backgroundColor: "var(--muted)" }}>
+            <div className="mb-12 text-center">
               <SectionTitle>Ucapan &amp; Doa</SectionTitle>
             </div>
             <MessageMarquee messages={messages} />
@@ -933,44 +917,47 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       )}
 
       {/* ── Footer ───────────────────────────────────────────── */}
-      <footer className="px-6 py-12 text-center" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
-        <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}>
+      <footer className="px-6 py-16 text-center" style={{ backgroundColor: "var(--background)" }}>
+        <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}>
           {invite.bride_name} &amp; {invite.groom_name}
         </p>
-        <p className="mt-2 text-xs uppercase tracking-widest" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+        <p className="mt-2 text-[10px] uppercase tracking-[0.3em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
           {day} {month} {year}
         </p>
 
         {(hasBrideIg || hasGroomIg) && (
-          <div className="mt-5 flex items-center justify-center gap-3">
+          <div className="mt-6 flex items-center justify-center gap-4">
             {hasBrideIg && (
               <a
                 href={`https://instagram.com/${igHandle(invite.bride_instagram!)}`}
                 target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-all hover:opacity-70"
-                style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
+                className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-60"
+                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
               >
-                <InstagramIcon className="h-3.5 w-3.5" style={{ color: "var(--primary)" } as React.CSSProperties} />
+                <InstagramIcon className="h-3.5 w-3.5" />
                 @{igHandle(invite.bride_instagram!)}
               </a>
+            )}
+            {hasBrideIg && hasGroomIg && (
+              <div className="h-3 w-px" style={{ background: "var(--border)" }} />
             )}
             {hasGroomIg && (
               <a
                 href={`https://instagram.com/${igHandle(invite.groom_instagram!)}`}
                 target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-all hover:opacity-70"
-                style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", fontFamily: "var(--font-inter)" }}
+                className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-60"
+                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
               >
-                <InstagramIcon className="h-3.5 w-3.5" style={{ color: "var(--primary)" } as React.CSSProperties} />
+                <InstagramIcon className="h-3.5 w-3.5" />
                 @{igHandle(invite.groom_instagram!)}
               </a>
             )}
           </div>
         )}
 
-        <div className="mx-auto mt-6 h-px w-16" style={{ background: "var(--border)" }} />
-        <p className="mt-4 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-          Dibuat dengan ❤️ menggunakan Wedding Invite
+        <div className="mx-auto mt-10 h-px w-10" style={{ background: "var(--border)" }} />
+        <p className="mt-4 text-[10px] uppercase tracking-[0.2em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", opacity: 0.6 }}>
+          Wedding Invite
         </p>
       </footer>
     </main>
@@ -979,8 +966,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
 // ─── Bank Card ────────────────────────────────────────────────────────────────
 
-function BankCard({ bank, accountName, accountNumber, qrisUrl }: {
-  bank: string; accountName: string; accountNumber: string; qrisUrl?: string;
+function BankCard({ bank, accountName, accountNumber, qrisUrl, isLast }: {
+  bank: string; accountName: string; accountNumber: string; qrisUrl?: string; isLast?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const [showQris, setShowQris] = useState(false);
@@ -1002,48 +989,55 @@ function BankCard({ bank, accountName, accountNumber, qrisUrl }: {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
-      <div className="flex items-center gap-4 p-4">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--muted)" }}>
-          <CreditCard className="h-5 w-5" style={{ color: "var(--primary)" }} />
-        </div>
+    <div style={{ borderBottom: isLast ? "none" : "1px solid var(--border)" }}>
+      <div className="flex items-center gap-4 py-5">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>{bank}</p>
-          <p className="text-lg font-bold tracking-widest" style={{ fontFamily: "var(--font-inter)" }}>{accountNumber}</p>
-          <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{accountName}</p>
+          <p className="text-[9px] uppercase tracking-[0.25em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{bank}</p>
+          <p className="mt-1 text-lg font-bold tracking-[0.12em]" style={{ fontFamily: "var(--font-inter)" }}>{accountNumber}</p>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{accountName}</p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
           {qrisUrl && (
             <motion.button
               onClick={() => setShowQris(!showQris)}
-              whileHover={{ scale: 1.12 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 18 }}
-              className="flex h-8 w-8 items-center justify-center rounded-lg"
-              style={{ background: showQris ? "var(--primary)" : "var(--muted)", color: showQris ? "#fff" : "var(--primary)" }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="flex h-8 w-8 items-center justify-center"
+              style={{
+                background: showQris ? "var(--primary)" : "transparent",
+                border: `1px solid ${showQris ? "var(--primary)" : "var(--border)"}`,
+                borderRadius: 4,
+                color: showQris ? "#fff" : "var(--muted-foreground)",
+              }}
               aria-label="Lihat QRIS"
             >
-              <QrCode className="h-4 w-4" />
+              <QrCode className="h-3.5 w-3.5" />
             </motion.button>
           )}
           <motion.button
             onClick={handleCopy}
-            whileHover={{ scale: 1.12 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="flex h-8 w-8 items-center justify-center rounded-lg"
-            style={{ background: "var(--muted)", color: copied ? "#16a34a" : "var(--muted-foreground)" }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className="flex h-8 w-8 items-center justify-center"
+            style={{
+              background: "transparent",
+              border: `1px solid ${copied ? "#16a34a" : "var(--border)"}`,
+              borderRadius: 4,
+              color: copied ? "#16a34a" : "var(--muted-foreground)",
+            }}
             aria-label="Salin nomor rekening"
           >
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
           </motion.button>
         </div>
       </div>
       {qrisUrl && showQris && (
-        <div className="border-t px-6 pb-6 pt-4" style={{ borderColor: "var(--border)" }}>
-          <img src={qrisUrl} alt="QRIS" className="mx-auto max-h-64 w-auto rounded-xl object-contain" />
-          <p className="mt-2 text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-            Scan QRIS untuk transfer
+        <div className="pb-6">
+          <img src={qrisUrl} alt="QRIS" className="mx-auto max-h-60 w-auto object-contain" />
+          <p className="mt-2 text-center text-[10px] uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+            Scan QRIS
           </p>
         </div>
       )}
@@ -1111,125 +1105,157 @@ function RsvpSection({ invite, guestName, onSuccess }: {
   const isDone = state === "done" || state === "already_submitted";
 
   return (
-    <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(color-mix(in srgb, var(--primary) 14%, transparent) 2px, transparent 2px)", backgroundSize: "22px 22px" }}>
-      <div className="mx-auto max-w-xl">
+    <section className="px-6 py-20" style={{ backgroundColor: "var(--background)" }}>
+      <div className="mx-auto max-w-sm">
         <SectionTitle>Konfirmasi Kehadiran</SectionTitle>
         <AnimatePresence mode="wait">
           {isDone ? (
-            <motion.div key="done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-              className="mt-8 flex flex-col items-center gap-5 rounded-2xl p-8 text-center"
-              style={{ background: "var(--muted)", border: "1px solid var(--border)" }}>
-              <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#f0fdf4" }}>
-                <CheckCircle className="h-8 w-8" style={{ color: "#16a34a" }} />
-              </div>
+            <motion.div key="done" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-12 flex flex-col items-center gap-4 text-center py-10">
+              <CheckCircle className="h-9 w-9" style={{ color: "var(--primary)" }} />
               <div>
-                <p className="text-lg font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>
-                  {state === "already_submitted" ? "Konfirmasi sudah diterima!" : `Terima kasih, ${name}!`}
+                <p className="text-xl font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>
+                  {state === "already_submitted" ? "Konfirmasi sudah diterima" : `Terima kasih, ${name}`}
                 </p>
-                <p className="mt-1 text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                   {state === "already_submitted"
                     ? "Anda sebelumnya telah mengisi konfirmasi kehadiran."
                     : status === "attending"
-                      ? `Terima kasih! Kami menantikan kehadiran Anda${guestCount > 1 ? ` bersama ${guestCount} orang` : ""}. 🎉`
-                      : "Terima kasih, konfirmasi berhasil!"}
+                      ? `Kami menantikan kehadiran Anda${guestCount > 1 ? ` bersama ${guestCount} orang` : ""}.`
+                      : "Terima kasih, konfirmasi berhasil dicatat."}
                 </p>
               </div>
             </motion.div>
           ) : (
-            <motion.form key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-3">
+            <motion.form key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={handleSubmit}
+              className="mt-10 flex flex-col">
+
+              {/* Attendance toggle */}
+              <div className="flex items-center gap-8 pb-8" style={{ borderBottom: "1px solid var(--border)" }}>
                 {([
-                  { val: "attending",     label: "Hadir ✓" },
+                  { val: "attending",     label: "Hadir" },
                   { val: "not_attending", label: "Tidak Hadir" },
                 ] as const).map((opt) => (
-                  <motion.button
-                    key={opt.val} type="button" onClick={() => setStatus(opt.val)}
-                    whileHover={status !== opt.val ? { scale: 1.03 } : undefined}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className={cn("rounded-xl py-3.5 text-sm font-medium")}
-                    style={{
-                      background: status === opt.val ? theme.gradient : "var(--muted)",
-                      color: status === opt.val ? "#fff" : "var(--muted-foreground)",
-                      fontFamily: "var(--font-inter)",
-                      border: status === opt.val ? `1px solid ${theme.primary}` : "1px solid var(--border)",
-                    }}
-                  >{opt.label}</motion.button>
+                  <button
+                    key={opt.val}
+                    type="button"
+                    onClick={() => setStatus(opt.val)}
+                    className="flex items-center gap-2.5"
+                  >
+                    <div
+                      className="h-4 w-4 rounded-full border-2 transition-all duration-200"
+                      style={{
+                        borderColor: "var(--primary)",
+                        background: status === opt.val ? "var(--primary)" : "transparent",
+                      }}
+                    />
+                    <span
+                      className="text-sm transition-colors duration-200"
+                      style={{
+                        fontFamily: "var(--font-inter)",
+                        color: status === opt.val ? "var(--foreground)" : "var(--muted-foreground)",
+                        fontWeight: status === opt.val ? 500 : 400,
+                      }}
+                    >
+                      {opt.label}
+                    </span>
+                  </button>
                 ))}
               </div>
 
-              <FormField icon={<User className="h-4 w-4" />} label="Nama" required>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+              {/* Name */}
+              <ElegantField label="Nama" required focused={false}>
+                <input
+                  type="text" value={name} onChange={(e) => setName(e.target.value)}
                   placeholder="Nama lengkap Anda" required
-                  className="w-full bg-transparent py-0.5 text-sm outline-none placeholder:opacity-50"
-                  style={{ fontFamily: "var(--font-inter)" }} />
-              </FormField>
+                  className="w-full bg-transparent py-0.5 text-sm outline-none placeholder:opacity-40"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                />
+              </ElegantField>
 
+              {/* Guest count */}
               {status === "attending" && (
-                <div className="flex items-center gap-4 rounded-xl px-4 py-3.5" style={{ background: "var(--muted)", border: "1px solid var(--border)" }}>
-                  <Users className="h-4 w-4 flex-shrink-0" style={{ color: "var(--primary)" }} />
-                  <div className="flex flex-1 flex-col gap-0.5">
-                    <p className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Jumlah Tamu</p>
-                    <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Berapa orang yang akan hadir?</p>
+                <div className="flex items-center justify-between py-5" style={{ borderBottom: "1px solid var(--border)" }}>
+                  <div>
+                    <p className="text-[9px] uppercase tracking-[0.25em]" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                      Jumlah Tamu
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <motion.button type="button" onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
-                      whileHover={{ scale: 1.15 }}
+                  <div className="flex items-center gap-4">
+                    <motion.button
+                      type="button"
+                      onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
                       whileTap={{ scale: 0.88 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 18 }}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold"
-                      style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
-                      −
-                    </motion.button>
-                    <span className="w-5 text-center text-base font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{guestCount}</span>
-                    <motion.button type="button" onClick={() => setGuestCount(Math.min(20, guestCount + 1))}
-                      whileHover={{ scale: 1.15 }}
+                      className="flex h-7 w-7 items-center justify-center text-base"
+                      style={{
+                        border: "1px solid var(--border)",
+                        borderRadius: 4,
+                        color: "var(--muted-foreground)",
+                        background: "transparent",
+                      }}
+                    >−</motion.button>
+                    <span className="w-4 text-center text-base font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>
+                      {guestCount}
+                    </span>
+                    <motion.button
+                      type="button"
+                      onClick={() => setGuestCount(Math.min(20, guestCount + 1))}
                       whileTap={{ scale: 0.88 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 18 }}
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold"
-                      style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
-                      +
-                    </motion.button>
+                      className="flex h-7 w-7 items-center justify-center text-base"
+                      style={{
+                        border: "1px solid var(--border)",
+                        borderRadius: 4,
+                        color: "var(--muted-foreground)",
+                        background: "transparent",
+                      }}
+                    >+</motion.button>
                   </div>
                 </div>
               )}
 
-              <div className="flex flex-col gap-1">
-                <FormField icon={<Phone className="h-4 w-4" />} label="No. WhatsApp (opsional)">
-                  <input type="tel" value={phone}
-                    onChange={(e) => { setPhone(e.target.value); if (phoneError) setPhoneError(""); }}
-                    placeholder="08xxxxxxxxxx"
-                    className="w-full bg-transparent py-0.5 text-sm outline-none placeholder:opacity-50"
-                    style={{ fontFamily: "var(--font-inter)" }} />
-                </FormField>
-                {phoneError && <p className="text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>{phoneError}</p>}
-              </div>
+              {/* Phone */}
+              <ElegantField label="No. WhatsApp (opsional)" focused={false}>
+                <input
+                  type="tel" value={phone}
+                  onChange={(e) => { setPhone(e.target.value); if (phoneError) setPhoneError(""); }}
+                  placeholder="08xxxxxxxxxx"
+                  className="w-full bg-transparent py-0.5 text-sm outline-none placeholder:opacity-40"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                />
+              </ElegantField>
+              {phoneError && (
+                <p className="mt-1 text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>{phoneError}</p>
+              )}
 
-              <FormField icon={<MessageSquare className="h-4 w-4" />} label="Ucapan & Doa (opsional)">
-                <textarea value={message} onChange={(e) => setMessage(e.target.value)}
+              {/* Message */}
+              <ElegantField label="Ucapan & Doa (opsional)" focused={false}>
+                <textarea
+                  value={message} onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tulis ucapan atau doa untuk pasangan..."
-                  rows={3} className="w-full resize-none bg-transparent py-0.5 text-sm outline-none placeholder:opacity-50"
-                  style={{ fontFamily: "var(--font-inter)" }} />
-              </FormField>
+                  rows={3}
+                  className="w-full resize-none bg-transparent py-0.5 text-sm outline-none placeholder:opacity-40"
+                  style={{ fontFamily: "var(--font-inter)" }}
+                />
+              </ElegantField>
 
               {state === "error" && (
-                <p className="rounded-lg px-3 py-2 text-sm" style={{ background: "#fef2f2", color: "#dc2626", fontFamily: "var(--font-inter)" }}>
-                  {errorMsg}
-                </p>
+                <p className="mt-2 text-xs" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>{errorMsg}</p>
               )}
 
               <motion.button
                 type="submit"
                 disabled={state === "submitting" || !name.trim()}
-                whileHover={state !== "submitting" && !!name.trim() ? { scale: 1.02, boxShadow: `0 4px 18px ${theme.primary}55` } : undefined}
-                whileTap={state !== "submitting" && !!name.trim() ? { scale: 0.98 } : undefined}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{ background: theme.gradient, color: "#fff", fontFamily: "var(--font-inter)" }}
+                whileHover={state !== "submitting" && !!name.trim() ? { opacity: 0.85 } : undefined}
+                whileTap={state !== "submitting" && !!name.trim() ? { scale: 0.99 } : undefined}
+                transition={{ duration: 0.15 }}
+                className="mt-8 flex w-full items-center justify-center py-4 text-[10px] uppercase tracking-[0.25em] font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: theme.primary, color: "#fff", fontFamily: "var(--font-inter)", borderRadius: 4 }}
               >
-                {state === "submitting" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Kirim Konfirmasi"}
+                {state === "submitting"
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : "Kirim Konfirmasi"}
               </motion.button>
-
             </motion.form>
           )}
         </AnimatePresence>
@@ -1238,55 +1264,49 @@ function RsvpSection({ invite, guestName, onSuccess }: {
   );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── ElegantField ─────────────────────────────────────────────────────────────
 
-function FormField({ icon, label, required, children }: { icon: React.ReactNode; label: string; required?: boolean; children: React.ReactNode }) {
+function ElegantField({ label, required, children, focused: _focused }: {
+  label: string; required?: boolean; children: React.ReactNode; focused?: boolean;
+}) {
   const [focused, setFocused] = useState(false);
   return (
     <div
-      className="flex gap-3 rounded-xl px-4 py-3.5 transition-all duration-150"
-      style={{ background: "var(--muted)", border: focused ? "1.5px solid var(--primary)" : "1px solid var(--border)", boxShadow: focused ? "0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent)" : "none" }}
+      className="py-4 transition-colors duration-200"
+      style={{ borderBottom: `1px solid ${focused ? "var(--primary)" : "var(--border)"}` }}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
     >
-      <div className="mt-0.5 flex-shrink-0" style={{ color: "var(--primary)" }}>{icon}</div>
-      <div className="flex flex-1 flex-col gap-0.5">
-        <label className="text-xs uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-          {label}{required && <span style={{ color: "var(--primary)" }}> *</span>}
-        </label>
-        {children}
-      </div>
+      <label
+        className="mb-1.5 block text-[9px] uppercase tracking-[0.25em] transition-colors duration-200"
+        style={{ color: focused ? "var(--primary)" : "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+      >
+        {label}{required && <span style={{ color: "var(--primary)" }}> *</span>}
+      </label>
+      {children}
     </div>
   );
 }
 
-function Ornament({ color }: { color: string }) {
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function HeroOrnament({ color }: { color: string }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
       <motion.svg
         animate={{ rotate: 360 }}
-        transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.06]"
-        width="600" height="600" viewBox="0 0 200 200" fill="none"
-        style={{ originX: "50%", originY: "50%" }}
+        transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        width="700" height="700" viewBox="0 0 200 200" fill="none"
+        style={{ opacity: 0.05, originX: "50%", originY: "50%" }}
       >
         <circle cx="100" cy="100" r="90" stroke={color} strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="70" stroke={color} strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="50" stroke={color} strokeWidth="0.5" />
+        <circle cx="100" cy="100" r="68" stroke={color} strokeWidth="0.5" />
+        <circle cx="100" cy="100" r="46" stroke={color} strokeWidth="0.5" />
         <line x1="10" y1="100" x2="190" y2="100" stroke={color} strokeWidth="0.5" />
         <line x1="100" y1="10" x2="100" y2="190" stroke={color} strokeWidth="0.5" />
         <line x1="29" y1="29" x2="171" y2="171" stroke={color} strokeWidth="0.5" />
         <line x1="171" y1="29" x2="29" y2="171" stroke={color} strokeWidth="0.5" />
-      </motion.svg>
-      <motion.svg
-        animate={{ rotate: -360 }}
-        transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03]"
-        width="900" height="900" viewBox="0 0 200 200" fill="none"
-        style={{ originX: "50%", originY: "50%" }}
-      >
-        <circle cx="100" cy="100" r="95" stroke={color} strokeWidth="0.4" strokeDasharray="4 8" />
-        <circle cx="100" cy="100" r="78" stroke={color} strokeWidth="0.4" strokeDasharray="2 6" />
       </motion.svg>
     </div>
   );
@@ -1295,10 +1315,10 @@ function Ornament({ color }: { color: string }) {
 function FadeSection({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 48 }}
+      initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -1309,23 +1329,18 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <motion.div
-        initial={{ opacity: 0, scaleX: 0.4 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
+        initial={{ scaleX: 0, opacity: 0 }}
+        whileInView={{ scaleX: 1, opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.55 }}
-        className="flex items-center gap-3"
-      >
-        <div className="h-px w-10" style={{ background: "var(--primary)", opacity: 0.35 }} />
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
-          <path d="M5 0L6.12 3.88L10 5L6.12 6.12L5 10L3.88 6.12L0 5L3.88 3.88Z" fill="currentColor" style={{ color: "var(--primary)" as React.CSSProperties["color"] }} />
-        </svg>
-        <div className="h-px w-10" style={{ background: "var(--primary)", opacity: 0.35 }} />
-      </motion.div>
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="h-px w-10"
+        style={{ background: "var(--primary)", transformOrigin: "center" }}
+      />
       <motion.h2
-        initial={{ opacity: 0, y: 14 }}
+        initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.55, delay: 0.1 }}
+        transition={{ duration: 0.65, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
         className="text-3xl font-bold sm:text-4xl"
         style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)" }}
       >
@@ -1393,57 +1408,15 @@ function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
       {text.split("").map((char, i) => (
         <motion.span
           key={i}
-          initial={{ opacity: 0, y: 28, rotateX: -55 }}
+          initial={{ opacity: 0, y: 24, rotateX: -50 }}
           animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ duration: 0.42, delay: delay + i * 0.058, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ duration: 0.45, delay: delay + i * 0.055, ease: [0.22, 1, 0.36, 1] }}
           style={{ display: "inline-block", transformOrigin: "bottom center" }}
         >
           {char === " " ? " " : char}
         </motion.span>
       ))}
     </>
-  );
-}
-
-// ─── FloatingPetals ───────────────────────────────────────────────────────────
-
-const PETAL_CONFIGS = [
-  { left: "7%",  delay: 0,    dur: 8,  size: 12 },
-  { left: "17%", delay: 1.4,  dur: 10, size: 8  },
-  { left: "27%", delay: 0.6,  dur: 7,  size: 14 },
-  { left: "37%", delay: 2.3,  dur: 9,  size: 9  },
-  { left: "47%", delay: 0.9,  dur: 11, size: 13 },
-  { left: "57%", delay: 1.8,  dur: 8,  size: 8  },
-  { left: "67%", delay: 0.3,  dur: 10, size: 15 },
-  { left: "77%", delay: 2.7,  dur: 7,  size: 10 },
-  { left: "87%", delay: 1.1,  dur: 9,  size: 12 },
-  { left: "13%", delay: 3.2,  dur: 8,  size: 8  },
-  { left: "53%", delay: 3.8,  dur: 10, size: 11 },
-  { left: "73%", delay: 4.3,  dur: 7,  size: 13 },
-];
-
-function FloatingPetals({ color }: { color: string }) {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {PETAL_CONFIGS.map((p, i) => (
-        <motion.div
-          key={i}
-          initial={{ y: 0, x: 0, opacity: 0, rotate: i * 28 }}
-          animate={{
-            y: [0, 1400],
-            x: [0, 22, -14, 28, 0],
-            opacity: [0, 0.5, 0.5, 0.28, 0],
-            rotate: [i * 28, i * 28 + 360],
-          }}
-          transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: "linear" }}
-          style={{ position: "absolute", left: p.left, top: -p.size * 2 }}
-        >
-          <svg width={p.size} height={Math.round(p.size * 1.45)} viewBox="0 0 14 20" fill="none">
-            <path d="M7 0 C10.5 3, 14 7.5, 14 12 C14 17, 11 20, 7 20 C3 20, 0 17, 0 12 C0 7.5, 3.5 3, 7 0Z" fill={color} opacity="0.4" />
-          </svg>
-        </motion.div>
-      ))}
-    </div>
   );
 }
 
@@ -1468,23 +1441,28 @@ function MessageMarquee({ messages }: { messages: GuestMessage[] }) {
         {doubled.map((m, i) => (
           <div
             key={i}
-            className="mx-3 flex-shrink-0 rounded-2xl p-5"
-            style={{ width: 264, background: "var(--background)", border: "1px solid var(--border)" }}
+            className="mx-3 flex-shrink-0 p-5"
+            style={{
+              width: 272,
+              background: "var(--background)",
+              boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
+              borderRadius: 8,
+            }}
           >
-            <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="mb-2.5 flex items-center justify-between gap-2">
               <p className="truncate text-sm font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{m.name}</p>
               <span
-                className="shrink-0 rounded-full px-2 py-0.5 text-[10px]"
+                className="shrink-0 px-2 py-0.5 text-[9px] uppercase tracking-wider"
                 style={{
-                  background: m.rsvp_status === "attending" ? "#f0fdf4" : "var(--muted)",
-                  color: m.rsvp_status === "attending" ? "#16a34a" : "var(--muted-foreground)",
+                  background: "transparent",
+                  color: m.rsvp_status === "attending" ? "var(--primary)" : "var(--muted-foreground)",
                   fontFamily: "var(--font-inter)",
                 }}
               >
-                {m.rsvp_status === "attending" ? "Hadir ✓" : m.rsvp_status === "not_attending" ? "Tidak Hadir" : "—"}
+                {m.rsvp_status === "attending" ? "Hadir" : m.rsvp_status === "not_attending" ? "Tidak Hadir" : "—"}
               </span>
             </div>
-            <p className="line-clamp-3 text-xs leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", fontStyle: "italic" }}>
+            <p className="line-clamp-3 text-xs leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-playfair)", fontStyle: "italic" }}>
               &ldquo;{m.message}&rdquo;
             </p>
           </div>
