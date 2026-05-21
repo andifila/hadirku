@@ -414,9 +414,12 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${invite.cover_image_url})`, y: coverParallaxY, scale: 1.08 }}
             />
-            {/* Tonal overlay — protects text readability */}
+            {/* Directional depth — warm near-black preserves photo colour temperature */}
             <div className="absolute inset-0"
-              style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.42) 55%, rgba(0,0,0,0.65) 85%, rgba(0,0,0,0.72) 100%)" }} />
+              style={{ background: "linear-gradient(180deg, rgba(10,7,4,0.08) 0%, rgba(10,7,4,0.38) 52%, rgba(6,4,2,0.62) 82%, rgba(6,4,2,0.7) 100%)" }} />
+            {/* Radial vignette — edges recede, subjects at centre stay illuminated */}
+            <div className="absolute inset-0"
+              style={{ background: "radial-gradient(ellipse 88% 72% at 50% 42%, transparent 28%, rgba(0,0,0,0.24) 100%)" }} />
             {/* Atmospheric bleed — photo world dissolves into paper world at the bottom */}
             <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[2]"
               style={{ height: 160, background: "linear-gradient(to bottom, transparent, var(--background))" }} />
@@ -770,7 +773,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   src={galleryUrls[0]}
                   alt=""
                   className="absolute inset-0 h-[112%] w-full object-cover"
-                  style={{ y: galleryParallaxY, top: "-6%" }}
+                  style={{ y: galleryParallaxY, top: "-6%", filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }}
                   initial={{ scale: 1.06, opacity: 0 }}
                   whileInView={{ scale: 1, opacity: 1 }}
                   viewport={{ once: true, margin: "-80px" }}
@@ -782,7 +785,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               <div className="flex gap-1 mt-1">
                 {/* Photo 2: deliberately still — stillness creates visual tension */}
                 <div className="flex-1 overflow-hidden" style={{ aspectRatio: "1/1" }}>
-                  <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover" />
+                  <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover"
+                    style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
                 </div>
                 {/* Photo 3: atmospheric opacity only, no y movement */}
                 <motion.div
@@ -793,7 +797,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   viewport={{ once: true }}
                   transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <img src={galleryUrls[2]} alt="" className="h-full w-full object-cover" />
+                  <img src={galleryUrls[2]} alt="" className="h-full w-full object-cover"
+                    style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
                 </motion.div>
               </div>
             </>
@@ -804,7 +809,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   src={galleryUrls[0]}
                   alt=""
                   className="absolute inset-0 h-[112%] w-full object-cover"
-                  style={{ y: galleryParallaxY, top: "-6%" }}
+                  style={{ y: galleryParallaxY, top: "-6%", filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }}
                   initial={{ scale: 1.06, opacity: 0 }}
                   whileInView={{ scale: 1, opacity: 1 }}
                   viewport={{ once: true }}
@@ -813,7 +818,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               </div>
               {/* Photo 2: still — no animation */}
               <div className="overflow-hidden" style={{ aspectRatio: "4/3", marginTop: 1 }}>
-                <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover" />
+                <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover"
+                  style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
               </div>
             </>
           ) : (
@@ -822,7 +828,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 src={galleryUrls[0]}
                 alt=""
                 className="absolute inset-0 h-[112%] w-full object-cover"
-                style={{ y: galleryParallaxY, top: "-6%" }}
+                style={{ y: galleryParallaxY, top: "-6%", filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }}
                 initial={{ scale: 1.06, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true }}
@@ -837,6 +843,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       <RevealSection>
         <section className="relative overflow-hidden px-6 py-24 text-center"
           style={{ background: "var(--primary)" }}>
+          {/* Atmospheric centre illumination — numbers feel lit from within */}
+          <div className="pointer-events-none absolute inset-0"
+            style={{ background: "radial-gradient(ellipse 65% 52% at 50% 50%, rgba(255,255,255,0.07), transparent)" }} />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
             <svg width="560" height="560" viewBox="0 0 200 200" fill="none" opacity="0.04">
               <circle cx="100" cy="100" r="90" stroke="white" strokeWidth="0.5" />

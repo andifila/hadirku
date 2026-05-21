@@ -37,6 +37,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Ambient page vignette — edges recede slightly, eye drawn to center content */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  background: radial-gradient(ellipse 110% 85% at 50% 50%, transparent 48%, rgba(0,0,0,0.05) 100%);
+}
+
 /* Subtle paper grain — adds premium depth without visual noise */
 body::after {
   content: '';
@@ -45,7 +55,7 @@ body::after {
   pointer-events: none;
   z-index: 9998;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23grain)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.028;
+  opacity: 0.032;
 }
 
 ::selection {
