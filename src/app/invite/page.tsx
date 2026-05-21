@@ -133,9 +133,9 @@ function InviteContent() {
           <motion.div
             key="envelope"
             className={`fixed inset-0 z-[60]${isPreview ? " pt-8" : ""}`}
-            exit={{ opacity: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }}
+            exit={{ opacity: 0, filter: "blur(10px)", scale: 0.98, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } }}
           >
-            <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => { setOpened(true); setShowConfetti(true); }} />
+            <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => { window.scrollTo({ top: 0 }); setOpened(true); setShowConfetti(true); }} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -146,7 +146,7 @@ function InviteContent() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
           <InvitationView
             invite={invite}
@@ -298,9 +298,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   // Hero scroll refs — parallax + content fade-out
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const coverParallaxY = useTransform(heroScroll, [0, 1], ["0%", "30%"]);
-  const heroContentOpacity = useTransform(heroScroll, [0, 0.45], [1, 0]);
-  const heroContentY = useTransform(heroScroll, [0, 0.45], ["0px", "-28px"]);
+  const coverParallaxY = useTransform(heroScroll, [0, 1], ["0%", "22%"]);
+  const heroContentOpacity = useTransform(heroScroll, [0, 0.55], [1, 0]);
+  const heroContentY = useTransform(heroScroll, [0, 0.55], ["0px", "-18px"]);
+  const scrollIndicatorOpacity = useTransform(heroScroll, [0, 0.22], [1, 0]);
 
   // Gallery parallax
   const galleryRef = useRef<HTMLElement>(null);
@@ -507,7 +508,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4, duration: 0.5 }}
-          style={{ opacity: heroContentOpacity }}
+          style={{ opacity: scrollIndicatorOpacity }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
         >
           <motion.div
@@ -757,79 +758,49 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
       {/* ── Gallery — full-bleed, no heading, cinematic portrait */}
       {galleryUrls.length > 0 && (
-        <RevealSection>
-          <section
-            ref={galleryRef}
-            className="overflow-hidden"
-            style={{ backgroundColor: hasAkad ? "var(--muted)" : "var(--background)" }}
-          >
-            {galleryUrls.length === 3 ? (
-              <>
-                {/* Photo 1: full-bleed portrait — the cinematic signature moment */}
-                <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
-                  <motion.img
-                    src={galleryUrls[0]}
-                    alt=""
-                    className="absolute inset-0 h-[112%] w-full object-cover"
-                    style={{ y: galleryParallaxY, top: "-6%" }}
-                    initial={{ scale: 1.06, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    viewport={{ once: true, margin: "-80px" }}
-                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                </div>
+        <section
+          ref={galleryRef}
+          className="overflow-hidden"
+          style={{ backgroundColor: hasAkad ? "var(--muted)" : "var(--background)" }}
+        >
+          {galleryUrls.length === 3 ? (
+            <>
+              {/* Photo 1: full-bleed portrait — cinematic scale reveal + parallax */}
+              <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
+                <motion.img
+                  src={galleryUrls[0]}
+                  alt=""
+                  className="absolute inset-0 h-[112%] w-full object-cover"
+                  style={{ y: galleryParallaxY, top: "-6%" }}
+                  initial={{ scale: 1.06, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
 
-                {/* Photos 2 & 3: editorial side-by-side, vertically offset */}
-                <div className="flex gap-1 mt-1">
-                  <motion.div
-                    className="flex-1 overflow-hidden"
-                    style={{ aspectRatio: "1/1" }}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]" />
-                  </motion.div>
-                  <motion.div
-                    className="flex-1 overflow-hidden"
-                    style={{ aspectRatio: "1/1", marginTop: 32 }}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <img src={galleryUrls[2]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]" />
-                  </motion.div>
+              {/* Photos 2 & 3: editorial side-by-side — photo 2 still, photo 3 slow fade */}
+              <div className="flex gap-1 mt-1">
+                {/* Photo 2: deliberately still — stillness creates visual tension */}
+                <div className="flex-1 overflow-hidden" style={{ aspectRatio: "1/1" }}>
+                  <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover" />
                 </div>
-              </>
-            ) : galleryUrls.length === 2 ? (
-              <>
-                <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
-                  <motion.img
-                    src={galleryUrls[0]}
-                    alt=""
-                    className="absolute inset-0 h-[112%] w-full object-cover"
-                    style={{ y: galleryParallaxY, top: "-6%" }}
-                    initial={{ scale: 1.06, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                </div>
+                {/* Photo 3: atmospheric opacity only, no y movement */}
                 <motion.div
-                  className="overflow-hidden"
-                  style={{ aspectRatio: "4/3", marginTop: 1 }}
+                  className="flex-1 overflow-hidden"
+                  style={{ aspectRatio: "1/1", marginTop: 32 }}
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
+                  transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]" />
+                  <img src={galleryUrls[2]} alt="" className="h-full w-full object-cover" />
                 </motion.div>
-              </>
-            ) : (
-              <div className="relative overflow-hidden" style={{ aspectRatio: "16/9" }}>
+              </div>
+            </>
+          ) : galleryUrls.length === 2 ? (
+            <>
+              <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
                 <motion.img
                   src={galleryUrls[0]}
                   alt=""
@@ -841,9 +812,26 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 />
               </div>
-            )}
-          </section>
-        </RevealSection>
+              {/* Photo 2: still — no animation */}
+              <div className="overflow-hidden" style={{ aspectRatio: "4/3", marginTop: 1 }}>
+                <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover" />
+              </div>
+            </>
+          ) : (
+            <div className="relative overflow-hidden" style={{ aspectRatio: "16/9" }}>
+              <motion.img
+                src={galleryUrls[0]}
+                alt=""
+                className="absolute inset-0 h-[112%] w-full object-cover"
+                style={{ y: galleryParallaxY, top: "-6%" }}
+                initial={{ scale: 1.06, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </div>
+          )}
+        </section>
       )}
 
       {/* ── Countdown ─────────────────────────────────────── */}
@@ -1457,14 +1445,14 @@ function HeroOrnament({ color }: { color: string }) {
   );
 }
 
-// Renamed from FadeSection — slightly subtler vertical offset, same easing
+// Atmospheric opacity reveal — no y movement, avoids mechanical "webpage stacking" feel
 function RevealSection({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
