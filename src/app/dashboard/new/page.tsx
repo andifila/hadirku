@@ -2,24 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
-import InvitationForm, {
-  type FormValues,
-} from "@/components/invitation/InvitationForm";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, Menu } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import InvitationForm, { type FormValues } from "@/components/invitation/InvitationForm";
 import { createInvitation, generateSlug } from "@/lib/supabase/invitation-crud";
 
 export default function NewInvitationPage() {
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const { user, signOut } = useAuth();
+  const [submitting,  setSubmitting]  = useState(false);
+  const [error,       setError]       = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   async function handleSubmit(values: FormValues) {
     setSubmitting(true);
     setError("");
-
     const slug = values.slug.trim() || generateSlug(values.bride_name, values.groom_name);
-
     try {
       await createInvitation({
         template_id:        values.template_id,
@@ -52,59 +52,92 @@ export default function NewInvitationPage() {
         gift_address:       values.gift_address.trim()       || null,
         owner_whatsapp:     values.owner_whatsapp.trim()     || null,
         slug,
-        is_published:       values.is_published,
+        is_published: values.is_published,
       });
       router.push("/dashboard");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Gagal membuat undangan."
-      );
+      setError(err instanceof Error ? err.message : "Gagal membuat undangan.");
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--muted)" }}>
-      <nav
-        className="sticky top-0 z-10 px-4 py-4"
-        style={{
-          background: "var(--background)",
-          borderBottom: "1px solid var(--border)",
-        }}
-      >
-        <div className="mx-auto flex max-w-2xl items-center gap-3">
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex lg:flex-shrink-0">
+        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={null} />
+      </div>
+
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              key="overlay"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+            />
+            <motion.div
+              key="drawer"
+              initial={{ x: -240 }} animate={{ x: 0 }} exit={{ x: -240 }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed inset-y-0 left-0 z-50 lg:hidden"
+            >
+              <Sidebar
+                userEmail={user?.email ?? ""}
+                onSignOut={signOut}
+                onClose={() => setSidebarOpen(false)}
+                invitationId={null}
+              />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Content */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+
+        {/* Topbar */}
+        <header
+          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
+          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
+        >
           <motion.button
-            onClick={() => router.push("/dashboard")}
-            whileHover={{ scale: 1.12, x: -2 }}
-            whileTap={{ scale: 0.92 }}
+            onClick={() => setSidebarOpen(true)}
+            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.9, rotate: -8 }}
             transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2"
+            className="rounded-lg p-2 lg:hidden"
             style={{ color: "var(--muted-foreground)" }}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <Menu className="h-5 w-5" />
           </motion.button>
-          <h1
-            className="text-base font-semibold"
-            style={{ fontFamily: "var(--font-playfair)" }}
-          >
-            Buat Undangan Baru
-          </h1>
-        </div>
-      </nav>
+          <div className="flex-1">
+            <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Undangan</h1>
+            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              Buat undangan pernikahan baru
+            </p>
+          </div>
+        </header>
 
-      <motion.main
-        className="mx-auto max-w-2xl px-4 py-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
-      >
-        <InvitationForm
-          submitting={submitting}
-          error={error}
-          onSubmit={handleSubmit}
-          submitLabel="Buat Undangan"
-        />
-      </motion.main>
+        {/* Scrollable content */}
+        <main className="flex-1 overflow-y-auto">
+          <motion.div
+            className="mx-auto max-w-2xl px-4 py-6"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            <InvitationForm
+              submitting={submitting}
+              error={error}
+              onSubmit={handleSubmit}
+              submitLabel="Buat Undangan"
+            />
+          </motion.div>
+        </main>
+      </div>
     </div>
   );
 }

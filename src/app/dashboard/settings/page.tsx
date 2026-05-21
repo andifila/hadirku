@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Menu, KeyRound, Bell, Trash2, Check, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,7 +30,14 @@ function Card({ children, danger }: { children: React.ReactNode; danger?: boolea
 
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen,  setSidebarOpen]  = useState(false);
+  const [invitationId, setInvitationId] = useState<string | null>(null);
+
+  const loadInvitation = useCallback(async () => {
+    const stats = await getUserInvitations().catch(() => []);
+    if (stats.length) setInvitationId(stats[0].invitation_id);
+  }, []);
+  useEffect(() => { loadInvitation(); }, [loadInvitation]);
 
   // Password reset
   const [pwSending,  setPwSending]  = useState(false);
@@ -80,7 +87,7 @@ export default function SettingsPage() {
 
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} />
+        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={invitationId} />
       </div>
 
       {/* Mobile Sidebar */}

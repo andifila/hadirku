@@ -106,11 +106,6 @@ function BarChart({ guests }: { guests: Guest[] }) {
   const counts = days.map((d) => byDate[d] || 0);
   const max = Math.max(...counts, 1);
 
-  const fmt = (d: string) => {
-    const [, m, day] = d.split("-");
-    return `${parseInt(day)}/${parseInt(m)}`;
-  };
-
   return (
     <div className="flex h-32 items-end gap-1">
       {days.map((d, i) => (
@@ -137,7 +132,7 @@ function BarChart({ guests }: { guests: Guest[] }) {
   );
 }
 
-function BarChartLabels({ guests }: { guests: Guest[] }) {
+function BarChartLabels() {
   const today = new Date();
   const days = Array.from({ length: 14 }, (_, i) => {
     const d = new Date(today);
@@ -331,7 +326,7 @@ export default function StatsPage() {
                   ) : (
                     <>
                       <BarChart guests={guests} />
-                      <BarChartLabels guests={guests} />
+                      <BarChartLabels />
                     </>
                   )}
                 </div>
