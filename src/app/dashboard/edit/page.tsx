@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Trash2, Menu, FileText } from "lucide-react";
+import { Toast } from "@/components/ui/Toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import InvitationForm, { type FormValues } from "@/components/invitation/InvitationForm";
@@ -40,6 +41,7 @@ function EditContent() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting,          setDeleting]          = useState(false);
   const [sidebarOpen,       setSidebarOpen]       = useState(false);
+  const [toast,             setToast]             = useState(false);
 
   useEffect(() => {
     if (!id) { setLoading(false); return; }
@@ -131,7 +133,8 @@ function EditContent() {
         owner_whatsapp:     values.owner_whatsapp.trim()     || null,
         is_published:       values.is_published,
       });
-      router.push("/dashboard");
+      setToast(true);
+      setTimeout(() => router.push("/dashboard"), 1400);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menyimpan.");
       setSubmitting(false);
@@ -292,6 +295,12 @@ function EditContent() {
           </div>
         </main>
       </div>
+
+      <Toast
+        message="Undangan berhasil disimpan"
+        visible={toast}
+        onClose={() => setToast(false)}
+      />
     </div>
   );
 }

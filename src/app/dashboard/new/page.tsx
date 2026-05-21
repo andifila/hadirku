@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Menu } from "lucide-react";
+import { Toast } from "@/components/ui/Toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import InvitationForm, { type FormValues } from "@/components/invitation/InvitationForm";
@@ -15,6 +16,7 @@ export default function NewInvitationPage() {
   const [submitting,  setSubmitting]  = useState(false);
   const [error,       setError]       = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [toast,       setToast]       = useState(false);
 
   async function handleSubmit(values: FormValues) {
     setSubmitting(true);
@@ -54,7 +56,8 @@ export default function NewInvitationPage() {
         slug,
         is_published: values.is_published,
       });
-      router.push("/dashboard");
+      setToast(true);
+      setTimeout(() => router.push("/dashboard"), 1400);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal membuat undangan.");
       setSubmitting(false);
@@ -138,6 +141,12 @@ export default function NewInvitationPage() {
           </motion.div>
         </main>
       </div>
+
+      <Toast
+        message="Undangan berhasil dibuat"
+        visible={toast}
+        onClose={() => setToast(false)}
+      />
     </div>
   );
 }

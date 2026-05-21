@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} h-full`}>
+    <html lang="id" className={`${playfair.variable} ${inter.variable} h-full`}>
       <body className="min-h-full antialiased">{children}</body>
     </html>
   );

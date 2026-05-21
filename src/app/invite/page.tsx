@@ -10,6 +10,7 @@ import {
   MapPin, Heart, Loader2, CheckCircle,
   Music, Music2,
   Copy, Check, QrCode, Package,
+  Share2, ArrowUp,
 } from "lucide-react";
 import {
   getInvitationBySlug,
@@ -293,6 +294,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
   const [timeLeft, setTimeLeft] = useState(getTimeLeft(eventDate));
   const [musicPlaying, setMusicPlaying] = useState(false);
+  const [showMusicHint, setShowMusicHint] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Hero scroll refs — parallax + content fade-out
@@ -323,8 +326,19 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
   useEffect(() => {
     if (!autoPlay || !audioRef.current) return;
-    audioRef.current.play().then(() => setMusicPlaying(true)).catch(() => {});
+    audioRef.current.play()
+      .then(() => setMusicPlaying(true))
+      .catch(() => {
+        setShowMusicHint(true);
+        setTimeout(() => setShowMusicHint(false), 4000);
+      });
   }, [autoPlay]);
+
+  useEffect(() => {
+    function onScroll() { setShowBackToTop(window.scrollY > 500); }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   function toggleMusic() {
     const audio = audioRef.current;
@@ -374,28 +388,62 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
     >
       {/* Floating music toggle */}
       {invite.music_url && (
-        <div className="fixed bottom-6 right-6 z-40">
-          {musicPlaying && (
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              animate={{ scale: [1, 2], opacity: [0.35, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
-              style={{ background: "var(--primary)" }}
-            />
-          )}
-          <motion.button
-            onClick={toggleMusic}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="relative flex h-11 w-11 items-center justify-center rounded-full"
-            style={{ background: "var(--primary)", color: "#fff", boxShadow: `0 4px 20px -4px ${theme.primary}88` }}
-            aria-label={musicPlaying ? "Pause musik" : "Putar musik"}
-          >
-            {musicPlaying ? <Music className="h-4 w-4" /> : <Music2 className="h-4 w-4" />}
-          </motion.button>
+        <div className="fixed bottom-6 right-6 z-40 flex items-center">
+          <AnimatePresence>
+            {showMusicHint && (
+              <motion.span
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.25 }}
+                className="mr-3 whitespace-nowrap rounded-full px-3 py-1.5 text-[10px] font-medium shadow-lg"
+                style={{ background: "var(--primary)", color: "#fff", fontFamily: "var(--font-inter)" }}
+              >
+                ♪ Ketuk untuk musik
+              </motion.span>
+            )}
+          </AnimatePresence>
+          <div className="relative">
+            {musicPlaying && (
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                animate={{ scale: [1, 2], opacity: [0.35, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+                style={{ background: "var(--primary)" }}
+              />
+            )}
+            <motion.button
+              onClick={toggleMusic}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="relative flex h-11 w-11 items-center justify-center rounded-full"
+              style={{ background: "var(--primary)", color: "#fff", boxShadow: `0 4px 20px -4px ${theme.primary}88` }}
+              aria-label={musicPlaying ? "Pause musik" : "Putar musik"}
+            >
+              {musicPlaying ? <Music className="h-4 w-4" /> : <Music2 className="h-4 w-4" />}
+            </motion.button>
+          </div>
         </div>
       )}
+
+      {/* Back to top */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="fixed bottom-20 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full shadow-md"
+            style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)" }}
+            aria-label="Kembali ke atas"
+          >
+            <ArrowUp className="h-4 w-4" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       {/*
@@ -740,7 +788,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                   {invite.venue_address}
                 </p>
-                {invite.dresscode && !hasAkad && (
+                {invite.dresscode && (!hasAkad || !invite.akad_venue_name) && (
                   <p className="pt-1 text-[10px] uppercase tracking-[0.2em]"
                     style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                     Dresscode —{" "}
@@ -1079,13 +1127,55 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           </div>
         )}
 
-        <div className="mx-auto mt-10 h-px w-8" style={{ background: "var(--border)" }} />
+        <div className="mt-10 flex justify-center">
+          <ShareButton invite={invite} />
+        </div>
+        <div className="mx-auto mt-6 h-px w-8" style={{ background: "var(--border)" }} />
         <p className="mt-4 text-[9px] uppercase tracking-[0.25em]"
           style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", opacity: 0.5 }}>
           Wedding Invite
         </p>
       </footer>
     </main>
+  );
+}
+
+// ─── Share Button ─────────────────────────────────────────────────────────────
+
+function ShareButton({ invite }: { invite: PublicInvitation }) {
+  const [state, setState] = useState<"idle" | "copied">("idle");
+
+  async function handleShare() {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const title = `Undangan pernikahan ${invite.bride_name} & ${invite.groom_name}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try { await navigator.share({ title, url }); } catch { /* user dismissed */ }
+    } else {
+      try { await navigator.clipboard.writeText(url); } catch { /* blocked */ }
+      setState("copied");
+      setTimeout(() => setState("idle"), 2000);
+    }
+  }
+
+  return (
+    <motion.button
+      onClick={handleShare}
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+      className="flex items-center gap-2 rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.2em]"
+      style={{
+        border: `1px solid ${state === "copied" ? "var(--primary)" : "var(--border)"}`,
+        fontFamily: "var(--font-inter)",
+        color: state === "copied" ? "var(--primary)" : "var(--muted-foreground)",
+        transition: "color 0.2s, border-color 0.2s",
+      }}
+    >
+      {state === "copied"
+        ? <><Check className="h-3.5 w-3.5" /> Link Tersalin</>
+        : <><Share2 className="h-3.5 w-3.5" /> Bagikan Undangan</>
+      }
+    </motion.button>
   );
 }
 
@@ -1351,18 +1441,18 @@ function RsvpSection({ invite, guestName, onSuccess }: {
                     <motion.button type="button"
                       onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
                       whileTap={{ scale: 0.97 }}
-                      className="flex h-7 w-7 items-center justify-center text-base"
-                      style={{ border: "1px solid var(--border)", borderRadius: 6, color: "var(--muted-foreground)", background: "transparent" }}
+                      className="flex h-11 w-11 items-center justify-center text-lg"
+                      style={{ border: "1px solid var(--border)", borderRadius: 8, color: "var(--muted-foreground)", background: "transparent" }}
                     >−</motion.button>
-                    <span className="w-4 text-center text-base font-semibold"
+                    <span className="w-6 text-center text-base font-semibold"
                       style={{ fontFamily: "var(--font-playfair)" }}>
                       {guestCount}
                     </span>
                     <motion.button type="button"
                       onClick={() => setGuestCount(Math.min(20, guestCount + 1))}
                       whileTap={{ scale: 0.97 }}
-                      className="flex h-7 w-7 items-center justify-center text-base"
-                      style={{ border: "1px solid var(--border)", borderRadius: 6, color: "var(--muted-foreground)", background: "transparent" }}
+                      className="flex h-11 w-11 items-center justify-center text-lg"
+                      style={{ border: "1px solid var(--border)", borderRadius: 8, color: "var(--muted-foreground)", background: "transparent" }}
                     >+</motion.button>
                   </div>
                 </div>

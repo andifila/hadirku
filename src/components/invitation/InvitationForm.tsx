@@ -219,6 +219,10 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     pengaturan: slugReserved,
   };
 
+  const tabHasRequired: Record<TabKey, boolean> = {
+    mempelai: true, acara: true, konten: false, pengaturan: true,
+  };
+
   const displayError = localError || error;
 
   return (
@@ -265,6 +269,12 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                 <span
                   className="relative z-10 h-1.5 w-1.5 flex-shrink-0 rounded-full"
                   style={{ background: "#f87171" }}
+                />
+              )}
+              {!hasIssue && !isActive && tabHasRequired[t.key] && (
+                <span
+                  className="relative z-10 h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                  style={{ background: "#4ade80" }}
                 />
               )}
             </motion.button>
