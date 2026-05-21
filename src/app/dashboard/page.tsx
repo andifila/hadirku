@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Calendar, ExternalLink, Loader2, Pencil,
+  Calendar, ExternalLink, Loader2,
   Link2, Check, Menu, Users, ArrowRight,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -118,24 +118,6 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {invitation && (
-            <MotionLink
-              href={`/dashboard/edit?id=${invitationId}`}
-              whileHover={{ scale: 1.02, boxShadow: "0 4px 18px rgba(176,141,87,0.4)" }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium"
-              style={{
-                background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)",
-                color: "var(--primary-foreground)",
-                fontFamily: "var(--font-inter)",
-                boxShadow: "0 2px 8px rgba(176,141,87,0.22)",
-              }}
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Edit Undangan</span>
-            </MotionLink>
-          )}
         </header>
 
         {/* Scrollable content */}

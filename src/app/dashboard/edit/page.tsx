@@ -3,10 +3,10 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
-import InvitationForm, {
-  type FormValues,
-} from "@/components/invitation/InvitationForm";
+import { Loader2, Trash2, Menu, FileText } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import InvitationForm, { type FormValues } from "@/components/invitation/InvitationForm";
 import {
   getInvitationById,
   updateInvitation,
@@ -17,11 +17,8 @@ export default function EditInvitationPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <Loader2
-            className="h-8 w-8 animate-spin"
-            style={{ color: "var(--primary)" }}
-          />
+        <div className="flex h-screen items-center justify-center" style={{ background: "var(--muted)" }}>
+          <Loader2 className="h-8 w-8 animate-spin" style={{ color: "var(--primary)" }} />
         </div>
       }
     >
@@ -33,20 +30,19 @@ export default function EditInvitationPage() {
 function EditContent() {
   const params = useSearchParams();
   const router = useRouter();
+  const { user, signOut } = useAuth();
   const id = params.get("id") ?? "";
 
-  const [initial, setInitial] = useState<FormValues | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [initial,           setInitial]           = useState<FormValues | null>(null);
+  const [loading,           setLoading]           = useState(true);
+  const [submitting,        setSubmitting]        = useState(false);
+  const [error,             setError]             = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [deleting,          setDeleting]          = useState(false);
+  const [sidebarOpen,       setSidebarOpen]       = useState(false);
 
   useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
+    if (!id) { setLoading(false); return; }
     getInvitationById(id).then((inv) => {
       if (inv) {
         setInitial({
@@ -142,146 +138,160 @@ function EditContent() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2
-          className="h-8 w-8 animate-spin"
-          style={{ color: "var(--primary)" }}
-        />
-      </div>
-    );
-  }
-
-  if (!id || !initial) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-        <p style={{ fontFamily: "var(--font-inter)" }}>
-          Undangan tidak ditemukan.
-        </p>
-        <motion.button
-          onClick={() => router.push("/dashboard")}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          className="text-sm underline"
-          style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
-        >
-          Kembali ke dashboard
-        </motion.button>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen" style={{ background: "var(--muted)" }}>
-      <nav
-        className="sticky top-0 z-10 px-4 py-4"
-        style={{
-          background: "var(--background)",
-          borderBottom: "1px solid var(--border)",
-        }}
-      >
-        <div className="mx-auto flex max-w-2xl items-center gap-3">
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex lg:flex-shrink-0">
+        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={id || null} />
+      </div>
+
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              key="overlay"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+            />
+            <motion.div
+              key="drawer"
+              initial={{ x: -240 }} animate={{ x: 0 }} exit={{ x: -240 }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed inset-y-0 left-0 z-50 lg:hidden"
+            >
+              <Sidebar
+                userEmail={user?.email ?? ""}
+                onSignOut={signOut}
+                onClose={() => setSidebarOpen(false)}
+                invitationId={id || null}
+              />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Content */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+
+        {/* Topbar */}
+        <header
+          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
+          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
+        >
           <motion.button
-            onClick={() => router.push("/dashboard")}
-            whileHover={{ scale: 1.12, x: -2 }}
-            whileTap={{ scale: 0.92 }}
+            onClick={() => setSidebarOpen(true)}
+            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.9, rotate: -8 }}
             transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2"
+            className="rounded-lg p-2 lg:hidden"
             style={{ color: "var(--muted-foreground)" }}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <Menu className="h-5 w-5" />
           </motion.button>
-          <h1
-            className="text-base font-semibold"
-            style={{ fontFamily: "var(--font-playfair)" }}
-          >
-            Edit Undangan
-          </h1>
-        </div>
-      </nav>
+          <div className="flex-1">
+            <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Undangan</h1>
+            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+              Edit konten &amp; pengaturan undangan
+            </p>
+          </div>
+        </header>
 
-      <motion.main
-        className="mx-auto max-w-2xl px-4 py-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
-      >
-        <InvitationForm
-          initial={initial}
-          submitting={submitting}
-          error={error}
-          onSubmit={handleSubmit}
-          submitLabel="Simpan Perubahan"
-        />
+        {/* Scrollable content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-2xl px-4 py-6">
 
-        {/* Danger zone */}
-        <div
-          className="mt-8 rounded-2xl p-5"
-          style={{ border: "1px solid #fecaca", background: "#fef2f2" }}
-        >
-          <p className="text-sm font-semibold" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>
-            Zona Berbahaya
-          </p>
-          <p className="mt-1 text-xs" style={{ color: "#b91c1c", fontFamily: "var(--font-inter)" }}>
-            Menghapus undangan akan menghapus semua data tamu secara permanen.
-          </p>
-          <AnimatePresence mode="wait">
-            {!showDeleteConfirm ? (
-              <motion.button
-                key="btn"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowDeleteConfirm(true)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                className="mt-4 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium"
-                style={{
-                  background: "#dc2626",
-                  color: "#fff",
-                  fontFamily: "var(--font-inter)",
-                }}
+            {loading ? (
+              <div className="flex items-center justify-center py-24">
+                <Loader2 className="h-8 w-8 animate-spin" style={{ color: "var(--primary)" }} />
+              </div>
+
+            ) : !id || !initial ? (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center rounded-2xl px-6 py-24 text-center"
+                style={{ background: "var(--background)", border: "1px solid var(--border)" }}
               >
-                <Trash2 className="h-4 w-4" />
-                Hapus Undangan
-              </motion.button>
+                <FileText className="mb-4 h-10 w-10" style={{ color: "var(--muted-foreground)", opacity: 0.4 }} />
+                <p className="text-sm font-medium" style={{ fontFamily: "var(--font-inter)" }}>
+                  Undangan tidak ditemukan.
+                </p>
+              </motion.div>
+
             ) : (
               <motion.div
-                key="confirm"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="mt-4 flex flex-wrap items-center gap-2"
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <span className="text-sm" style={{ color: "#7f1d1d", fontFamily: "var(--font-inter)" }}>
-                  Yakin ingin menghapus?
-                </span>
-                <motion.button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-60"
-                  style={{ background: "#dc2626", color: "#fff", fontFamily: "var(--font-inter)" }}
+                <InvitationForm
+                  initial={initial}
+                  submitting={submitting}
+                  error={error}
+                  onSubmit={handleSubmit}
+                  submitLabel="Simpan Perubahan"
+                />
+
+                {/* Danger zone */}
+                <div
+                  className="mt-8 rounded-2xl p-5"
+                  style={{ border: "1px solid #fecaca", background: "#fef2f2" }}
                 >
-                  {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                  Ya, Hapus
-                </motion.button>
-                <motion.button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="rounded-xl px-4 py-2 text-sm font-medium"
-                  style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)", color: "var(--foreground)" }}
-                >
-                  Batal
-                </motion.button>
+                  <p className="text-sm font-semibold" style={{ color: "#dc2626", fontFamily: "var(--font-inter)" }}>
+                    Zona Berbahaya
+                  </p>
+                  <p className="mt-1 text-xs" style={{ color: "#b91c1c", fontFamily: "var(--font-inter)" }}>
+                    Menghapus undangan akan menghapus semua data tamu secara permanen.
+                  </p>
+                  <AnimatePresence mode="wait">
+                    {!showDeleteConfirm ? (
+                      <motion.button
+                        key="btn"
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        onClick={() => setShowDeleteConfirm(true)}
+                        whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                        className="mt-4 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium"
+                        style={{ background: "#dc2626", color: "#fff", fontFamily: "var(--font-inter)" }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Hapus Undangan
+                      </motion.button>
+                    ) : (
+                      <motion.div
+                        key="confirm"
+                        initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                        className="mt-4 flex flex-wrap items-center gap-2"
+                      >
+                        <span className="text-sm" style={{ color: "#7f1d1d", fontFamily: "var(--font-inter)" }}>
+                          Yakin ingin menghapus?
+                        </span>
+                        <motion.button
+                          onClick={handleDelete}
+                          disabled={deleting}
+                          whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                          className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-60"
+                          style={{ background: "#dc2626", color: "#fff", fontFamily: "var(--font-inter)" }}
+                        >
+                          {deleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                          Ya, Hapus
+                        </motion.button>
+                        <motion.button
+                          onClick={() => setShowDeleteConfirm(false)}
+                          whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                          className="rounded-xl px-4 py-2 text-sm font-medium"
+                          style={{ background: "var(--background)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)", color: "var(--foreground)" }}
+                        >
+                          Batal
+                        </motion.button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </motion.div>
             )}
-          </AnimatePresence>
-        </div>
-      </motion.main>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
