@@ -85,6 +85,7 @@ function InviteContent() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [opened, setOpened] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     if (!slug) { setNotFound(true); setLoading(false); return; }
@@ -141,10 +142,14 @@ function InviteContent() {
             className={`fixed inset-0 z-[60]${isPreview ? " pt-8" : ""}`}
             exit={{ opacity: 0, transition: { duration: 0.4, ease: "easeInOut" } }}
           >
-            <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => setOpened(true)} />
+            <EnvelopeCover invite={invite} guestName={guestName} onOpen={() => { setOpened(true); setShowConfetti(true); }} />
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showConfetti && (
+        <ConfettiBurst onComplete={() => setShowConfetti(false)} />
+      )}
 
       {opened && (
         <motion.div
@@ -391,8 +396,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           </>
         ) : (
           <>
-            <div className="absolute inset-0" style={{ background: theme.muted }} />
-            <div className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 35%, rgba(255,255,255,0.9), transparent)" }} />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(140deg, ${theme.muted} 0%, #fff 50%, ${theme.muted} 100%)` }} />
+            <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 80% 65% at 50% 30%, rgba(255,255,255,0.88), transparent)" }} />
+            <FloatingPetals color={theme.primary} />
           </>
         )}
         <Ornament color={theme.primary} />
@@ -421,9 +427,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           </motion.p>
 
           {/* Bride */}
-          <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
-              {invite.bride_name}
+              <LetterReveal text={invite.bride_name} delay={0.5} />
             </h1>
             {invite.bride_title && (
               <p className="mt-1 text-sm font-medium" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
@@ -448,7 +454,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 @{igHandle(invite.bride_instagram!)}
               </a>
             )}
-          </motion.div>
+          </div>
 
           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.7, type: "spring", stiffness: 200 }} className="my-5">
             <motion.div
@@ -460,9 +466,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           </motion.div>
 
           {/* Groom */}
-          <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }} className="flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <h1 className="text-5xl font-bold leading-tight sm:text-6xl" style={{ color: hasCover ? "#fff" : undefined, fontFamily: "var(--font-playfair)" }}>
-              {invite.groom_name}
+              <LetterReveal text={invite.groom_name} delay={0.82} />
             </h1>
             {invite.groom_title && (
               <p className="mt-1 text-sm font-medium" style={{ color: hasCover ? "rgba(255,255,255,0.8)" : "var(--primary)", fontFamily: "var(--font-inter)" }}>
@@ -487,7 +493,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 @{igHandle(invite.groom_instagram!)}
               </a>
             )}
-          </motion.div>
+          </div>
 
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.95 }}
             className="mt-6 max-w-xs text-sm leading-relaxed"
@@ -515,12 +521,61 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Quote ────────────────────────────────────────────── */}
       {invite.custom_message && (
         <FadeSection>
-          <section className="px-6 py-16 text-center">
-            <div className="mx-auto max-w-xl">
-              <div className="mb-4 text-2xl" style={{ color: "var(--primary)" }}>✦</div>
-              <p className="text-base leading-relaxed sm:text-lg" style={{ fontFamily: "var(--font-playfair)", color: "var(--muted-foreground)", fontStyle: "italic" }}>
-                &ldquo;{invite.custom_message}&rdquo;
-              </p>
+          <section className="relative overflow-hidden px-6 py-24 text-center" style={{ background: "var(--muted)" }}>
+            <div className="pointer-events-none absolute inset-0 opacity-[0.055]" aria-hidden>
+              <svg width="100%" height="100%">
+                <defs>
+                  <pattern id="batik-quote" x="0" y="0" width="56" height="56" patternUnits="userSpaceOnUse">
+                    <circle cx="28" cy="28" r="11" stroke={theme.primary} strokeWidth="1" fill="none" />
+                    <circle cx="28" cy="28" r="5.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
+                    <circle cx="0" cy="0" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
+                    <circle cx="56" cy="0" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
+                    <circle cx="0" cy="56" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
+                    <circle cx="56" cy="56" r="3.5" stroke={theme.primary} strokeWidth="0.5" fill="none" />
+                    <line x1="0" y1="28" x2="17" y2="28" stroke={theme.primary} strokeWidth="0.5" />
+                    <line x1="39" y1="28" x2="56" y2="28" stroke={theme.primary} strokeWidth="0.5" />
+                    <line x1="28" y1="0" x2="28" y2="17" stroke={theme.primary} strokeWidth="0.5" />
+                    <line x1="28" y1="39" x2="28" y2="56" stroke={theme.primary} strokeWidth="0.5" />
+                    <line x1="14" y1="14" x2="20" y2="20" stroke={theme.primary} strokeWidth="0.5" />
+                    <line x1="36" y1="14" x2="42" y2="20" stroke={theme.primary} strokeWidth="0.5" />
+                    <line x1="14" y1="42" x2="20" y2="36" stroke={theme.primary} strokeWidth="0.5" />
+                    <line x1="36" y1="42" x2="42" y2="36" stroke={theme.primary} strokeWidth="0.5" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#batik-quote)" />
+              </svg>
+            </div>
+            <div className="relative z-10 mx-auto max-w-lg">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+                className="mb-4 text-5xl font-bold leading-none"
+                style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}
+              >
+                ❝
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: 0.12 }}
+                className="text-xl leading-relaxed sm:text-2xl"
+                style={{ fontFamily: "var(--font-playfair)", color: "var(--foreground)", fontStyle: "italic" }}
+              >
+                {invite.custom_message}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.28 }}
+                className="mt-4 text-5xl font-bold leading-none"
+                style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}
+              >
+                ❞
+              </motion.div>
             </div>
           </section>
         </FadeSection>
@@ -864,41 +919,11 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Guest messages ───────────────────────────────────── */}
       {messages.length > 0 && (
         <FadeSection>
-          <section className="px-6 py-16" style={{ background: "var(--muted)" }}>
-            <div className="mx-auto max-w-xl">
+          <section className="overflow-hidden py-16" style={{ background: "var(--muted)" }}>
+            <div className="mb-10 text-center">
               <SectionTitle>Ucapan &amp; Doa</SectionTitle>
-              <motion.div
-                className="mt-8 flex flex-col gap-4"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
-              >
-                {messages.map((m) => (
-                  <motion.div
-                    key={m.id}
-                    variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }}
-                    className="rounded-2xl p-5" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
-                    <div className="mb-2 flex items-center justify-between gap-2">
-                      <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{m.name}</p>
-                      <span
-                        className="shrink-0 rounded-full px-2.5 py-0.5 text-xs"
-                        style={{
-                          background: m.rsvp_status === "attending" ? "#f0fdf4" : "var(--muted)",
-                          color: m.rsvp_status === "attending" ? "#16a34a" : "var(--muted-foreground)",
-                          fontFamily: "var(--font-inter)",
-                        }}
-                      >
-                        {m.rsvp_status === "attending" ? "Hadir ✓" : m.rsvp_status === "not_attending" ? "Tidak Hadir" : "—"}
-                      </span>
-                    </div>
-                    <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", fontStyle: "italic" }}>
-                      &ldquo;{m.message}&rdquo;
-                    </p>
-                  </motion.div>
-                ))}
-              </motion.div>
             </div>
+            <MessageMarquee messages={messages} />
           </section>
         </FadeSection>
       )}
@@ -1302,6 +1327,165 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
       >
         {children}
       </motion.h2>
+    </div>
+  );
+}
+
+// ─── ConfettiBurst ────────────────────────────────────────────────────────────
+
+const CONFETTI_COLORS = ["#b08d57", "#c06080", "#4a7c59", "#6b35a3", "#e8c98a", "#f8f4ee", "#d4b8f0", "#c5dfc5"];
+
+function ConfettiBurst({ onComplete }: { onComplete: () => void }) {
+  const particles = Array.from({ length: 64 }, (_, i) => {
+    const angle = (i / 64) * 360 + (Math.random() - 0.5) * 18;
+    const dist = 90 + Math.random() * 220;
+    const rad = (angle * Math.PI) / 180;
+    return {
+      id: i,
+      tx: Math.cos(rad) * dist,
+      ty: Math.sin(rad) * dist - 60,
+      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+      size: 5 + (i % 5) * 3,
+      rotation: Math.random() * 720 - 360,
+      shape: i % 3,
+      delay: Math.random() * 0.12,
+    };
+  });
+
+  return (
+    <motion.div
+      className="pointer-events-none fixed inset-0 z-[65] flex items-center justify-center overflow-hidden"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 0 }}
+      transition={{ delay: 1.3, duration: 0.6 }}
+      onAnimationComplete={onComplete}
+    >
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          initial={{ x: 0, y: 0, scale: 0, rotate: 0, opacity: 1 }}
+          animate={{ x: p.tx, y: p.ty, scale: [0, 1, 1], rotate: p.rotation, opacity: [1, 1, 0.3] }}
+          transition={{ duration: 1.1, delay: p.delay, ease: [0.2, 0.8, 0.35, 1] }}
+          style={{
+            position: "absolute",
+            width: p.size,
+            height: p.shape === 1 ? p.size * 0.45 : p.size,
+            background: p.color,
+            borderRadius: p.shape === 0 ? "50%" : "2px",
+            transform: p.shape === 2 ? "rotate(45deg)" : undefined,
+            opacity: 0.85,
+          }}
+        />
+      ))}
+    </motion.div>
+  );
+}
+
+// ─── LetterReveal ─────────────────────────────────────────────────────────────
+
+function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
+  return (
+    <>
+      {text.split("").map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 28, rotateX: -55 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ duration: 0.42, delay: delay + i * 0.058, ease: [0.25, 0.46, 0.45, 0.94] }}
+          style={{ display: "inline-block", transformOrigin: "bottom center" }}
+        >
+          {char === " " ? " " : char}
+        </motion.span>
+      ))}
+    </>
+  );
+}
+
+// ─── FloatingPetals ───────────────────────────────────────────────────────────
+
+const PETAL_CONFIGS = [
+  { left: "7%",  delay: 0,    dur: 8,  size: 12 },
+  { left: "17%", delay: 1.4,  dur: 10, size: 8  },
+  { left: "27%", delay: 0.6,  dur: 7,  size: 14 },
+  { left: "37%", delay: 2.3,  dur: 9,  size: 9  },
+  { left: "47%", delay: 0.9,  dur: 11, size: 13 },
+  { left: "57%", delay: 1.8,  dur: 8,  size: 8  },
+  { left: "67%", delay: 0.3,  dur: 10, size: 15 },
+  { left: "77%", delay: 2.7,  dur: 7,  size: 10 },
+  { left: "87%", delay: 1.1,  dur: 9,  size: 12 },
+  { left: "13%", delay: 3.2,  dur: 8,  size: 8  },
+  { left: "53%", delay: 3.8,  dur: 10, size: 11 },
+  { left: "73%", delay: 4.3,  dur: 7,  size: 13 },
+];
+
+function FloatingPetals({ color }: { color: string }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {PETAL_CONFIGS.map((p, i) => (
+        <motion.div
+          key={i}
+          initial={{ y: 0, x: 0, opacity: 0, rotate: i * 28 }}
+          animate={{
+            y: [0, 1400],
+            x: [0, 22, -14, 28, 0],
+            opacity: [0, 0.5, 0.5, 0.28, 0],
+            rotate: [i * 28, i * 28 + 360],
+          }}
+          transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: "linear" }}
+          style={{ position: "absolute", left: p.left, top: -p.size * 2 }}
+        >
+          <svg width={p.size} height={Math.round(p.size * 1.45)} viewBox="0 0 14 20" fill="none">
+            <path d="M7 0 C10.5 3, 14 7.5, 14 12 C14 17, 11 20, 7 20 C3 20, 0 17, 0 12 C0 7.5, 3.5 3, 7 0Z" fill={color} opacity="0.4" />
+          </svg>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// ─── MessageMarquee ───────────────────────────────────────────────────────────
+
+function MessageMarquee({ messages }: { messages: GuestMessage[] }) {
+  const withMsg = messages.filter((m) => m.message?.trim());
+  if (withMsg.length === 0) return null;
+  const doubled = [...withMsg, ...withMsg];
+  const dur = Math.max(24, withMsg.length * 9);
+
+  return (
+    <div className="relative overflow-hidden">
+      <style>{`
+        @keyframes marquee-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .marquee-track { animation: marquee-slide ${dur}s linear infinite; }
+        .marquee-track:hover { animation-play-state: paused; }
+      `}</style>
+      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-20" style={{ background: "linear-gradient(to right, var(--muted), transparent)" }} />
+      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-20" style={{ background: "linear-gradient(to left, var(--muted), transparent)" }} />
+      <div className="marquee-track flex" style={{ width: "max-content" }}>
+        {doubled.map((m, i) => (
+          <div
+            key={i}
+            className="mx-3 flex-shrink-0 rounded-2xl p-5"
+            style={{ width: 264, background: "var(--background)", border: "1px solid var(--border)" }}
+          >
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="truncate text-sm font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>{m.name}</p>
+              <span
+                className="shrink-0 rounded-full px-2 py-0.5 text-[10px]"
+                style={{
+                  background: m.rsvp_status === "attending" ? "#f0fdf4" : "var(--muted)",
+                  color: m.rsvp_status === "attending" ? "#16a34a" : "var(--muted-foreground)",
+                  fontFamily: "var(--font-inter)",
+                }}
+              >
+                {m.rsvp_status === "attending" ? "Hadir ✓" : m.rsvp_status === "not_attending" ? "Tidak Hadir" : "—"}
+              </span>
+            </div>
+            <p className="line-clamp-3 text-xs leading-relaxed" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", fontStyle: "italic" }}>
+              &ldquo;{m.message}&rdquo;
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
