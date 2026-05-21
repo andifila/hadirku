@@ -38,12 +38,6 @@ function InstagramIcon({ className, style }: { className?: string; style?: React
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function generateWhatsAppLink(guestName: string, invitationUrl: string): string {
-  const name = guestName || "Tamu Undangan";
-  const msg = `Dear ${name},\n\nAnda diundang ke pernikahan kami:\n\n${invitationUrl}\n\nKami sangat mengharapkan kehadiran Anda. 🙏`;
-  return `https://wa.me/?text=${encodeURIComponent(msg)}`;
-}
-
 function igHandle(raw: string): string {
   return raw.replace(/^@/, "");
 }
@@ -863,7 +857,6 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         <RsvpSection
           invite={invite}
           guestName={guestName}
-          inviteUrl={typeof window !== "undefined" ? window.location.href : ""}
           onSuccess={onRsvpSuccess}
         />
       </FadeSection>
@@ -1033,8 +1026,8 @@ function BankCard({ bank, accountName, accountNumber, qrisUrl }: {
 
 type RsvpState = "idle" | "submitting" | "done" | "error" | "already_submitted";
 
-function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
-  invite: PublicInvitation; guestName: string; inviteUrl: string; onSuccess: () => void;
+function RsvpSection({ invite, guestName, onSuccess }: {
+  invite: PublicInvitation; guestName: string; onSuccess: () => void;
 }) {
   const storageKey = `rsvp_${invite.id}`;
   const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
@@ -1086,7 +1079,6 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
     }
   }
 
-  const ownerWa = invite.owner_whatsapp?.replace(/\D/g, "");
   const isDone = state === "done" || state === "already_submitted";
 
   return (
@@ -1112,33 +1104,6 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
                       ? `Terima kasih! Kami menantikan kehadiran Anda${guestCount > 1 ? ` bersama ${guestCount} orang` : ""}. 🎉`
                       : "Terima kasih, konfirmasi berhasil!"}
                 </p>
-              </div>
-              <div className="flex flex-col items-center gap-3">
-                {ownerWa && state === "done" && (
-                  <motion.a
-                    href={`https://wa.me/${ownerWa}?text=${encodeURIComponent(`Halo, saya ${name}. Saya ingin mengkonfirmasi ${status === "attending" ? `kehadiran saya (${guestCount} orang) 🎉` : "bahwa saya tidak bisa hadir"} pada acara pernikahan Anda. Terima kasih!`)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    whileHover={{ scale: 1.03, boxShadow: "0 6px 20px rgba(37,211,102,0.38)" }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium"
-                    style={{ background: "linear-gradient(135deg, #25D366 0%, #1fb855 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
-                  >
-                    <WhatsAppIcon className="h-4 w-4" />
-                    Konfirmasi via WhatsApp
-                  </motion.a>
-                )}
-                {inviteUrl && (
-                  <motion.a href={generateWhatsAppLink(guestName, inviteUrl)} target="_blank" rel="noopener noreferrer"
-                    whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                    className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium"
-                    style={{ background: "var(--muted)", color: "var(--foreground)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}>
-                    <WhatsAppIcon className="h-4 w-4" style={{ color: "#25D366" } as React.CSSProperties} />
-                    Bagikan Undangan
-                  </motion.a>
-                )}
               </div>
             </motion.div>
           ) : (
@@ -1236,20 +1201,6 @@ function RsvpSection({ invite, guestName, inviteUrl, onSuccess }: {
                 {state === "submitting" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Kirim Konfirmasi"}
               </motion.button>
 
-              {ownerWa && (
-                <motion.a
-                  href={`https://wa.me/${ownerWa}?text=${encodeURIComponent(`Halo, saya ${name || "..."} ingin mengkonfirmasi kehadiran pada acara pernikahan Anda. 🙏`)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  whileHover={{ scale: 1.02, boxShadow: "0 6px 20px rgba(37,211,102,0.38)" }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium"
-                  style={{ background: "linear-gradient(135deg, #25D366 0%, #1fb855 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
-                >
-                  <WhatsAppIcon className="h-4 w-4" />
-                  Konfirmasi via WhatsApp
-                </motion.a>
-              )}
             </motion.form>
           )}
         </AnimatePresence>
