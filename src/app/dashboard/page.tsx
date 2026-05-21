@@ -258,7 +258,7 @@ export default function DashboardPage() {
 
                     <div className="mt-5 flex flex-wrap gap-2">
                       <motion.a
-                        href={`/invite/?s=${invitation.slug}${!invitation.is_published ? "&preview=1" : ""}`}
+                        href={getShareLink(invitation.slug) + (!invitation.is_published ? "&preview=1" : "")}
                         target="_blank"
                         rel="noopener noreferrer"
                         whileHover={{ scale: 1.03, backgroundColor: "rgba(255,255,255,0.26)" }}
