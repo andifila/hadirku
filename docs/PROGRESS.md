@@ -1,6 +1,6 @@
 # Progress — Wedding Invite App
 
-> Terakhir diperbarui: 19 Mei 2026
+> Terakhir diperbarui: 20 Mei 2026
 
 ## Tech Stack
 
@@ -27,7 +27,9 @@
 - [x] Kartu undangan: nama pengantin, tanggal, venue, status published/draft
 - [x] Warning banner jika undangan masih draft
 - [x] Tombol Lihat — otomatis preview mode untuk draft
-- [x] Statistik RSVP: Hadir / Tidak Hadir / Belum
+- [x] Statistik RSVP: Hadir / Tidak Hadir / Belum (Quick Stats cards + Response Rate bar)
+- [x] Sidebar nav clickable — pakai `MotionLink` langsung, bukan `Link > motion.div`
+- [x] Sidebar "Undangan" link mengarah ke halaman edit undangan aktif
 - [x] Daftar tamu inline + search/filter nama
 - [x] Tambah tamu manual (form inline dengan animasi)
 - [x] Upload tamu via Excel (`.xlsx` / `.xls`)
@@ -130,6 +132,9 @@ Dashboard menampilkan warning banner jika undangan masih draft.
 
 ### Slug Update (fix: 19 Mei 2026)
 Edit slug di form sekarang tersimpan dengan benar. Jika slug tidak berubah sebelumnya, buka Edit dan simpan ulang.
+
+### Dashboard Sidebar Fix (20 Mei 2026)
+Sidebar nav sebelumnya tidak bisa diklik karena `<Link>` membungkus `<motion.div whileTap>` — Framer Motion gesture absorb pointer events. Solusi: ganti ke `MotionLink = motion(Link)` langsung. `NAV` constant juga sudah dihapus, nav items kini didefinisikan di dalam `Sidebar` component dengan `invitationId` prop untuk dynamic href.
 
 ### RLS `invitation_stats` View — Action Required
 Jalankan di Supabase SQL Editor untuk keamanan penuh:
