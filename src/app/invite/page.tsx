@@ -525,7 +525,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Quote ────────────────────────────────────────────── */}
       {invite.custom_message && (
         <FadeSection>
-          <section className="relative overflow-hidden px-6 py-24 text-center" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, rgba(0,0,0,0.028) 0px, rgba(0,0,0,0.028) 1px, transparent 1px, transparent 18px)" }}>
+          <section className="relative overflow-hidden px-6 py-24 text-center" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
             <div className="pointer-events-none absolute inset-0 opacity-[0.055]" aria-hidden>
               <svg width="100%" height="100%">
                 <defs>
@@ -588,7 +588,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Akad Nikah ───────────────────────────────────────── */}
       {hasAkad && invite.akad_venue_name && (
         <FadeSection>
-          <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(rgba(0,0,0,0.042) 1.5px, transparent 1.5px)", backgroundSize: "28px 28px" }}>
+          <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(color-mix(in srgb, var(--primary) 14%, transparent) 2px, transparent 2px)", backgroundSize: "22px 22px" }}>
             <div className="mx-auto max-w-xl">
               <SectionTitle>Akad Nikah</SectionTitle>
               <div className="mt-10 overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
@@ -651,7 +651,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
       {/* ── Resepsi ──────────────────────────────────────────── */}
       <FadeSection>
-        <section className="px-6 py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, rgba(0,0,0,0.028) 0px, rgba(0,0,0,0.028) 1px, transparent 1px, transparent 18px)" }}>
+        <section className="px-6 py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
           <div className="mx-auto max-w-xl">
             <SectionTitle>{hasAkad ? "Resepsi" : "Waktu & Tempat"}</SectionTitle>
             <div className="mt-10 overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
@@ -717,7 +717,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Galeri ───────────────────────────────────────────── */}
       {galleryUrls.length > 0 && (
         <FadeSection>
-          <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(rgba(0,0,0,0.042) 1.5px, transparent 1.5px)", backgroundSize: "28px 28px" }}>
+          <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(color-mix(in srgb, var(--primary) 14%, transparent) 2px, transparent 2px)", backgroundSize: "22px 22px" }}>
             <div className="mx-auto max-w-xl">
               <SectionTitle>Galeri</SectionTitle>
               <div className="mt-10">
@@ -866,7 +866,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Hadiah & Angpao ──────────────────────────────────── */}
       {(bankAccounts.length > 0 || invite.gift_address) && (
         <FadeSection>
-          <section className="px-6 py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, rgba(0,0,0,0.028) 0px, rgba(0,0,0,0.028) 1px, transparent 1px, transparent 18px)" }}>
+          <section className="px-6 py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
             <div className="mx-auto max-w-xl">
               <SectionTitle>Hadiah &amp; Angpao</SectionTitle>
               <p className="mt-3 text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
@@ -923,7 +923,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Guest messages ───────────────────────────────────── */}
       {messages.length > 0 && (
         <FadeSection>
-          <section className="overflow-hidden py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, rgba(0,0,0,0.028) 0px, rgba(0,0,0,0.028) 1px, transparent 1px, transparent 18px)" }}>
+          <section className="overflow-hidden py-16" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
             <div className="mb-10 text-center">
               <SectionTitle>Ucapan &amp; Doa</SectionTitle>
             </div>
@@ -933,7 +933,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       )}
 
       {/* ── Footer ───────────────────────────────────────────── */}
-      <footer className="px-6 py-12 text-center" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, rgba(0,0,0,0.028) 0px, rgba(0,0,0,0.028) 1px, transparent 1px, transparent 18px)" }}>
+      <footer className="px-6 py-12 text-center" style={{ backgroundColor: "var(--muted)", backgroundImage: "repeating-linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0px, color-mix(in srgb, var(--primary) 10%, transparent) 1px, transparent 1px, transparent 15px)" }}>
         <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}>
           {invite.bride_name} &amp; {invite.groom_name}
         </p>
@@ -1111,7 +1111,7 @@ function RsvpSection({ invite, guestName, onSuccess }: {
   const isDone = state === "done" || state === "already_submitted";
 
   return (
-    <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(rgba(0,0,0,0.042) 1.5px, transparent 1.5px)", backgroundSize: "28px 28px" }}>
+    <section className="px-6 py-16" style={{ backgroundColor: "var(--background)", backgroundImage: "radial-gradient(color-mix(in srgb, var(--primary) 14%, transparent) 2px, transparent 2px)", backgroundSize: "22px 22px" }}>
       <div className="mx-auto max-w-xl">
         <SectionTitle>Konfirmasi Kehadiran</SectionTitle>
         <AnimatePresence mode="wait">
