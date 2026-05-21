@@ -15,13 +15,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "WeddingInvite — Beautiful Digital Invitations",
+  metadataBase: new URL(
+    process.env.NODE_ENV === "production"
+      ? "https://andifila.github.io/invitation-wedding"
+      : "http://localhost:3000"
+  ),
+  title: "Wedding Invite — Undangan Pernikahan Digital",
   description:
-    "Create stunning, personalized wedding invitations. Share with guests via WhatsApp. Track RSVPs in real-time.",
+    "Buat undangan pernikahan digital yang indah. Bagikan ke tamu via WhatsApp. Pantau RSVP secara real-time.",
   openGraph: {
-    title: "WeddingInvite — Beautiful Digital Invitations",
-    description: "Create stunning, personalized wedding invitations.",
+    title: "Wedding Invite — Undangan Pernikahan Digital",
+    description: "Buat undangan digital elegan, bagikan via WhatsApp, pantau RSVP tamu secara real-time.",
     type: "website",
+    locale: "id_ID",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Wedding Invite — Undangan Pernikahan Digital",
+    description: "Buat undangan digital elegan, bagikan via WhatsApp, pantau RSVP tamu secara real-time.",
   },
 };
 
