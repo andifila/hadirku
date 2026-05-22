@@ -9,11 +9,11 @@ import { ArrowRight, Heart, BarChart2, MessageSquare, Loader2 } from "lucide-rea
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const TEMPLATES = [
-  { name: "Garden Bloom",   primary: "#4a7c59", muted: "#e4ede6" },
-  { name: "Rustic Gold",    primary: "#b08d57", muted: "#ece8e0" },
-  { name: "Modern Minimal", primary: "#1a1a1a", muted: "#f0f0f0" },
-  { name: "Royal Elegance", primary: "#6b35a3", muted: "#ede8f5" },
-  { name: "Floral Dream",   primary: "#c06080", muted: "#f5e8ee" },
+  { name: "Garden Bloom",   mood: "Segar & Natural",      primary: "#4a7c59", muted: "#e4ede6" },
+  { name: "Rustic Gold",    mood: "Elegan & Hangat",       primary: "#b08d57", muted: "#ece8e0" },
+  { name: "Modern Minimal", mood: "Bersih & Kontemporer", primary: "#1a1a1a", muted: "#f0f0f0" },
+  { name: "Royal Elegance", mood: "Mewah & Dramatis",      primary: "#6b35a3", muted: "#ede8f5" },
+  { name: "Floral Dream",   mood: "Romantis & Feminin",   primary: "#c06080", muted: "#f5e8ee" },
 ];
 
 const FEATURES = [
@@ -39,6 +39,7 @@ const FEATURES = [
 export default function LandingPage() {
   const { user, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES[1]);
   useEffect(() => setMounted(true), []);
 
   const ctaHref  = !mounted || loading ? "#" : user ? "/dashboard" : "/login";
@@ -137,8 +138,12 @@ export default function LandingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-xs"
+          className="relative w-full max-w-sm pb-3"
         >
+          <div className="absolute inset-x-6 bottom-0 h-[calc(100%-12px)] rounded-sm"
+            style={{ background: "#f0ebe2", border: "1px solid #e0dbd2", transform: "rotate(1.8deg)", opacity: 0.5 }} />
+          <div className="absolute inset-x-3 bottom-1 h-[calc(100%-12px)] rounded-sm"
+            style={{ background: "#f5f1eb", border: "1px solid #e0dbd2", transform: "rotate(-1deg)", opacity: 0.7 }} />
           <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
             <div
               className="overflow-hidden"
@@ -243,7 +248,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mb-10 text-center"
+            className="mb-8 text-center"
           >
             <p className="mb-3 text-[9px] uppercase tracking-[0.4em]"
               style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>5 Tema</p>
@@ -252,24 +257,88 @@ export default function LandingPage() {
             </h2>
           </motion.div>
 
-          <div className="flex flex-col gap-3">
-            {TEMPLATES.map((t, i) => (
-              <motion.div
-                key={t.name}
-                initial={{ opacity: 0, x: -14 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-                className="flex items-center gap-4 rounded-2xl px-5 py-4"
-                style={{ background: t.muted, border: `1px solid ${t.primary}20` }}
-              >
-                <div className="h-5 w-5 flex-shrink-0 rounded-full" style={{ background: t.primary }} />
-                <p className="text-sm font-medium"
-                  style={{ fontFamily: "var(--font-inter)", color: t.primary }}>
-                  {t.name}
-                </p>
-              </motion.div>
-            ))}
+          {/* Live mini preview — updates on tap */}
+          <motion.div
+            key={selectedTemplate.name}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-6 overflow-hidden px-10 py-10 text-center"
+            style={{
+              background: `linear-gradient(160deg, #fffdf9 0%, ${selectedTemplate.muted} 100%)`,
+              border: `1px solid ${selectedTemplate.primary}28`,
+              boxShadow: `0 24px 64px -16px ${selectedTemplate.primary}18, 0 0 0 1px rgba(255,255,255,0.8)`,
+            }}
+          >
+            <p className="mb-6 text-[8px] uppercase tracking-[0.4em]"
+              style={{ color: selectedTemplate.primary, fontFamily: "var(--font-inter)" }}>
+              Undangan Pernikahan
+            </p>
+            <p className="mb-1 text-[8px] uppercase tracking-[0.3em]"
+              style={{ color: "#aaa", fontFamily: "var(--font-inter)" }}>Kepada Yth.</p>
+            <p className="mb-5 text-sm font-medium italic"
+              style={{ fontFamily: "var(--font-playfair)" }}>Bapak/Ibu Tamu Undangan</p>
+            <div className="mb-5 flex items-center gap-2">
+              <div className="h-px flex-1" style={{ background: `${selectedTemplate.primary}28` }} />
+              <Heart className="h-3 w-3" style={{ color: selectedTemplate.primary }} fill="currentColor" />
+              <div className="h-px flex-1" style={{ background: `${selectedTemplate.primary}28` }} />
+            </div>
+            <p className="text-xl font-bold" style={{ fontFamily: "var(--font-playfair)" }}>Sarah</p>
+            <p className="my-1 text-[9px]" style={{ color: "#aaa", fontFamily: "var(--font-inter)" }}>&amp;</p>
+            <p className="text-xl font-bold" style={{ fontFamily: "var(--font-playfair)" }}>Raka</p>
+            <p className="mt-4 text-[9px] tracking-wider"
+              style={{ color: "#aaa", fontFamily: "var(--font-inter)" }}>
+              Sabtu, 15 Maret 2026
+            </p>
+          </motion.div>
+
+          {/* Template selector */}
+          <div className="flex flex-col gap-2">
+            {TEMPLATES.map((t, i) => {
+              const isSelected = selectedTemplate.name === t.name;
+              return (
+                <motion.button
+                  key={t.name}
+                  onClick={() => setSelectedTemplate(t)}
+                  initial={{ opacity: 0, x: -14 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex w-full items-center gap-4 rounded-2xl px-5 py-4 text-left"
+                  style={{
+                    background: isSelected ? t.muted : "transparent",
+                    border: `1px solid ${isSelected ? t.primary + "44" : "var(--border)"}`,
+                    transition: "background 0.2s, border-color 0.2s",
+                  }}
+                >
+                  <div className="h-7 w-7 flex-shrink-0 rounded-full" style={{ background: t.primary }} />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium"
+                      style={{ fontFamily: "var(--font-inter)", color: isSelected ? t.primary : "var(--foreground)" }}>
+                      {t.name}
+                    </p>
+                    <p className="mt-0.5 text-[10px]"
+                      style={{ fontFamily: "var(--font-inter)", color: isSelected ? t.primary : "var(--muted-foreground)", opacity: 0.7 }}>
+                      {t.mood}
+                    </p>
+                  </div>
+                  {isSelected && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+                      style={{ background: t.primary }}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </motion.div>
+                  )}
+                </motion.button>
+              );
+            })}
           </div>
         </div>
       </section>

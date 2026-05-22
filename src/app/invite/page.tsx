@@ -193,8 +193,8 @@ function EnvelopeCover({ invite, guestName, onOpen }: {
         className="w-full max-w-xs"
       >
         <motion.div
-          animate={{ y: [0, -7, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         >
           <div
             className="relative overflow-hidden px-10 py-14"
@@ -620,6 +620,99 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         </RevealSection>
       )}
 
+      {/* ── Couple Introduction ───────────────────────────── */}
+      <RevealSection>
+        <section className="px-6 py-24" style={{ background: "var(--background)" }}>
+          <div className="mx-auto max-w-sm">
+            <div className="flex flex-col gap-14">
+              <motion.div
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <p className="mb-4 text-[9px] uppercase tracking-[0.4em]"
+                  style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  Mempelai Wanita
+                </p>
+                <p style={{
+                  fontFamily: "var(--font-playfair)",
+                  fontSize: "clamp(2rem, 8vw, 2.75rem)",
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  color: "var(--foreground)",
+                }}>
+                  {invite.bride_name}
+                </p>
+                {brideFamilyLine && (
+                  <p className="mt-3 text-sm leading-relaxed"
+                    style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                    Putri dari {brideFamilyLine}
+                  </p>
+                )}
+                {hasBrideIg && (
+                  <a
+                    href={`https://instagram.com/${igHandle(invite.bride_instagram!)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs transition-opacity hover:opacity-60"
+                    style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
+                  >
+                    <InstagramIcon className="h-3.5 w-3.5" />
+                    @{igHandle(invite.bride_instagram!)}
+                  </a>
+                )}
+              </motion.div>
+
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+                <Heart className="h-3.5 w-3.5 flex-shrink-0"
+                  style={{ color: "var(--primary)" }} fill="currentColor" />
+                <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="text-right"
+              >
+                <p className="mb-4 text-[9px] uppercase tracking-[0.4em]"
+                  style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  Mempelai Pria
+                </p>
+                <p style={{
+                  fontFamily: "var(--font-playfair)",
+                  fontSize: "clamp(2rem, 8vw, 2.75rem)",
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  color: "var(--foreground)",
+                }}>
+                  {invite.groom_name}
+                </p>
+                {groomFamilyLine && (
+                  <p className="mt-3 text-sm leading-relaxed"
+                    style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                    Putra dari {groomFamilyLine}
+                  </p>
+                )}
+                {hasGroomIg && (
+                  <a
+                    href={`https://instagram.com/${igHandle(invite.groom_instagram!)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs transition-opacity hover:opacity-60"
+                    style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
+                  >
+                    <InstagramIcon className="h-3.5 w-3.5" />
+                    @{igHandle(invite.groom_instagram!)}
+                  </a>
+                )}
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </RevealSection>
+
       {/* ── Akad Nikah — LEFT-ALIGNED editorial ──────────── */}
       {hasAkad && invite.akad_venue_name && (
         <RevealSection>
@@ -848,11 +941,17 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
               {/* Photos 2 & 3: editorial side-by-side — photo 2 still, photo 3 slow fade */}
               <div className="flex gap-1 mt-1">
-                {/* Photo 2: deliberately still — stillness creates visual tension */}
-                <div className="flex-1 overflow-hidden" style={{ aspectRatio: "1/1" }}>
+                <motion.div
+                  className="flex-1 overflow-hidden"
+                  style={{ aspectRatio: "1/1" }}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                >
                   <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover"
                     style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
-                </div>
+                </motion.div>
                 {/* Photo 3: atmospheric opacity only, no y movement */}
                 <motion.div
                   className="flex-1 overflow-hidden"
@@ -906,58 +1005,46 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
 
       {/* ── Countdown ─────────────────────────────────────── */}
       <RevealSection>
-        <section className="relative overflow-hidden px-6 py-24 text-center"
-          style={{ background: "var(--primary)" }}>
-          {/* Atmospheric centre illumination — numbers feel lit from within */}
-          <div className="pointer-events-none absolute inset-0"
-            style={{ background: "radial-gradient(ellipse 65% 52% at 50% 50%, rgba(255,255,255,0.07), transparent)" }} />
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden>
-            <svg width="560" height="560" viewBox="0 0 200 200" fill="none" opacity="0.04">
-              <circle cx="100" cy="100" r="90" stroke="white" strokeWidth="0.5" />
-              <circle cx="100" cy="100" r="62" stroke="white" strokeWidth="0.5" />
-              <circle cx="100" cy="100" r="36" stroke="white" strokeWidth="0.5" />
-              <line x1="10" y1="100" x2="190" y2="100" stroke="white" strokeWidth="0.5" />
-              <line x1="100" y1="10" x2="100" y2="190" stroke="white" strokeWidth="0.5" />
-            </svg>
-          </div>
-          <div className="relative z-10 mx-auto max-w-lg">
+        <section className="px-6 py-16 text-center" style={{ background: "var(--muted)" }}>
+          <div className="mx-auto max-w-lg">
             {timeLeft ? (
               <>
-                <p className="mb-1 text-[9px] uppercase tracking-[0.45em]"
-                  style={{ color: "rgba(255,255,255,0.4)", fontFamily: "var(--font-inter)" }}>
+                <p className="mb-8 text-[9px] uppercase tracking-[0.45em]"
+                  style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                   Menuju Hari Bahagia
                 </p>
-                <p className="mb-12 text-sm italic"
-                  style={{ color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-playfair)" }}>
-                  {dayName}, {day} {month} {year}
-                </p>
-                <div className="flex items-end justify-center gap-2 sm:gap-4">
+                <div className="flex items-end justify-center gap-3 sm:gap-6">
                   {[
                     { value: timeLeft.days,    label: "Hari" },
                     { value: timeLeft.hours,   label: "Jam" },
                     { value: timeLeft.minutes, label: "Menit" },
                     { value: timeLeft.seconds, label: "Detik" },
                   ].map((item, idx) => (
-                    <div key={item.label} className="flex items-end gap-2 sm:gap-4">
-                      <div className="flex flex-col items-center gap-2.5">
+                    <div key={item.label} className="flex items-end gap-3 sm:gap-6">
+                      <div className="flex flex-col items-center gap-2">
                         <motion.span
                           key={`${item.label}-${item.value}`}
-                          initial={{ opacity: 0, y: -6 }}
+                          initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.18 }}
-                          className="text-4xl font-bold leading-none sm:text-5xl"
-                          style={{ fontFamily: "var(--font-playfair)", color: "#fff" }}
+                          style={{
+                            fontFamily: "var(--font-playfair)",
+                            color: "var(--primary)",
+                            fontSize: "clamp(2.2rem, 9vw, 3rem)",
+                            fontWeight: 700,
+                            lineHeight: 1,
+                          }}
                         >
                           {String(item.value).padStart(2, "0")}
                         </motion.span>
                         <span className="text-[8px] uppercase tracking-[0.22em]"
-                          style={{ color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-inter)" }}>
+                          style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                           {item.label}
                         </span>
                       </div>
                       {idx < 3 && (
-                        <span className="mb-7 text-xl font-thin leading-none"
-                          style={{ color: "rgba(255,255,255,0.18)" }}>
+                        <span className="mb-7 text-lg font-thin leading-none"
+                          style={{ color: "var(--border)" }}>
                           ·
                         </span>
                       )}
@@ -966,20 +1053,18 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 </div>
               </>
             ) : (
-              <>
-                <p className="text-2xl font-bold"
-                  style={{ fontFamily: "var(--font-playfair)", color: "#fff" }}>
-                  Hari Istimewa
-                </p>
-                <p className="mt-4 text-sm leading-loose"
-                  style={{ fontFamily: "var(--font-playfair)", color: "rgba(255,255,255,0.55)", fontStyle: "italic" }}>
-                  Alhamdulillah, acara pernikahan telah berlangsung dengan lancar.<br />
-                  Terima kasih atas doa dan kehadiran Anda.
-                </p>
-              </>
+              <p className="text-xl font-semibold italic"
+                style={{ fontFamily: "var(--font-playfair)", color: "var(--muted-foreground)" }}>
+                Alhamdulillah, acara telah berlangsung dengan lancar.
+              </p>
             )}
           </div>
         </section>
+      </RevealSection>
+
+      {/* ── RSVP — intimate, warm, personal ──────────────── */}
+      <RevealSection>
+        <RsvpSection invite={invite} guestName={guestName} onSuccess={onRsvpSuccess} />
       </RevealSection>
 
       {/* ── Hadiah & Angpao ───────────────────────────────── */}
@@ -1039,15 +1124,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         </RevealSection>
       )}
 
-      {/* ── RSVP — intimate, warm, personal ──────────────── */}
-      <RevealSection>
-        <RsvpSection invite={invite} guestName={guestName} onSuccess={onRsvpSuccess} />
-      </RevealSection>
-
       {/* ── Ucapan & Doa ──────────────────────────────────── */}
       {messages.length > 0 && (
         <RevealSection>
-          <section className="overflow-hidden py-20" style={{ backgroundColor: "var(--muted)" }}>
+          <section className="py-20" style={{ backgroundColor: "var(--muted)" }}>
             <div className="mb-12 text-center">
               <SectionTitle>Ucapan &amp; Doa</SectionTitle>
             </div>
@@ -1073,61 +1153,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           {day} {month} {year}
         </p>
 
-        {/* Parent names — culturally important, shown here not in hero */}
-        {(brideFamilyLine || groomFamilyLine) && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-8 space-y-1"
-          >
-            {brideFamilyLine && (
-              <p className="text-[10px] leading-relaxed"
-                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                Putri dari {brideFamilyLine}
-              </p>
-            )}
-            {groomFamilyLine && (
-              <p className="text-[10px] leading-relaxed"
-                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                Putra dari {groomFamilyLine}
-              </p>
-            )}
-          </motion.div>
-        )}
-
-        {(hasBrideIg || hasGroomIg) && (
-          <div className="mt-6 flex items-center justify-center gap-4">
-            {hasBrideIg && (
-              <a
-                href={`https://instagram.com/${igHandle(invite.bride_instagram!)}`}
-                target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-60"
-                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
-              >
-                <InstagramIcon className="h-3.5 w-3.5" />
-                @{igHandle(invite.bride_instagram!)}
-              </a>
-            )}
-            {hasBrideIg && hasGroomIg && (
-              <div className="h-3 w-px" style={{ background: "var(--border)" }} />
-            )}
-            {hasGroomIg && (
-              <a
-                href={`https://instagram.com/${igHandle(invite.groom_instagram!)}`}
-                target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-60"
-                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
-              >
-                <InstagramIcon className="h-3.5 w-3.5" />
-                @{igHandle(invite.groom_instagram!)}
-              </a>
-            )}
-          </div>
-        )}
-
-        <div className="mt-10 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <ShareButton invite={invite} />
         </div>
         <div className="mx-auto mt-6 h-px w-8" style={{ background: "var(--border)" }} />
@@ -1681,33 +1707,25 @@ function LetterReveal({ text, delay = 0 }: { text: string; delay?: number }) {
 function MessageMarquee({ messages }: { messages: GuestMessage[] }) {
   const withMsg = messages.filter((m) => m.message?.trim());
   if (withMsg.length === 0) return null;
-  const doubled = [...withMsg, ...withMsg];
-  const dur = Math.max(24, withMsg.length * 9);
 
   return (
-    <div className="relative overflow-hidden">
-      <style>{`
-        @keyframes marquee-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        .marquee-track { animation: marquee-slide ${dur}s linear infinite; }
-        .marquee-track:hover { animation-play-state: paused; }
-      `}</style>
-      <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-20"
-        style={{ background: "linear-gradient(to right, var(--muted), transparent)" }} />
-      <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-20"
-        style={{ background: "linear-gradient(to left, var(--muted), transparent)" }} />
-      <div className="marquee-track flex" style={{ width: "max-content" }}>
-        {doubled.map((m, i) => (
-          <div
+    <div className="px-6">
+      <div className="mx-auto flex max-w-sm flex-col gap-3">
+        {withMsg.map((m, i) => (
+          <motion.div
             key={i}
-            className="mx-3 flex-shrink-0 p-5"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.45, delay: Math.min(i * 0.07, 0.35), ease: [0.22, 1, 0.36, 1] }}
+            className="p-5"
             style={{
-              width: 268,
               background: "var(--background)",
               boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
               borderRadius: 8,
             }}
           >
-            <div className="mb-2.5 flex items-center justify-between gap-2">
+            <div className="mb-2 flex items-center justify-between gap-2">
               <p className="truncate text-sm font-semibold"
                 style={{ fontFamily: "var(--font-playfair)" }}>
                 {m.name}
@@ -1722,11 +1740,11 @@ function MessageMarquee({ messages }: { messages: GuestMessage[] }) {
                 {m.rsvp_status === "attending" ? "Hadir" : m.rsvp_status === "not_attending" ? "Tidak Hadir" : "—"}
               </span>
             </div>
-            <p className="line-clamp-3 text-xs leading-relaxed"
+            <p className="text-xs leading-relaxed"
               style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-playfair)", fontStyle: "italic" }}>
               &ldquo;{m.message}&rdquo;
             </p>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
