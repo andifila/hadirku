@@ -103,7 +103,14 @@ function InviteContent() {
   }, [invite, opened]);
 
   function refreshMessages(id: string) {
-    getPublicMessages(id).then(setMessages);
+    getPublicMessages(id).then((msgs) => {
+      setMessages(msgs);
+      if (msgs.length > 0) {
+        setTimeout(() => {
+          document.getElementById("ucapan-doa")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 900);
+      }
+    });
   }
 
   if (loading) return <EnvelopeSkeleton />;
@@ -1127,7 +1134,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {/* ── Ucapan & Doa ──────────────────────────────────── */}
       {messages.length > 0 && (
         <RevealSection>
-          <section className="py-20" style={{ backgroundColor: "var(--muted)" }}>
+          <section id="ucapan-doa" className="py-20" style={{ backgroundColor: "var(--muted)" }}>
             <div className="mb-12 text-center">
               <SectionTitle>Ucapan &amp; Doa</SectionTitle>
             </div>

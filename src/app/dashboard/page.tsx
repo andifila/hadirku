@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations, type InvitationStat } from "@/lib/supabase/invitations";
-import { getInvitationById, type Invitation } from "@/lib/supabase/invitation-crud";
+import { getInvitationById, updateInvitation, type Invitation } from "@/lib/supabase/invitation-crud";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 
 const MotionLink = motion(Link);
@@ -47,6 +47,17 @@ export default function DashboardPage() {
   const totalGuests  = stat?.total_guests ?? 0;
 
   const daysUntil = invitation ? getDaysUntil(invitation.event_date) : null;
+
+  const [publishing, setPublishing] = useState(false);
+
+  async function handleTogglePublish() {
+    if (!invitationId || !invitation) return;
+    setPublishing(true);
+    try {
+      await updateInvitation(invitationId, { is_published: !invitation.is_published });
+      setInvitation((prev) => prev ? { ...prev, is_published: !prev.is_published } : prev);
+    } catch { } finally { setPublishing(false); }
+  }
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
@@ -248,10 +259,10 @@ export default function DashboardPage() {
                           }}
                         >
                           {daysUntil > 0
-                            ? `⏳ ${daysUntil} hari lagi`
+                            ? `${daysUntil} hari lagi`
                             : daysUntil === 0
-                              ? "🎉 Hari ini!"
-                              : "✨ Acara sudah berlangsung"}
+                              ? "Hari ini"
+                              : "Telah berlangsung"}
                         </span>
                       </div>
                     )}
@@ -331,6 +342,26 @@ export default function DashboardPage() {
                           )}
                         </AnimatePresence>
                       </motion.button>
+                      <motion.button
+                        onClick={handleTogglePublish}
+                        disabled={publishing}
+                        whileHover={{ scale: publishing ? 1 : 1.03 }}
+                        whileTap={{ scale: publishing ? 1 : 0.97 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-medium"
+                        style={{
+                          background: invitation.is_published ? "rgba(220,38,38,0.18)" : "rgba(22,163,74,0.18)",
+                          color: invitation.is_published ? "#fca5a5" : "#86efac",
+                          border: `1px solid ${invitation.is_published ? "rgba(220,38,38,0.35)" : "rgba(22,163,74,0.35)"}`,
+                          backdropFilter: "blur(6px)",
+                          fontFamily: "var(--font-inter)",
+                          opacity: publishing ? 0.6 : 1,
+                        }}
+                      >
+                        {publishing
+                          ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          : invitation.is_published ? "Unpublish" : "Publish"}
+                      </motion.button>
                     </div>
                   </div>
                 </div>
@@ -349,9 +380,8 @@ export default function DashboardPage() {
                         Undangan masih Draft
                       </p>
                       <p className="mt-0.5 text-xs" style={{ color: "#a16207", fontFamily: "var(--font-inter)" }}>
-                        Tamu belum bisa membuka link undangan. Klik{" "}
-                        <strong>Edit Undangan</strong> lalu aktifkan toggle{" "}
-                        <strong>Dipublikasikan</strong>.
+                        Tamu belum bisa membuka link undangan. Klik tombol{" "}
+                        <strong>Publish</strong> di atas untuk mempublikasikan undangan.
                       </p>
                     </div>
                   </motion.div>

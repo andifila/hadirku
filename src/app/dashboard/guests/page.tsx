@@ -264,6 +264,8 @@ export default function GuestsPage() {
   const [search,       setSearch]       = useState("");
   const [filter,       setFilter]       = useState<RsvpFilter>("all");
   const [flash, setFlash] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [blastMode, setBlastMode] = useState(false);
+  const [blastIdx,  setBlastIdx]  = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -289,6 +291,8 @@ export default function GuestsPage() {
     setFlash({ type, msg });
     setTimeout(() => setFlash(null), 3500);
   }
+
+  const pendingWithPhone = guests.filter((g) => g.rsvp_status === "pending" && !!g.phone);
 
   const attending    = guests.filter((g) => g.rsvp_status === "attending").length;
   const notAttending = guests.filter((g) => g.rsvp_status === "not_attending").length;
@@ -345,8 +349,129 @@ export default function GuestsPage() {
     }
   }
 
+  const blastGuest = pendingWithPhone[blastIdx] ?? null;
+
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
+
+      {/* ── WA Blast Overlay ── */}
+      <AnimatePresence>
+        {blastMode && blastGuest && invitation && (
+          <motion.div
+            key="blast-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
+            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+          >
+            <motion.div
+              initial={{ scale: 0.92, y: 16 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.92, y: 16 }}
+              transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              className="w-full max-w-sm rounded-3xl p-6"
+              style={{ background: "var(--background)", border: "1px solid var(--border)", boxShadow: "0 24px 48px rgba(0,0,0,0.2)" }}
+            >
+              {/* Header */}
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
+                  Kirim Undangan WA
+                </p>
+                <button
+                  onClick={() => setBlastMode(false)}
+                  className="rounded-lg p-1"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Progress bar */}
+              <div className="mb-5">
+                <div className="mb-1.5 flex justify-between text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  <span>{blastIdx + 1} dari {pendingWithPhone.length}</span>
+                  <span>{Math.round(((blastIdx) / pendingWithPhone.length) * 100)}%</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "var(--muted)" }}>
+                  <motion.div
+                    animate={{ width: `${((blastIdx) / pendingWithPhone.length) * 100}%` }}
+                    transition={{ duration: 0.35 }}
+                    className="h-full rounded-full"
+                    style={{ background: "#25D366" }}
+                  />
+                </div>
+              </div>
+
+              {/* Guest card */}
+              <div
+                className="mb-5 rounded-2xl px-4 py-4"
+                style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                    style={{ background: "#fde68a", color: "#d97706" }}
+                  >
+                    {blastGuest.name[0]?.toUpperCase() ?? "?"}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
+                      {blastGuest.name}
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                      {blastGuest.phone}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-2">
+                <motion.a
+                  href={`https://wa.me/${toWaPhone(blastGuest.phone!)}?text=${encodeURIComponent(buildWaMessage(blastGuest.name, invitation.slug))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold"
+                  style={{
+                    background: "#25D366",
+                    color: "#fff",
+                    fontFamily: "var(--font-inter)",
+                    boxShadow: "0 4px 14px rgba(37,211,102,0.35)",
+                  }}
+                >
+                  <WaIcon className="h-4 w-4" />
+                  Buka WhatsApp
+                </motion.a>
+                <motion.button
+                  onClick={() => {
+                    if (blastIdx + 1 < pendingWithPhone.length) {
+                      setBlastIdx((i) => i + 1);
+                    } else {
+                      setBlastMode(false);
+                    }
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="rounded-2xl py-3 text-sm font-medium"
+                  style={{
+                    background: "var(--muted)",
+                    color: "var(--foreground)",
+                    fontFamily: "var(--font-inter)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  {blastIdx + 1 < pendingWithPhone.length ? "Lanjut →" : "Selesai"}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Desktop Sidebar ── */}
       <div className="hidden lg:flex lg:flex-shrink-0">
@@ -411,6 +536,25 @@ export default function GuestsPage() {
               Kelola dan kirim undangan ke tamu Anda
             </p>
           </div>
+
+          {invitation && pendingWithPhone.length > 0 && (
+            <motion.button
+              onClick={() => { setBlastIdx(0); setBlastMode(true); }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium"
+              style={{
+                background: "rgba(37,211,102,0.12)",
+                border: "1px solid rgba(37,211,102,0.3)",
+                color: "#16a34a",
+                fontFamily: "var(--font-inter)",
+              }}
+            >
+              <WaIcon className="h-3.5 w-3.5" />
+              Blast ({pendingWithPhone.length})
+            </motion.button>
+          )}
 
           {invitation && (
             <div className="flex items-center gap-2">
