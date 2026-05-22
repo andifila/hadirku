@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Menu, MessageSquare, BarChart2, Users } from "lucide-react";
+import { Loader2, Menu, MessageSquare, BarChart2, Users, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations } from "@/lib/supabase/invitations";
 import { getInvitationGuests, type Guest } from "@/lib/supabase/guests";
@@ -167,17 +167,23 @@ export default function StatsPage() {
   const [invitationId, setInvitationId] = useState<string | null>(null);
   const [guests,       setGuests]       = useState<Guest[]>([]);
   const [loading,      setLoading]      = useState(true);
+  const [refreshing,   setRefreshing]   = useState(false);
+  const [lastUpdated,  setLastUpdated]  = useState<Date | null>(null);
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
     try {
       const stats = await getUserInvitations();
-      if (!stats.length) { setLoading(false); return; }
+      if (!stats.length) return;
       const id = stats[0].invitation_id;
       setInvitationId(id);
       setGuests(await getInvitationGuests(id));
+      setLastUpdated(new Date());
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -239,9 +245,24 @@ export default function StatsPage() {
           <div className="flex-1">
             <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Statistik</h1>
             <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Data RSVP &amp; ucapan tamu
+              {lastUpdated
+                ? `Update: ${lastUpdated.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`
+                : "Data RSVP & ucapan tamu"}
             </p>
           </div>
+
+          <motion.button
+            onClick={() => load(true)}
+            disabled={refreshing || loading}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            className="rounded-lg p-2 disabled:opacity-50"
+            style={{ color: "var(--muted-foreground)" }}
+            title="Refresh data"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+          </motion.button>
         </header>
 
         <main className="flex-1 overflow-y-auto">

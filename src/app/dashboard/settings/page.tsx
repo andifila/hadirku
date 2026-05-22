@@ -229,13 +229,13 @@ export default function SettingsPage() {
                       <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Notifikasi RSVP</p>
                       <span
                         className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                        style={{ background: "var(--muted)", color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+                        style={{ background: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0", fontFamily: "var(--font-inter)" }}
                       >
-                        Segera hadir
+                        Aktif
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                      Kirim email ke Anda setiap kali ada tamu yang konfirmasi RSVP.
+                      Email otomatis ke <strong>{user?.email}</strong> setiap tamu konfirmasi RSVP.
                     </p>
                   </div>
                 </div>

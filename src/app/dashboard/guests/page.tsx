@@ -72,6 +72,29 @@ function parseExcelGuests(file: File): Promise<Array<{ name: string; phone: stri
   });
 }
 
+function downloadGuests(guests: Guest[], slug: string) {
+  const STATUS: Record<string, string> = {
+    attending:     "Hadir",
+    not_attending: "Tidak Hadir",
+    pending:       "Belum Konfirmasi",
+  };
+  const rows = guests.map((g) => ({
+    Nama:          g.name,
+    "No. HP":      g.phone ?? "",
+    Status:        STATUS[g.rsvp_status] ?? g.rsvp_status,
+    "Jml. Tamu":   g.guest_count ?? (g.rsvp_status === "attending" ? 1 : ""),
+    Ucapan:        g.message ?? "",
+    "Tgl. Konfirmasi": new Date(g.created_at).toLocaleDateString("id-ID", {
+      day: "numeric", month: "short", year: "numeric",
+    }),
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws["!cols"] = [{ wch: 28 }, { wch: 18 }, { wch: 18 }, { wch: 12 }, { wch: 40 }, { wch: 20 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Tamu");
+  XLSX.writeFile(wb, `tamu_${slug}.xlsx`);
+}
+
 function downloadTemplate() {
   const ws = XLSX.utils.aoa_to_sheet([
     ["Nama", "No. HP"],
@@ -595,6 +618,26 @@ export default function GuestsPage() {
                 Impor Excel
               </motion.button>
 
+              {guests.length > 0 && (
+                <motion.button
+                  onClick={() => downloadGuests(guests, invitation.slug)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                  className="hidden items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium sm:flex"
+                  style={{
+                    background: "var(--muted)",
+                    border: "1px solid var(--border)",
+                    color: "var(--muted-foreground)",
+                    fontFamily: "var(--font-inter)",
+                  }}
+                  title="Export daftar tamu ke Excel"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Export
+                </motion.button>
+              )}
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -705,7 +748,7 @@ export default function GuestsPage() {
                 <AddGuestForm onAdd={handleAddGuest} adding={adding} />
 
                 {/* Mobile Excel buttons */}
-                <div className="flex gap-2 sm:hidden">
+                <div className="flex flex-wrap gap-2 sm:hidden">
                   <motion.button
                     onClick={downloadTemplate}
                     whileHover={{ scale: 1.03 }}
@@ -719,7 +762,7 @@ export default function GuestsPage() {
                     }}
                   >
                     <Download className="h-3.5 w-3.5" />
-                    Template Excel
+                    Template
                   </motion.button>
                   <motion.button
                     onClick={() => fileInputRef.current?.click()}
@@ -735,8 +778,25 @@ export default function GuestsPage() {
                     }}
                   >
                     {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
-                    Impor Excel
+                    Impor
                   </motion.button>
+                  {guests.length > 0 && (
+                    <motion.button
+                      onClick={() => downloadGuests(guests, invitation.slug)}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-medium"
+                      style={{
+                        background: "var(--background)",
+                        border: "1px solid var(--border)",
+                        color: "var(--muted-foreground)",
+                        fontFamily: "var(--font-inter)",
+                      }}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Export
+                    </motion.button>
+                  )}
                 </div>
 
                 {/* Search + filter tabs */}

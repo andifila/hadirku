@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, ExternalLink, Loader2,
-  Link2, Check, Menu, Users, ArrowRight,
+  Link2, Check, Menu, Users, ArrowRight, Pencil,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations, type InvitationStat } from "@/lib/supabase/invitations";
@@ -268,6 +268,23 @@ export default function DashboardPage() {
                     )}
 
                     <div className="mt-5 flex flex-wrap gap-2">
+                      <MotionLink
+                        href={`/dashboard/edit?id=${invitationId}`}
+                        whileHover={{ scale: 1.03, backgroundColor: "rgba(255,255,255,0.26)" }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-medium"
+                        style={{
+                          background: "rgba(255,255,255,0.18)",
+                          color: "#fff",
+                          border: "1px solid rgba(255,255,255,0.3)",
+                          backdropFilter: "blur(6px)",
+                          fontFamily: "var(--font-inter)",
+                        }}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        Edit
+                      </MotionLink>
                       <motion.a
                         href={getShareLink(invitation.slug) + (!invitation.is_published ? "&preview=1" : "")}
                         target="_blank"
