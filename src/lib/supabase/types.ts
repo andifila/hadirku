@@ -101,6 +101,7 @@ export type Database = {
           // Pengaturan
           timezone: string;
           rsvp_closes_at: string | null;
+          primary_color: string | null;
           // Status
           is_published: boolean;
           created_at: string;
@@ -144,6 +145,7 @@ export type Database = {
           owner_whatsapp?: string | null;
           timezone?: string;
           rsvp_closes_at?: string | null;
+          primary_color?: string | null;
           is_published?: boolean;
         };
         Update: {
@@ -182,6 +184,7 @@ export type Database = {
           owner_whatsapp?: string | null;
           timezone?: string;
           rsvp_closes_at?: string | null;
+          primary_color?: string | null;
           is_published?: boolean;
         };
         Relationships: [

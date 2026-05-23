@@ -80,6 +80,7 @@ function EditContent() {
           owner_whatsapp:     inv.owner_whatsapp     ?? "",
           timezone:           inv.timezone           ?? "WIB",
           rsvp_closes_at:     inv.rsvp_closes_at     ?? "",
+          primary_color:      inv.primary_color      ?? "",
           slug:               inv.slug,
           is_published:       inv.is_published,
         });
@@ -139,6 +140,7 @@ function EditContent() {
         owner_whatsapp:     values.owner_whatsapp.trim()     || null,
         timezone:           values.timezone || "WIB",
         rsvp_closes_at:     values.rsvp_closes_at.trim()     || null,
+        primary_color:      values.primary_color.trim()      || null,
         is_published:       values.is_published,
       });
       setToast(true);

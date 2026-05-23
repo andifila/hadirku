@@ -22,6 +22,11 @@ import type { BankAccount } from "@/lib/supabase/types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+const WEDDING_COLORS = [
+  "#b08d57", "#4a7c59", "#c06080", "#6b35a3",
+  "#2563eb", "#0f766e", "#be185d", "#92400e", "#475569",
+];
+
 const TEMPLATE_COLORS: Record<string, { primary: string; muted: string }> = {
   "garden-bloom":   { primary: "#4a7c59", muted: "#e8f4e8" },
   "rustic-gold":    { primary: "#b08d57", muted: "#f3f0eb" },
@@ -79,6 +84,7 @@ export type FormValues = {
   owner_whatsapp: string;
   timezone: string;
   rsvp_closes_at: string;
+  primary_color: string;
   slug: string;
   is_published: boolean;
 };
@@ -136,6 +142,7 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     owner_whatsapp:     initial?.owner_whatsapp      ?? "",
     timezone:           initial?.timezone            ?? "WIB",
     rsvp_closes_at:     initial?.rsvp_closes_at      ?? "",
+    primary_color:      initial?.primary_color       ?? "",
     slug:               initial?.slug                ?? "",
     is_published:       initial?.is_published        ?? false,
   });
@@ -349,6 +356,72 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                     );
                   })}
                 </div>
+
+                {/* ── Warna aksen kustom ── */}
+                {(() => {
+                  const selectedSlug = templates.find(t => t.id === values.template_id)?.slug ?? "rustic-gold";
+                  const defaultColor = (TEMPLATE_COLORS[selectedSlug] ?? TEMPLATE_COLORS["rustic-gold"]).primary;
+                  const activeColor  = values.primary_color || defaultColor;
+                  return (
+                    <div className="mt-4">
+                      <p className="mb-2 text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                        Warna Aksen
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Default */}
+                        <button
+                          type="button"
+                          onClick={() => set("primary_color", "")}
+                          title="Default tema"
+                          className="h-7 w-7 rounded-full border-2 text-[9px] font-bold"
+                          style={{
+                            background: defaultColor,
+                            borderColor: !values.primary_color ? "#1a1a1a" : "transparent",
+                            color: "#fff",
+                            outline: !values.primary_color ? "2px solid rgba(255,255,255,0.6)" : "none",
+                            outlineOffset: "-3px",
+                          }}
+                        >
+                          ✓
+                        </button>
+                        {WEDDING_COLORS.filter(c => c !== defaultColor).map((hex) => {
+                          const isActive = values.primary_color === hex;
+                          return (
+                            <button
+                              key={hex}
+                              type="button"
+                              onClick={() => set("primary_color", hex)}
+                              title={hex}
+                              className="h-7 w-7 rounded-full border-2 transition-transform hover:scale-110"
+                              style={{
+                                background: hex,
+                                borderColor: isActive ? "#1a1a1a" : "transparent",
+                                outline: isActive ? "2px solid rgba(255,255,255,0.6)" : "none",
+                                outlineOffset: "-3px",
+                              }}
+                            />
+                          );
+                        })}
+                        {/* Custom color */}
+                        <div
+                          className="relative h-7 w-7 cursor-pointer overflow-hidden rounded-full border-2"
+                          style={{
+                            background: "conic-gradient(red,yellow,lime,cyan,blue,magenta,red)",
+                            borderColor: values.primary_color && !WEDDING_COLORS.includes(values.primary_color) ? "#1a1a1a" : "transparent",
+                          }}
+                          title="Warna kustom"
+                        >
+                          <input
+                            type="color"
+                            value={activeColor}
+                            onChange={(e) => set("primary_color", e.target.value)}
+                            className="absolute inset-0 cursor-pointer opacity-0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </SectionCard>
 
               <SectionCard title="Mempelai">

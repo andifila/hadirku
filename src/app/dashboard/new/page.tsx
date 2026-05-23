@@ -53,6 +53,7 @@ export default function NewInvitationPage() {
         owner_whatsapp:     values.owner_whatsapp.trim()     || null,
         timezone:           values.timezone || "WIB",
         rsvp_closes_at:     values.rsvp_closes_at.trim()     || null,
+        primary_color:      values.primary_color.trim()      || null,
         slug,
         is_published: values.is_published,
       });

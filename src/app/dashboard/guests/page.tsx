@@ -130,7 +130,7 @@ function GuestTable({
       <table className="w-full border-collapse">
         <thead>
           <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--muted)" }}>
-            {["Tamu", "Status", "No. HP", "Aksi"].map((h, i) => (
+            {["Tamu", "Status", "No. HP", "Kursi", "Aksi"].map((h, i) => (
               <th
                 key={h}
                 className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider ${i === 3 ? "text-right" : "text-left"}`}
@@ -181,6 +181,9 @@ function GuestTable({
                 </td>
                 <td className="px-4 py-3 text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                   {guest.phone ?? "—"}
+                </td>
+                <td className="px-4 py-3 text-sm tabular-nums" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  {guest.rsvp_status === "attending" ? (guest.guest_count ?? 1) : "—"}
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-0.5">

@@ -1,5 +1,5 @@
 -- ============================================================
--- WeddingInvite — Full Database Schema (idempotent)
+-- Hadirku — Full Database Schema (idempotent)
 -- Run this in: Supabase Dashboard → SQL Editor → New query
 -- ============================================================
 
@@ -97,22 +97,56 @@ insert into templates (name, slug, thumbnail_url, is_premium, sort_order) values
 -- INVITATIONS
 -- ─────────────────────────────────────────
 create table invitations (
-  id               uuid primary key default uuid_generate_v4(),
-  user_id          uuid not null references profiles(id) on delete cascade,
-  template_id      uuid not null references templates(id),
-  slug             text not null unique,
-  bride_name       text not null,
-  groom_name       text not null,
-  event_date       date not null,
-  event_time       time not null,
-  venue_name       text not null,
-  venue_address    text not null,
-  cover_image_url  text,
-  music_url        text,
-  custom_message   text,
-  is_published     boolean not null default false,
-  created_at       timestamptz not null default now(),
-  updated_at       timestamptz not null default now()
+  id                   uuid primary key default uuid_generate_v4(),
+  user_id              uuid not null references profiles(id) on delete cascade,
+  template_id          uuid not null references templates(id),
+  slug                 text not null unique,
+  -- Mempelai
+  bride_name           text not null,
+  bride_title          text,
+  bride_father_name    text,
+  bride_mother_name    text,
+  bride_instagram      text,
+  groom_name           text not null,
+  groom_title          text,
+  groom_father_name    text,
+  groom_mother_name    text,
+  groom_instagram      text,
+  -- Resepsi
+  event_date           date not null,
+  event_time           time not null,
+  venue_name           text not null,
+  venue_address        text not null,
+  -- Akad (opsional)
+  akad_date            date,
+  akad_time            time,
+  akad_venue_name      text,
+  akad_venue_address   text,
+  -- Konten
+  dresscode            text,
+  custom_message       text,
+  -- Media
+  cover_image_url      text,
+  music_url            text,
+  gallery_url_1        text,
+  gallery_url_2        text,
+  gallery_url_3        text,
+  gallery_url_4        text,
+  gallery_url_5        text,
+  gallery_url_6        text,
+  -- Angpao & Hadiah
+  bank_accounts        jsonb,
+  gift_address         text,
+  -- Kontak
+  owner_whatsapp       text,
+  -- Pengaturan
+  timezone             text not null default 'WIB',
+  rsvp_closes_at       timestamptz,
+  primary_color        text,
+  -- Status
+  is_published         boolean not null default false,
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now()
 );
 
 alter table invitations enable row level security;
@@ -154,13 +188,15 @@ create trigger invitations_updated_at
 -- GUESTS
 -- ─────────────────────────────────────────
 create table guests (
-  id             uuid primary key default uuid_generate_v4(),
-  invitation_id  uuid not null references invitations(id) on delete cascade,
-  name           text not null,
-  phone          text,
-  rsvp_status    rsvp_status not null default 'pending',
-  message        text,
-  created_at     timestamptz not null default now()
+  id               uuid primary key default uuid_generate_v4(),
+  invitation_id    uuid not null references invitations(id) on delete cascade,
+  name             text not null,
+  phone            text,
+  rsvp_status      rsvp_status not null default 'pending',
+  message          text,
+  guest_count      integer not null default 1,
+  is_message_public boolean not null default true,
+  created_at       timestamptz not null default now()
 );
 
 alter table guests enable row level security;
@@ -239,10 +275,11 @@ select
   i.groom_name,
   i.event_date,
   i.is_published,
-  count(g.id)                                                  as total_guests,
-  count(g.id) filter (where g.rsvp_status = 'attending')      as attending,
-  count(g.id) filter (where g.rsvp_status = 'not_attending')  as not_attending,
-  count(g.id) filter (where g.rsvp_status = 'pending')        as pending
+  count(g.id)                                                                          as total_guests,
+  count(g.id) filter (where g.rsvp_status = 'attending')                              as attending,
+  count(g.id) filter (where g.rsvp_status = 'not_attending')                          as not_attending,
+  count(g.id) filter (where g.rsvp_status = 'pending')                                as pending,
+  coalesce(sum(g.guest_count) filter (where g.rsvp_status = 'attending'), 0)          as total_seats
 from invitations i
 left join guests g on g.invitation_id = i.id
 group by i.id;

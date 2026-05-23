@@ -241,7 +241,8 @@ function TemplateDivider({ templateSlug, color, borderColor }: {
 function EnvelopeCover({ invite, guestName, onOpen }: {
   invite: PublicInvitation; guestName: string; onOpen: () => void;
 }) {
-  const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
+  const baseTheme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
+  const theme = invite.primary_color ? { ...baseTheme, primary: invite.primary_color } : baseTheme;
   const displayName = guestName ? `Bapak/Ibu ${guestName}` : "Tamu Undangan";
   const eventDate = new Date(invite.event_date);
   const dayName = eventDate.toLocaleDateString("id-ID", { weekday: "long" });
@@ -349,7 +350,8 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   onRsvpSuccess: () => void;
   autoPlay: boolean;
 }) {
-  const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
+  const baseTheme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
+  const theme = invite.primary_color ? { ...baseTheme, primary: invite.primary_color } : baseTheme;
   const extra = TEMPLATE_EXTRAS[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_EXTRAS["rustic-gold"];
   const hasCover = !!invite.cover_image_url;
 
@@ -1387,7 +1389,8 @@ function RsvpSection({ invite, guestName, onSuccess }: {
   invite: PublicInvitation; guestName: string; onSuccess: () => void;
 }) {
   const storageKey = `rsvp_${invite.id}`;
-  const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
+  const baseTheme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
+  const theme = invite.primary_color ? { ...baseTheme, primary: invite.primary_color } : baseTheme;
   const [name, setName] = useState(guestName);
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"attending" | "not_attending">("attending");

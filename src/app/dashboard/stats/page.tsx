@@ -36,11 +36,12 @@ function downloadMessages(messages: Guest[]) {
   const rows = messages.map((g) => ({
     Nama:    g.name,
     Status:  STATUS[g.rsvp_status] ?? g.rsvp_status,
+    Kursi:   g.rsvp_status === "attending" ? (g.guest_count ?? 1) : "",
     Ucapan:  g.message ?? "",
     Tanggal: new Date(g.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
-  ws["!cols"] = [{ wch: 28 }, { wch: 18 }, { wch: 60 }, { wch: 20 }];
+  ws["!cols"] = [{ wch: 28 }, { wch: 18 }, { wch: 8 }, { wch: 60 }, { wch: 20 }];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Ucapan");
   XLSX.writeFile(wb, "ucapan_tamu.xlsx");
