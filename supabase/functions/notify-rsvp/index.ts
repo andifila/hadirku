@@ -100,7 +100,7 @@ serve(async (req) => {
               </table>
             </div>
 
-            <a href="https://andifila.github.io/invitation-wedding/dashboard/stats"
+            <a href="https://andifila.github.io/hadirku/dashboard/stats"
               style="display: inline-block; background: linear-gradient(135deg, #b08d57, #9a7040); color: #fff;
                      text-decoration: none; padding: 12px 24px; border-radius: 8px; font-size: 13px; font-family: sans-serif;">
               Lihat Semua RSVP

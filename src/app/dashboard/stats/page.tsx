@@ -23,8 +23,8 @@ const RSVP_CFG: Record<RsvpStatus, { label: string; color: string; bg: string; b
 
 function getShareLink(slug: string): string {
   if (typeof window === "undefined") return "";
-  const base = window.location.pathname.includes("/invitation-wedding")
-    ? `${window.location.origin}/invitation-wedding`
+  const base = window.location.pathname.includes("/hadirku")
+    ? `${window.location.origin}/hadirku`
     : window.location.origin;
   return `${base}/invite/?s=${slug}`;
 }

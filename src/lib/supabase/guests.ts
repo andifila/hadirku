@@ -75,7 +75,7 @@ export async function updateGuest(
 export function buildInviteUrl(slug: string, guestName: string): string {
   if (typeof window === "undefined") return "";
   const base =
-    process.env.NODE_ENV === "production" ? "/invitation-wedding" : "";
+    process.env.NODE_ENV === "production" ? "/hadirku" : "";
   const encoded = encodeURIComponent(guestName);
   return `${window.location.origin}${base}/invite/?s=${slug}&to=${encoded}`;
 }

@@ -3,7 +3,7 @@ import { supabase } from "./client";
 function getRedirectUrl() {
   const isProd = process.env.NODE_ENV === "production";
   const base = isProd
-    ? "https://andifila.github.io/invitation-wedding"
+    ? "https://andifila.github.io/hadirku"
     : "http://localhost:3000";
   return `${base}/auth/callback/`;
 }

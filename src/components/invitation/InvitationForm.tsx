@@ -821,8 +821,8 @@ function SlugPreview({ slug }: { slug: string }) {
   function handleCopy() {
     const fullUrl =
       typeof window !== "undefined"
-        ? (window.location.pathname.includes("/invitation-wedding")
-            ? `${window.location.origin}/invitation-wedding${relUrl}`
+        ? (window.location.pathname.includes("/hadirku")
+            ? `${window.location.origin}/hadirku${relUrl}`
             : `${window.location.origin}${relUrl}`)
         : relUrl;
     try {

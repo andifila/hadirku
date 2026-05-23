@@ -85,8 +85,8 @@ export function TopNav() {
         className="flex-shrink-0 select-none"
         style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)" }}
       >
-        <span className="hidden text-lg font-bold sm:inline">WeddingInvite</span>
-        <span className="text-base font-bold sm:hidden">WI</span>
+        <span className="hidden text-lg font-bold sm:inline">Hadirku</span>
+        <span className="text-base font-bold sm:hidden">H</span>
       </Link>
 
       {/* Nav */}
