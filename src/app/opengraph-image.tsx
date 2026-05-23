@@ -51,7 +51,7 @@ export default function Image() {
           fontFamily: "sans-serif",
           display: "flex",
         }}>
-          Wedding Invite
+          Hadirku
         </div>
 
         {/* Headline */}

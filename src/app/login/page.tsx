@@ -78,7 +78,7 @@ export default function LoginPage() {
             className="mb-2 text-xs uppercase tracking-widest"
             style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
           >
-            Wedding Invite
+            Hadirku
           </motion.p>
           <motion.h1
             initial={{ opacity: 0 }}

@@ -40,7 +40,7 @@ const TESTIMONIALS = [
 const FAQS = [
   {
     q: "Apakah layanan ini gratis?",
-    a: "Ya, layanan Wedding Invite sepenuhnya gratis. Daftar dengan email dan langsung buat undangan.",
+    a: "Ya, layanan Hadirku sepenuhnya gratis. Daftar dengan email dan langsung buat undangan.",
   },
   {
     q: "Berapa banyak tamu yang bisa ditambahkan?",
@@ -114,7 +114,7 @@ export default function LandingPage() {
             className="mb-6 text-[9px] uppercase tracking-[0.45em]"
             style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}
           >
-            Wedding Invite
+            Hadirku
           </p>
 
           <h1
@@ -546,7 +546,7 @@ export default function LandingPage() {
       >
         <p className="text-[9px] uppercase tracking-[0.25em]"
           style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", opacity: 0.5 }}>
-          Wedding Invite
+          Hadirku
         </p>
         <Link
           href="/login"

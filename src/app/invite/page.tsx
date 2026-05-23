@@ -1248,7 +1248,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         <div className="mx-auto mt-6 h-px w-8" style={{ background: "var(--border)" }} />
         <p className="mt-4 text-[9px] uppercase tracking-[0.25em]"
           style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)", opacity: 0.5 }}>
-          Wedding Invite
+          Hadirku
         </p>
       </footer>
     </main>

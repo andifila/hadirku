@@ -20,19 +20,19 @@ export const metadata: Metadata = {
       ? "https://andifila.github.io/invitation-wedding"
       : "http://localhost:3000"
   ),
-  title: "Wedding Invite — Undangan Pernikahan Digital",
+  title: "Hadirku — Undangan Pernikahan Digital",
   description:
     "Buat undangan pernikahan digital yang indah. Bagikan ke tamu via WhatsApp. Pantau RSVP secara real-time.",
   manifest: "/manifest.json",
   openGraph: {
-    title: "Wedding Invite — Undangan Pernikahan Digital",
+    title: "Hadirku — Undangan Pernikahan Digital",
     description: "Buat undangan digital elegan, bagikan via WhatsApp, pantau RSVP tamu secara real-time.",
     type: "website",
     locale: "id_ID",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Wedding Invite — Undangan Pernikahan Digital",
+    title: "Hadirku — Undangan Pernikahan Digital",
     description: "Buat undangan digital elegan, bagikan via WhatsApp, pantau RSVP tamu secara real-time.",
   },
 };
