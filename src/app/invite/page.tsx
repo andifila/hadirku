@@ -299,7 +299,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   const month = eventDate.toLocaleDateString("id-ID", { month: "long" });
   const year = eventDate.getFullYear();
 
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft(eventDate));
+  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(eventDate));
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [showMusicHint, setShowMusicHint] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -319,9 +319,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   const galleryParallaxY = useTransform(galleryScroll, [0, 1], ["-6%", "6%"]);
 
   useEffect(() => {
-    const interval = setInterval(() => setTimeLeft(getTimeLeft(eventDate)), 1000);
+    const target = new Date(invite.event_date);
+    const interval = setInterval(() => setTimeLeft(getTimeLeft(target)), 1000);
     return () => clearInterval(interval);
-  }, [eventDate]);
+  }, [invite.event_date]);
 
   useEffect(() => {
     if (!invite.music_url) return;
