@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Loader2, Plus, Search, X, Upload, Download,
-  Trash2, UserPlus, Users,
+  Trash2, UserPlus, Users, UserCheck, UserX, Clock,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useAuth } from "@/hooks/useAuth";
@@ -102,6 +102,116 @@ function downloadTemplate() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Tamu");
   XLSX.writeFile(wb, "template_tamu.xlsx");
+}
+
+// ── GuestTable (desktop) ──────────────────────────────────────────────────────
+
+function GuestTable({
+  guests,
+  slug,
+  onRemove,
+}: {
+  guests: Guest[];
+  slug: string;
+  onRemove: (id: string) => void;
+}) {
+  return (
+    <div
+      className="overflow-hidden rounded-2xl"
+      style={{ background: "var(--background)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}
+    >
+      <table className="w-full border-collapse">
+        <thead>
+          <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--muted)" }}>
+            {["Tamu", "Status", "No. HP", "Aksi"].map((h, i) => (
+              <th
+                key={h}
+                className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider ${i === 3 ? "text-right" : "text-left"}`}
+                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+              >
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {guests.map((guest) => {
+            const cfg = RSVP_CONFIG[guest.rsvp_status];
+            const waUrl = guest.phone
+              ? `https://wa.me/${toWaPhone(guest.phone)}?text=${encodeURIComponent(buildWaMessage(guest.name, slug))}`
+              : null;
+            return (
+              <tr
+                key={guest.id}
+                className="border-b last:border-0 transition-colors"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                      style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}
+                    >
+                      {guest.name[0]?.toUpperCase() ?? "?"}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>{guest.name}</p>
+                      {guest.guest_count != null && guest.guest_count > 1 && (
+                        <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                          {guest.guest_count} orang
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <span
+                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                    style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}
+                  >
+                    {cfg.label}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                  {guest.phone ?? "—"}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-0.5">
+                    {waUrl && (
+                      <motion.a
+                        href={waUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.12 }}
+                        whileTap={{ scale: 0.88 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                        className="rounded-lg p-1.5"
+                        style={{ color: "#25D366" }}
+                        title="Kirim undangan via WhatsApp"
+                      >
+                        <WaIcon className="h-4 w-4" />
+                      </motion.a>
+                    )}
+                    <motion.button
+                      onClick={() => onRemove(guest.id)}
+                      whileHover={{ scale: 1.12 }}
+                      whileTap={{ scale: 0.88 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                      className="rounded-lg p-1.5"
+                      style={{ color: "var(--muted-foreground)" }}
+                      title="Hapus tamu"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </motion.button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 // ── GuestCard ─────────────────────────────────────────────────────────────────
@@ -601,8 +711,18 @@ export default function GuestsPage() {
           <div className="mx-auto max-w-3xl px-4 py-6">
 
             {loading ? (
-              <div className="flex items-center justify-center py-24">
-                <Loader2 className="h-8 w-8 animate-spin" style={{ color: "var(--primary)" }} />
+              <div className="flex flex-col gap-5">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-24 animate-pulse rounded-2xl" style={{ background: "var(--background)" }} />
+                  ))}
+                </div>
+                <div className="h-20 animate-pulse rounded-2xl" style={{ background: "var(--background)" }} />
+                <div className="flex flex-col gap-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-16 animate-pulse rounded-2xl" style={{ background: "var(--background)" }} />
+                  ))}
+                </div>
               </div>
 
             ) : !invitation ? (
@@ -666,10 +786,10 @@ export default function GuestsPage() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {[
-                    { label: "Total Tamu",   value: guests.length, color: "var(--primary)", bg: "var(--background)", border: "var(--border)" },
-                    { label: "Hadir",        value: attending,     color: "#16a34a",         bg: "#f0fdf4",          border: "#bbf7d0"       },
-                    { label: "Tidak Hadir",  value: notAttending,  color: "#dc2626",         bg: "#fef2f2",          border: "#fecaca"       },
-                    { label: "Belum",        value: pending,       color: "#d97706",         bg: "#fffbeb",          border: "#fde68a"       },
+                    { label: "Total Tamu",  value: guests.length, icon: Users,      iconBg: "rgba(176,141,87,0.12)", color: "var(--primary)", bg: "var(--background)", border: "var(--border)" },
+                    { label: "Hadir",       value: attending,     icon: UserCheck,  iconBg: "#dcfce7",               color: "#16a34a",         bg: "#f0fdf4",           border: "#bbf7d0"       },
+                    { label: "Tidak Hadir", value: notAttending,  icon: UserX,      iconBg: "#fee2e2",               color: "#dc2626",         bg: "#fef2f2",           border: "#fecaca"       },
+                    { label: "Belum",       value: pending,       icon: Clock,      iconBg: "#fef9c3",               color: "#d97706",         bg: "#fffbeb",           border: "#fde68a"       },
                   ].map((s) => (
                     <motion.div
                       key={s.label}
@@ -678,6 +798,12 @@ export default function GuestsPage() {
                       className="rounded-2xl p-4"
                       style={{ background: s.bg, border: `1px solid ${s.border}`, boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}
                     >
+                      <div
+                        className="mb-2 flex h-7 w-7 items-center justify-center rounded-lg"
+                        style={{ background: s.iconBg }}
+                      >
+                        <s.icon className="h-3.5 w-3.5" style={{ color: s.color }} />
+                      </div>
                       <p className="text-xs font-medium" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                         {s.label}
                       </p>
@@ -842,22 +968,35 @@ export default function GuestsPage() {
                     )}
                   </div>
                 ) : (
-                  <motion.div layout className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2">
                     <p className="px-1 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                       {filtered.length} tamu
                       {filtered.length !== guests.length ? ` (dari ${guests.length})` : ""}
                     </p>
-                    <AnimatePresence mode="popLayout">
-                      {filtered.map((guest) => (
-                        <GuestCard
-                          key={guest.id}
-                          guest={guest}
-                          slug={invitation.slug}
-                          onRemove={handleRemoveGuest}
-                        />
-                      ))}
-                    </AnimatePresence>
-                  </motion.div>
+
+                    {/* Desktop table */}
+                    <div className="hidden sm:block">
+                      <GuestTable
+                        guests={filtered}
+                        slug={invitation.slug}
+                        onRemove={handleRemoveGuest}
+                      />
+                    </div>
+
+                    {/* Mobile cards */}
+                    <motion.div layout className="flex flex-col gap-2 sm:hidden">
+                      <AnimatePresence mode="popLayout">
+                        {filtered.map((guest) => (
+                          <GuestCard
+                            key={guest.id}
+                            guest={guest}
+                            slug={invitation.slug}
+                            onRemove={handleRemoveGuest}
+                          />
+                        ))}
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
                 )}
 
               </motion.div>

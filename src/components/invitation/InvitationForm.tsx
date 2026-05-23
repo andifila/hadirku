@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Image, Music, Upload, X, CheckCircle2, Plus, Trash2, QrCode, Copy, Check } from "lucide-react";
+import { Loader2, Image, Music, Upload, X, CheckCircle2, Plus, Trash2, QrCode, Copy, Check, Heart, Calendar, Palette, Settings, ChevronRight } from "lucide-react";
 import {
   getTemplates,
   generateSlug,
@@ -35,10 +35,10 @@ const RESERVED_SLUGS = ["dashboard", "login", "auth", "invite", "api", "admin", 
 const COMMON_BANKS = ["BCA", "BNI", "BRI", "Mandiri", "CIMB Niaga", "GoPay", "OVO", "DANA", "ShopeePay", "Lainnya"];
 
 const TABS = [
-  { key: "mempelai",   label: "Mempelai"   },
-  { key: "acara",      label: "Acara"      },
-  { key: "konten",     label: "Konten"     },
-  { key: "pengaturan", label: "Pengaturan" },
+  { key: "mempelai",   label: "Mempelai",   icon: Heart    },
+  { key: "acara",      label: "Acara",       icon: Calendar },
+  { key: "konten",     label: "Konten",      icon: Palette  },
+  { key: "pengaturan", label: "Pengaturan",  icon: Settings },
 ] as const;
 type TabKey = typeof TABS[number]["key"];
 
@@ -207,6 +207,9 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     );
   }
 
+  const activeTabIndex = TABS.findIndex((t) => t.key === activeTab);
+  const nextTab        = activeTabIndex < TABS.length - 1 ? TABS[activeTabIndex + 1] : null;
+
   const slugReserved  = RESERVED_SLUGS.includes(values.slug);
   const isPastDate    = values.event_date
     ? new Date(values.event_date) < new Date(new Date().toDateString())
@@ -264,7 +267,8 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                   transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />
               )}
-              <span className="relative z-10">{t.label}</span>
+              <t.icon className="relative z-10 h-3.5 w-3.5 flex-shrink-0" />
+              <span className="relative z-10 hidden sm:inline">{t.label}</span>
               {hasIssue && !isActive && (
                 <span
                   className="relative z-10 h-1.5 w-1.5 flex-shrink-0 rounded-full"
@@ -735,17 +739,38 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
               </motion.p>
             )}
           </AnimatePresence>
-          <motion.button
-            type="submit"
-            disabled={submitting}
-            whileHover={!submitting ? { scale: 1.02, boxShadow: "0 4px 18px rgba(176,141,87,0.4)" } : undefined}
-            whileTap={!submitting ? { scale: 0.98 } : undefined}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-            style={{ background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)", color: "var(--primary-foreground)", fontFamily: "var(--font-inter)" }}
-          >
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : submitLabel}
-          </motion.button>
+          <div className="flex gap-2">
+            {nextTab && (
+              <motion.button
+                type="button"
+                onClick={() => switchTab(nextTab.key)}
+                whileHover={{ scale: 1.02, boxShadow: "0 4px 18px rgba(176,141,87,0.4)" }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium"
+                style={{ background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)", color: "var(--primary-foreground)", fontFamily: "var(--font-inter)" }}
+              >
+                <nextTab.icon className="h-4 w-4" />
+                {nextTab.label}
+                <ChevronRight className="h-4 w-4" />
+              </motion.button>
+            )}
+            <motion.button
+              type="submit"
+              disabled={submitting}
+              whileHover={!submitting ? { scale: 1.02 } : undefined}
+              whileTap={!submitting ? { scale: 0.98 } : undefined}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed ${nextTab ? "px-5" : "flex-1"}`}
+              style={
+                nextTab
+                  ? { background: "var(--muted)", color: "var(--foreground)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }
+                  : { background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)", color: "var(--primary-foreground)", fontFamily: "var(--font-inter)", boxShadow: "0 2px 8px rgba(176,141,87,0.3)" }
+              }
+            >
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : submitLabel}
+            </motion.button>
+          </div>
         </div>
       </div>
     </motion.form>

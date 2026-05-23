@@ -26,30 +26,35 @@ export function TopNav() {
     {
       icon: LayoutDashboard,
       label: "Dashboard",
+      short: "Home",
       href: "/dashboard",
       active: pathname === "/dashboard",
     },
     {
       icon: FileText,
       label: "Undangan",
+      short: "Edit",
       href: invitationId ? `/dashboard/edit?id=${invitationId}` : "/dashboard/new",
       active: pathname === "/dashboard/edit" || pathname === "/dashboard/new",
     },
     {
       icon: Users,
       label: "Tamu",
+      short: "Tamu",
       href: "/dashboard/guests",
       active: pathname === "/dashboard/guests",
     },
     {
       icon: BarChart3,
       label: "Statistik",
+      short: "Stats",
       href: "/dashboard/stats",
       active: pathname === "/dashboard/stats",
     },
     {
       icon: Settings,
       label: "Pengaturan",
+      short: "Akun",
       href: "/dashboard/settings",
       active: pathname === "/dashboard/settings",
     },
@@ -80,7 +85,7 @@ export function TopNav() {
             href={item.href}
             whileTap={{ scale: 0.94 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="relative flex items-center gap-1.5 rounded-xl px-2.5 py-2"
+            className="relative flex flex-col items-center gap-0.5 rounded-xl px-1.5 py-1.5 sm:flex-row sm:gap-1.5 sm:px-2.5 sm:py-2"
             style={{
               color: item.active ? "var(--primary)" : "var(--muted-foreground)",
               fontFamily: "var(--font-inter)",
@@ -96,6 +101,12 @@ export function TopNav() {
             )}
             <span className="relative z-10 flex-shrink-0">
               <item.icon className="h-[18px] w-[18px]" />
+            </span>
+            <span
+              className="relative z-10 text-[9px] font-medium sm:hidden"
+              style={{ letterSpacing: "0.01em", lineHeight: 1 }}
+            >
+              {item.short}
             </span>
             <span
               className="relative z-10 hidden text-[11px] font-medium sm:inline"

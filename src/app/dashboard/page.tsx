@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, ExternalLink, Loader2,
   Link2, Check, Users, ArrowRight, Pencil,
+  UserCheck, UserX, Clock,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations, type InvitationStat } from "@/lib/supabase/invitations";
@@ -354,27 +355,33 @@ export default function DashboardPage() {
                   className="grid grid-cols-2 gap-3 sm:grid-cols-4"
                 >
                   {[
-                    { label: "Total Tamu",       value: totalGuests,  sub: "tamu diundang",        valueColor: "var(--primary)", subColor: "var(--muted-foreground)", bg: "var(--background)", border: "var(--border)" },
-                    { label: "Hadir",             value: attending,    sub: totalGuests > 0 ? `${Math.round((attending / totalGuests) * 100)}% dari total` : "0%",    valueColor: "#16a34a", subColor: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
-                    { label: "Tidak Hadir",       value: notAttending, sub: totalGuests > 0 ? `${Math.round((notAttending / totalGuests) * 100)}% dari total` : "0%", valueColor: "#dc2626", subColor: "#dc2626", bg: "#fef2f2", border: "#fecaca" },
-                    { label: "Belum Konfirmasi",  value: pending,      sub: totalGuests > 0 ? `${Math.round((pending / totalGuests) * 100)}% dari total` : "0%",      valueColor: "#d97706", subColor: "#d97706", bg: "#fffbeb", border: "#fde68a" },
+                    { label: "Total Tamu",       value: totalGuests,  sub: "tamu diundang",        icon: Users,       iconBg: "rgba(176,141,87,0.12)", valueColor: "var(--primary)", subColor: "var(--muted-foreground)", bg: "var(--background)", border: "var(--border)" },
+                    { label: "Hadir",             value: attending,    sub: totalGuests > 0 ? `${Math.round((attending / totalGuests) * 100)}% dari total` : "0%",    icon: UserCheck, iconBg: "#dcfce7",               valueColor: "#16a34a", subColor: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
+                    { label: "Tidak Hadir",       value: notAttending, sub: totalGuests > 0 ? `${Math.round((notAttending / totalGuests) * 100)}% dari total` : "0%", icon: UserX,     iconBg: "#fee2e2",               valueColor: "#dc2626", subColor: "#dc2626", bg: "#fef2f2", border: "#fecaca" },
+                    { label: "Belum Konfirmasi",  value: pending,      sub: totalGuests > 0 ? `${Math.round((pending / totalGuests) * 100)}% dari total` : "0%",      icon: Clock,     iconBg: "#fef9c3",               valueColor: "#d97706", subColor: "#d97706", bg: "#fffbeb", border: "#fde68a" },
                   ].map((s) => (
                     <motion.div
                       key={s.label}
                       variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }}
                       whileHover={{ y: -3, boxShadow: "0 8px 24px rgba(0,0,0,0.09)" }}
                       transition={{ y: { type: "spring", stiffness: 400, damping: 25 }, boxShadow: { duration: 0.2 } }}
-                      className="rounded-2xl p-5"
+                      className="rounded-2xl p-4"
                       style={{ background: s.bg, border: `1px solid ${s.border}`, boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}
                     >
+                      <div
+                        className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-xl"
+                        style={{ background: s.iconBg }}
+                      >
+                        <s.icon className="h-4 w-4" style={{ color: s.valueColor }} />
+                      </div>
                       <p className="text-xs font-medium" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                         {s.label}
                       </p>
-                      <p className="mt-2 text-3xl font-bold leading-none tabular-nums sm:text-4xl"
+                      <p className="mt-1 text-3xl font-bold leading-none tabular-nums sm:text-4xl"
                         style={{ fontFamily: "var(--font-playfair)", color: s.valueColor }}>
                         {s.value}
                       </p>
-                      <p className="mt-1.5 text-xs" style={{ color: s.subColor, fontFamily: "var(--font-inter)", opacity: 0.8 }}>
+                      <p className="mt-1 text-xs" style={{ color: s.subColor, fontFamily: "var(--font-inter)", opacity: 0.8 }}>
                         {s.sub}
                       </p>
                     </motion.div>

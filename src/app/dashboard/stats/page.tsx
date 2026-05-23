@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, MessageSquare, BarChart2, Users, RefreshCw } from "lucide-react";
+import { MessageSquare, BarChart2, Users, RefreshCw } from "lucide-react";
 import { getUserInvitations } from "@/lib/supabase/invitations";
 import { getInvitationGuests, type Guest } from "@/lib/supabase/guests";
 
@@ -225,8 +225,10 @@ export default function StatsPage() {
           <div className="mx-auto max-w-3xl px-4 py-6">
 
             {loading ? (
-              <div className="flex items-center justify-center py-24">
-                <Loader2 className="h-8 w-8 animate-spin" style={{ color: "var(--primary)" }} />
+              <div className="flex flex-col gap-5">
+                <div className="h-64 animate-pulse rounded-2xl" style={{ background: "var(--background)" }} />
+                <div className="h-52 animate-pulse rounded-2xl" style={{ background: "var(--background)" }} />
+                <div className="h-72 animate-pulse rounded-2xl" style={{ background: "var(--background)" }} />
               </div>
             ) : !invitationId ? (
               <motion.div
