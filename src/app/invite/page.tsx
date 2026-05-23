@@ -175,12 +175,15 @@ const TEMPLATE_EXTRAS: Record<string, {
   headingWeight: 700 | 600;
   headingLetterSpacing: string;
   bgPattern: string;
+  countdownStyle: "text" | "box" | "pill";
+  heroSeparator: "heart" | "line" | "star" | "bloom";
+  sectionOrnament: "line" | "diamond" | "leaf" | "crown" | "bloom";
 }> = {
-  "garden-bloom":   { divider: "floral",    headingWeight: 600, headingLetterSpacing: "0em",    bgPattern: "none" },
-  "rustic-gold":    { divider: "diamond",   headingWeight: 700, headingLetterSpacing: "-0.01em", bgPattern: "none" },
-  "modern-minimal": { divider: "geometric", headingWeight: 700, headingLetterSpacing: "-0.02em", bgPattern: "none" },
-  "royal-elegance": { divider: "dots",      headingWeight: 700, headingLetterSpacing: "0.01em",  bgPattern: "none" },
-  "floral-dream":   { divider: "floral",    headingWeight: 600, headingLetterSpacing: "0.01em",  bgPattern: "none" },
+  "garden-bloom":   { divider: "floral",    headingWeight: 600, headingLetterSpacing: "0em",    bgPattern: "none", countdownStyle: "box",  heroSeparator: "bloom", sectionOrnament: "leaf"    },
+  "rustic-gold":    { divider: "diamond",   headingWeight: 700, headingLetterSpacing: "-0.01em", bgPattern: "none", countdownStyle: "box",  heroSeparator: "heart", sectionOrnament: "diamond" },
+  "modern-minimal": { divider: "geometric", headingWeight: 700, headingLetterSpacing: "-0.02em", bgPattern: "none", countdownStyle: "text", heroSeparator: "line",  sectionOrnament: "line"    },
+  "royal-elegance": { divider: "dots",      headingWeight: 700, headingLetterSpacing: "0.01em",  bgPattern: "none", countdownStyle: "pill", heroSeparator: "star",  sectionOrnament: "crown"   },
+  "floral-dream":   { divider: "floral",    headingWeight: 600, headingLetterSpacing: "0.01em",  bgPattern: "none", countdownStyle: "pill", heroSeparator: "bloom", sectionOrnament: "bloom"   },
 };
 
 const TEMPLATE_THEMES: Record<string, { primary: string; muted: string; border: string; gradient: string }> = {
@@ -554,7 +557,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           </>
         )}
 
-        <HeroOrnament color={theme.primary} />
+        <HeroOrnament color={theme.primary} templateSlug={invite.template_slug ?? "rustic-gold"} />
 
         {/* Content fades out as you scroll — cinematic depth effect */}
         <motion.div
@@ -597,20 +600,37 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               <LetterReveal text={invite.bride_name} delay={0.38} />
             </h1>
 
-            {/* separator */}
+            {/* separator — per-template personality */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.68, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="my-7 flex items-center gap-5"
             >
-              <div className="h-px w-12"
-                style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
-              <Heart className="h-4 w-4 flex-shrink-0"
-                style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--primary)" }}
-                fill="currentColor" />
-              <div className="h-px w-12"
-                style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
+              {extra.heroSeparator === "line" ? (
+                <>
+                  <div className="h-px w-20" style={{ background: hasCover ? "rgba(255,255,255,0.25)" : "var(--border)" }} />
+                  <div className="h-px w-20" style={{ background: hasCover ? "rgba(255,255,255,0.25)" : "var(--border)" }} />
+                </>
+              ) : extra.heroSeparator === "star" ? (
+                <>
+                  <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
+                  <span style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontSize: 14 }}>✦</span>
+                  <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
+                </>
+              ) : extra.heroSeparator === "bloom" ? (
+                <>
+                  <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
+                  <span style={{ color: hasCover ? "rgba(255,255,255,0.7)" : "var(--primary)", fontSize: 16 }}>✿</span>
+                  <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
+                </>
+              ) : (
+                <>
+                  <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
+                  <Heart className="h-4 w-4 flex-shrink-0" style={{ color: hasCover ? "rgba(255,255,255,0.65)" : "var(--primary)" }} fill="currentColor" />
+                  <div className="h-px w-12" style={{ background: hasCover ? "rgba(255,255,255,0.2)" : "var(--border)" }} />
+                </>
+              )}
             </motion.div>
 
             {/* Groom name */}
@@ -1104,38 +1124,82 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                   Menuju Hari Bahagia
                 </p>
-                <div className="flex items-end justify-center gap-3 sm:gap-6">
+                <div className={`flex items-${extra.countdownStyle === "text" ? "end" : "center"} justify-center gap-3 sm:gap-4`}>
                   {[
                     { value: timeLeft.days,    label: "Hari" },
                     { value: timeLeft.hours,   label: "Jam" },
                     { value: timeLeft.minutes, label: "Menit" },
                     { value: timeLeft.seconds, label: "Detik" },
                   ].map((item, idx) => (
-                    <div key={item.label} className="flex items-end gap-3 sm:gap-6">
-                      <div className="flex flex-col items-center gap-2">
-                        <motion.span
-                          key={`${item.label}-${item.value}`}
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.18 }}
+                    <div key={item.label} className="flex items-center gap-3 sm:gap-4">
+                      {extra.countdownStyle === "box" ? (
+                        <motion.div
+                          className="flex flex-col items-center justify-center gap-1.5 rounded-2xl"
                           style={{
-                            fontFamily: "var(--font-playfair)",
-                            color: "var(--primary)",
-                            fontSize: "clamp(2.2rem, 9vw, 3rem)",
-                            fontWeight: 700,
-                            lineHeight: 1,
+                            background: "var(--primary)",
+                            color: "#fff",
+                            minWidth: "clamp(56px, 15vw, 72px)",
+                            padding: "14px 8px",
                           }}
                         >
-                          {String(item.value).padStart(2, "0")}
-                        </motion.span>
-                        <span className="text-[8px] uppercase tracking-[0.22em]"
-                          style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                          {item.label}
-                        </span>
-                      </div>
+                          <motion.span
+                            key={`${item.label}-${item.value}`}
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.18 }}
+                            style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(1.7rem, 7vw, 2.4rem)", fontWeight: 700, lineHeight: 1 }}
+                          >
+                            {String(item.value).padStart(2, "0")}
+                          </motion.span>
+                          <span style={{ fontFamily: "var(--font-inter)", fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.85 }}>
+                            {item.label}
+                          </span>
+                        </motion.div>
+                      ) : extra.countdownStyle === "pill" ? (
+                        <motion.div
+                          className="flex flex-col items-center justify-center gap-1.5"
+                          style={{
+                            background: "var(--background)",
+                            border: "1px solid var(--border)",
+                            borderRadius: 999,
+                            minWidth: "clamp(52px, 14vw, 66px)",
+                            padding: "18px 8px",
+                          }}
+                        >
+                          <motion.span
+                            key={`${item.label}-${item.value}`}
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.18 }}
+                            style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)", fontSize: "clamp(1.6rem, 7vw, 2.2rem)", fontWeight: 700, lineHeight: 1 }}
+                          >
+                            {String(item.value).padStart(2, "0")}
+                          </motion.span>
+                          <span style={{ fontFamily: "var(--font-inter)", color: "var(--muted-foreground)", fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+                            {item.label}
+                          </span>
+                        </motion.div>
+                      ) : (
+                        /* text style (modern-minimal) */
+                        <div className="flex flex-col items-center gap-2">
+                          <motion.span
+                            key={`${item.label}-${item.value}`}
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.18 }}
+                            style={{ fontFamily: "var(--font-playfair)", color: "var(--primary)", fontSize: "clamp(2.2rem, 9vw, 3rem)", fontWeight: 700, lineHeight: 1 }}
+                          >
+                            {String(item.value).padStart(2, "0")}
+                          </motion.span>
+                          <span className="text-[8px] uppercase tracking-[0.22em]"
+                            style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                            {item.label}
+                          </span>
+                        </div>
+                      )}
                       {idx < 3 && (
-                        <span className="mb-7 text-lg font-thin leading-none"
-                          style={{ color: "var(--border)" }}>
+                        <span className="text-lg font-thin leading-none"
+                          style={{ color: "var(--border)", marginBottom: extra.countdownStyle === "text" ? "1.75rem" : 0 }}>
                           ·
                         </span>
                       )}
@@ -1163,7 +1227,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         <RevealSection>
           <section className="px-6 py-20" style={{ backgroundColor: "var(--muted)" }}>
             <div className="mx-auto max-w-sm">
-              <SectionTitle>Hadiah &amp; Angpao</SectionTitle>
+              <SectionTitle ornament={extra.sectionOrnament}>Hadiah &amp; Angpao</SectionTitle>
               <p className="mt-4 text-center text-xs leading-relaxed"
                 style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                 Tanpa mengurangi rasa hormat, bagi yang ingin memberikan hadiah:
@@ -1220,7 +1284,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
         <RevealSection>
           <section id="ucapan-doa" className="py-20" style={{ backgroundColor: "var(--muted)" }}>
             <div className="mb-12 text-center">
-              <SectionTitle>Ucapan &amp; Doa</SectionTitle>
+              <SectionTitle ornament={extra.sectionOrnament}>Ucapan &amp; Doa</SectionTitle>
             </div>
             <MessageMarquee messages={messages} />
           </section>
@@ -1670,26 +1734,111 @@ function ElegantField({ label, required, children, focused: _focused }: {
 
 // ─── Shared Components ────────────────────────────────────────────────────────
 
-function HeroOrnament({ color }: { color: string }) {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <motion.svg
-        animate={{ rotate: 360 }}
-        transition={{ duration: 150, repeat: Infinity, ease: "linear" }}
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        width="720" height="720" viewBox="0 0 200 200" fill="none"
-        style={{ opacity: 0.045, originX: "50%", originY: "50%" }}
-      >
-        <circle cx="100" cy="100" r="90" stroke={color} strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="68" stroke={color} strokeWidth="0.5" />
-        <circle cx="100" cy="100" r="46" stroke={color} strokeWidth="0.5" />
-        <line x1="10" y1="100" x2="190" y2="100" stroke={color} strokeWidth="0.5" />
-        <line x1="100" y1="10" x2="100" y2="190" stroke={color} strokeWidth="0.5" />
-        <line x1="29" y1="29" x2="171" y2="171" stroke={color} strokeWidth="0.5" />
-        <line x1="171" y1="29" x2="29" y2="171" stroke={color} strokeWidth="0.5" />
-      </motion.svg>
-    </div>
-  );
+function HeroOrnament({ color, templateSlug }: { color: string; templateSlug: string }) {
+  switch (templateSlug) {
+    case "garden-bloom":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <motion.svg
+            animate={{ rotate: 360 }}
+            transition={{ duration: 220, repeat: Infinity, ease: "linear" }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            width="680" height="680" viewBox="0 0 200 200" fill="none"
+            style={{ opacity: 0.055, originX: "50%", originY: "50%" }}
+          >
+            {[0,45,90,135,180,225,270,315].map((deg) => (
+              <ellipse key={deg}
+                cx={100 + Math.cos((deg * Math.PI) / 180) * 70}
+                cy={100 + Math.sin((deg * Math.PI) / 180) * 70}
+                rx="9" ry="24"
+                transform={`rotate(${deg + 90}, ${100 + Math.cos((deg * Math.PI) / 180) * 70}, ${100 + Math.sin((deg * Math.PI) / 180) * 70})`}
+                stroke={color} strokeWidth="0.6" fill="none"
+              />
+            ))}
+            <circle cx="100" cy="100" r="88" stroke={color} strokeWidth="0.4" />
+            <circle cx="100" cy="100" r="42" stroke={color} strokeWidth="0.3" />
+          </motion.svg>
+        </div>
+      );
+    case "modern-minimal":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-10 right-10 top-10 h-px" style={{ background: color, opacity: 0.07 }} />
+          <div className="absolute left-10 right-10 bottom-10 h-px" style={{ background: color, opacity: 0.07 }} />
+          <div className="absolute top-10 bottom-10 left-10 w-px" style={{ background: color, opacity: 0.07 }} />
+          <div className="absolute top-10 bottom-10 right-10 w-px" style={{ background: color, opacity: 0.07 }} />
+          <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2" style={{ background: color, opacity: 0.04 }} />
+          <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2" style={{ background: color, opacity: 0.04 }} />
+        </div>
+      );
+    case "royal-elegance":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <motion.svg
+            animate={{ rotate: 360 }}
+            transition={{ duration: 130, repeat: Infinity, ease: "linear" }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            width="720" height="720" viewBox="0 0 200 200" fill="none"
+            style={{ opacity: 0.06, originX: "50%", originY: "50%" }}
+          >
+            {[0,15,30,45,60,75,90,105,120,135,150,165].map((deg) => (
+              <line key={deg}
+                x1="100" y1="100"
+                x2={100 + Math.cos((deg * Math.PI) / 180) * 86}
+                y2={100 + Math.sin((deg * Math.PI) / 180) * 86}
+                stroke={color} strokeWidth="0.35"
+              />
+            ))}
+            <circle cx="100" cy="100" r="86" stroke={color} strokeWidth="0.5" />
+            <circle cx="100" cy="100" r="58" stroke={color} strokeWidth="0.45" />
+            <circle cx="100" cy="100" r="30" stroke={color} strokeWidth="0.4" />
+          </motion.svg>
+        </div>
+      );
+    case "floral-dream":
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <motion.svg
+            animate={{ rotate: -360 }}
+            transition={{ duration: 190, repeat: Infinity, ease: "linear" }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            width="660" height="660" viewBox="0 0 200 200" fill="none"
+            style={{ opacity: 0.055, originX: "50%", originY: "50%" }}
+          >
+            {[0,60,120,180,240,300].map((deg) => (
+              <ellipse key={deg}
+                cx={100 + Math.cos((deg * Math.PI) / 180) * 56}
+                cy={100 + Math.sin((deg * Math.PI) / 180) * 56}
+                rx="13" ry="40"
+                transform={`rotate(${deg + 90}, ${100 + Math.cos((deg * Math.PI) / 180) * 56}, ${100 + Math.sin((deg * Math.PI) / 180) * 56})`}
+                stroke={color} strokeWidth="0.55" fill="none"
+              />
+            ))}
+            <circle cx="100" cy="100" r="86" stroke={color} strokeWidth="0.4" />
+          </motion.svg>
+        </div>
+      );
+    default: // rustic-gold
+      return (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <motion.svg
+            animate={{ rotate: 360 }}
+            transition={{ duration: 150, repeat: Infinity, ease: "linear" }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            width="720" height="720" viewBox="0 0 200 200" fill="none"
+            style={{ opacity: 0.045, originX: "50%", originY: "50%" }}
+          >
+            <circle cx="100" cy="100" r="90" stroke={color} strokeWidth="0.5" />
+            <circle cx="100" cy="100" r="68" stroke={color} strokeWidth="0.5" />
+            <circle cx="100" cy="100" r="46" stroke={color} strokeWidth="0.5" />
+            <line x1="10" y1="100" x2="190" y2="100" stroke={color} strokeWidth="0.5" />
+            <line x1="100" y1="10" x2="100" y2="190" stroke={color} strokeWidth="0.5" />
+            <line x1="29" y1="29" x2="171" y2="171" stroke={color} strokeWidth="0.5" />
+            <line x1="171" y1="29" x2="29" y2="171" stroke={color} strokeWidth="0.5" />
+          </motion.svg>
+        </div>
+      );
+  }
 }
 
 // Atmospheric opacity reveal — no y movement, avoids mechanical "webpage stacking" feel
@@ -1706,7 +1855,7 @@ function RevealSection({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({ children, ornament = "line" }: { children: React.ReactNode; ornament?: string }) {
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       <motion.div
@@ -1714,9 +1863,16 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="h-px w-8"
-        style={{ background: "var(--primary)" }}
-      />
+        className="flex items-center justify-center gap-2"
+      >
+        {ornament === "leaf"    && <span style={{ color: "var(--primary)", fontSize: 15 }}>🌿</span>}
+        {ornament === "crown"   && <span style={{ color: "var(--primary)", fontSize: 14 }}>♛</span>}
+        {ornament === "bloom"   && <span style={{ color: "var(--primary)", fontSize: 15 }}>✿</span>}
+        {ornament === "diamond" && <div className="h-1.5 w-1.5 rotate-45" style={{ background: "var(--primary)" }} />}
+        {(ornament === "line" || !["leaf","crown","bloom","diamond"].includes(ornament)) && (
+          <div className="h-px w-8" style={{ background: "var(--primary)" }} />
+        )}
+      </motion.div>
       <motion.h2
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
