@@ -8,6 +8,7 @@ export type RsvpPayload = {
   rsvp_status: RsvpStatus;
   message?: string;
   guest_count?: number;
+  rsvp_closes_at?: string | null;
 };
 
 const RATE_LIMIT_KEY = "rsvp_submitted";
@@ -31,6 +32,10 @@ export function markRsvpSubmitted(invitationId: string): void {
 }
 
 export async function submitRsvp(payload: RsvpPayload): Promise<void> {
+  if (payload.rsvp_closes_at && new Date(payload.rsvp_closes_at) < new Date()) {
+    throw new Error("RSVP_CLOSED");
+  }
+
   const trimmedName  = payload.name.trim();
   const trimmedPhone = payload.phone?.trim() || null;
 

@@ -16,6 +16,7 @@ export async function getPublicMessages(
     .from("guests")
     .select("id, name, message, rsvp_status, created_at")
     .eq("invitation_id", invitationId)
+    .eq("is_message_public", true)
     .not("message", "is", null)
     .neq("message", "")
     .order("created_at", { ascending: false });

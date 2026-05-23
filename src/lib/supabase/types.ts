@@ -90,11 +90,17 @@ export type Database = {
           gallery_url_1: string | null;
           gallery_url_2: string | null;
           gallery_url_3: string | null;
+          gallery_url_4: string | null;
+          gallery_url_5: string | null;
+          gallery_url_6: string | null;
           // Angpao & Hadiah
           bank_accounts: BankAccount[] | null;
           gift_address: string | null;
           // Kontak
           owner_whatsapp: string | null;
+          // Pengaturan
+          timezone: string;
+          rsvp_closes_at: string | null;
           // Status
           is_published: boolean;
           created_at: string;
@@ -130,9 +136,14 @@ export type Database = {
           gallery_url_1?: string | null;
           gallery_url_2?: string | null;
           gallery_url_3?: string | null;
+          gallery_url_4?: string | null;
+          gallery_url_5?: string | null;
+          gallery_url_6?: string | null;
           bank_accounts?: BankAccount[] | null;
           gift_address?: string | null;
           owner_whatsapp?: string | null;
+          timezone?: string;
+          rsvp_closes_at?: string | null;
           is_published?: boolean;
         };
         Update: {
@@ -163,9 +174,14 @@ export type Database = {
           gallery_url_1?: string | null;
           gallery_url_2?: string | null;
           gallery_url_3?: string | null;
+          gallery_url_4?: string | null;
+          gallery_url_5?: string | null;
+          gallery_url_6?: string | null;
           bank_accounts?: BankAccount[] | null;
           gift_address?: string | null;
           owner_whatsapp?: string | null;
+          timezone?: string;
+          rsvp_closes_at?: string | null;
           is_published?: boolean;
         };
         Relationships: [
@@ -194,6 +210,7 @@ export type Database = {
           rsvp_status: RsvpStatus;
           message: string | null;
           guest_count: number | null;
+          is_message_public: boolean;
           created_at: string;
         };
         Insert: {
@@ -204,6 +221,7 @@ export type Database = {
           rsvp_status?: RsvpStatus;
           message?: string | null;
           guest_count?: number | null;
+          is_message_public?: boolean;
         };
         Update: {
           rsvp_status?: RsvpStatus;

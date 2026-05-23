@@ -416,7 +416,10 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   }
 
   const displayName = guestName ? `Bapak/Ibu ${guestName}` : null;
-  const galleryUrls = [invite.gallery_url_1, invite.gallery_url_2, invite.gallery_url_3].filter(Boolean) as string[];
+  const galleryUrls = [
+    invite.gallery_url_1, invite.gallery_url_2, invite.gallery_url_3,
+    invite.gallery_url_4, invite.gallery_url_5, invite.gallery_url_6,
+  ].filter(Boolean) as string[];
   const bankAccounts = invite.bank_accounts ?? [];
 
   const hasAkad = !!invite.akad_date;
@@ -427,7 +430,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
     akadDay = String(akadDate.getDate());
     akadMonth = akadDate.toLocaleDateString("id-ID", { month: "long" });
     akadYear = String(akadDate.getFullYear());
-    akadTime = invite.akad_time ? formatTime(invite.akad_time) : "";
+    akadTime = invite.akad_time ? formatTime(invite.akad_time, invite.timezone) : "";
   }
 
   const hasBrideIg = !!invite.bride_instagram;
@@ -938,7 +941,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 className="space-y-2"
               >
                 <p className="text-sm" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                  {formatTime(invite.event_time)}
+                  {formatTime(invite.event_time, invite.timezone)}
                 </p>
                 <p className="text-xl font-semibold leading-snug"
                   style={{ fontFamily: "var(--font-playfair)" }}>
@@ -990,7 +993,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
           className="overflow-hidden"
           style={{ backgroundColor: hasAkad ? "var(--muted)" : "var(--background)" }}
         >
-          {galleryUrls.length === 3 ? (
+          {galleryUrls.length >= 3 ? (
             <>
               {/* Photo 1: full-bleed portrait — cinematic scale reveal + parallax */}
               <div className="relative overflow-hidden" style={{ aspectRatio: "3/4" }}>
@@ -1006,7 +1009,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 />
               </div>
 
-              {/* Photos 2 & 3: editorial side-by-side — photo 2 still, photo 3 slow fade */}
+              {/* Photos 2 & 3: editorial side-by-side */}
               <div className="flex gap-1 mt-1">
                 <motion.div
                   className="flex-1 overflow-hidden"
@@ -1019,7 +1022,6 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   <img src={galleryUrls[1]} alt="" loading="lazy" className="h-full w-full object-cover"
                     style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
                 </motion.div>
-                {/* Photo 3: atmospheric opacity only, no y movement */}
                 <motion.div
                   className="flex-1 overflow-hidden"
                   style={{ aspectRatio: "1/1", marginTop: 32 }}
@@ -1032,6 +1034,26 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                     style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
                 </motion.div>
               </div>
+
+              {/* Photos 4-6: additional row(s) of squares */}
+              {galleryUrls.length > 3 && (
+                <div className={`flex gap-1 mt-1`}>
+                  {galleryUrls.slice(3).map((url, i) => (
+                    <motion.div
+                      key={i}
+                      className="flex-1 overflow-hidden"
+                      style={{ aspectRatio: "1/1" }}
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <img src={url} alt="" loading="lazy" className="h-full w-full object-cover"
+                        style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </>
           ) : galleryUrls.length === 2 ? (
             <>
@@ -1359,7 +1381,7 @@ function BankCard({ bank, accountName, accountNumber, qrisUrl, isLast }: {
 
 // ─── RSVP Section ─────────────────────────────────────────────────────────────
 
-type RsvpState = "idle" | "submitting" | "done" | "error" | "already_submitted";
+type RsvpState = "idle" | "submitting" | "done" | "error" | "already_submitted" | "rsvp_closed";
 
 function RsvpSection({ invite, guestName, onSuccess }: {
   invite: PublicInvitation; guestName: string; onSuccess: () => void;
@@ -1377,7 +1399,10 @@ function RsvpSection({ invite, guestName, onSuccess }: {
 
   useEffect(() => {
     try { if (localStorage.getItem(storageKey)) setState("already_submitted"); } catch { /* private mode */ }
-  }, [storageKey]);
+    if (invite.rsvp_closes_at && new Date(invite.rsvp_closes_at) < new Date()) {
+      setState("rsvp_closed");
+    }
+  }, [storageKey, invite.rsvp_closes_at]);
 
   function validatePhone(v: string): boolean {
     if (!v.trim()) return true;
@@ -1397,6 +1422,7 @@ function RsvpSection({ invite, guestName, onSuccess }: {
         invitation_id: invite.id,
         name, phone, rsvp_status: status, message,
         guest_count: status === "attending" ? guestCount : undefined,
+        rsvp_closes_at: invite.rsvp_closes_at,
       });
       try { localStorage.setItem(storageKey, "1"); } catch { /* private mode */ }
       setState("done");
@@ -1404,6 +1430,8 @@ function RsvpSection({ invite, guestName, onSuccess }: {
     } catch (err) {
       if (err instanceof Error && err.message === "ALREADY_SUBMITTED") {
         setState("already_submitted");
+      } else if (err instanceof Error && err.message === "RSVP_CLOSED") {
+        setState("rsvp_closed");
       } else {
         setErrorMsg(err instanceof Error ? err.message : "Terjadi kesalahan.");
         setState("error");
@@ -1411,7 +1439,7 @@ function RsvpSection({ invite, guestName, onSuccess }: {
     }
   }
 
-  const isDone = state === "done" || state === "already_submitted";
+  const isDone = state === "done" || state === "already_submitted" || state === "rsvp_closed";
 
   return (
     <section className="px-6 py-20" style={{ backgroundColor: "var(--background)" }}>
@@ -1460,15 +1488,19 @@ function RsvpSection({ invite, guestName, onSuccess }: {
               <CheckCircle className="h-8 w-8" style={{ color: "var(--primary)" }} />
               <div>
                 <p className="text-xl font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>
-                  {state === "already_submitted" ? "Konfirmasi sudah diterima" : `Terima kasih, ${name}`}
+                  {state === "already_submitted" ? "Konfirmasi sudah diterima"
+                    : state === "rsvp_closed" ? "Konfirmasi ditutup"
+                    : `Terima kasih, ${name}`}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed"
                   style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                   {state === "already_submitted"
                     ? "Anda sebelumnya telah mengisi konfirmasi kehadiran."
-                    : status === "attending"
-                      ? `Kami menantikan kehadiran Anda${guestCount > 1 ? ` bersama ${guestCount} orang` : ""}.`
-                      : "Terima kasih, konfirmasi berhasil dicatat."}
+                    : state === "rsvp_closed"
+                      ? "Batas waktu konfirmasi kehadiran telah berakhir."
+                      : status === "attending"
+                        ? `Kami menantikan kehadiran Anda${guestCount > 1 ? ` bersama ${guestCount} orang` : ""}.`
+                        : "Terima kasih, konfirmasi berhasil dicatat."}
                 </p>
               </div>
             </motion.div>
@@ -1820,11 +1852,11 @@ function MessageMarquee({ messages }: { messages: GuestMessage[] }) {
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
-function formatTime(time: string) {
+function formatTime(time: string, timezone = "WIB") {
   const [h, m] = time.split(":");
   const hour = parseInt(h);
   const period = hour < 12 ? "Pagi" : hour < 15 ? "Siang" : hour < 18 ? "Sore" : "Malam";
-  return `${h}.${m} WIB (${period})`;
+  return `${h}.${m} ${timezone} (${period})`;
 }
 
 function getTimeLeft(target: Date) {

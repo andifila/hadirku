@@ -71,9 +71,14 @@ export type FormValues = {
   gallery_url_1: string;
   gallery_url_2: string;
   gallery_url_3: string;
+  gallery_url_4: string;
+  gallery_url_5: string;
+  gallery_url_6: string;
   bank_accounts: BankAccount[];
   gift_address: string;
   owner_whatsapp: string;
+  timezone: string;
+  rsvp_closes_at: string;
   slug: string;
   is_published: boolean;
 };
@@ -123,9 +128,14 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
     gallery_url_1:      initial?.gallery_url_1       ?? "",
     gallery_url_2:      initial?.gallery_url_2       ?? "",
     gallery_url_3:      initial?.gallery_url_3       ?? "",
+    gallery_url_4:      initial?.gallery_url_4       ?? "",
+    gallery_url_5:      initial?.gallery_url_5       ?? "",
+    gallery_url_6:      initial?.gallery_url_6       ?? "",
     bank_accounts:      initial?.bank_accounts       ?? [],
     gift_address:       initial?.gift_address        ?? "",
     owner_whatsapp:     initial?.owner_whatsapp      ?? "",
+    timezone:           initial?.timezone            ?? "WIB",
+    rsvp_closes_at:     initial?.rsvp_closes_at      ?? "",
     slug:               initial?.slug                ?? "",
     is_published:       initial?.is_published        ?? false,
   });
@@ -504,10 +514,10 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                 />
                 <div className="flex flex-col gap-2">
                   <p className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-                    Galeri Foto (opsional, maks. 3)
+                    Galeri Foto (opsional, maks. 6)
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    {(["gallery_url_1", "gallery_url_2", "gallery_url_3"] as const).map((key, i) => (
+                    {(["gallery_url_1", "gallery_url_2", "gallery_url_3", "gallery_url_4", "gallery_url_5", "gallery_url_6"] as const).map((key, i) => (
                       <FileUploadField
                         key={key}
                         label={`Foto ${i + 1}`}
@@ -665,6 +675,31 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
               </SectionCard>
 
               <SectionCard title="Pengaturan">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>Zona Waktu</label>
+                  <select
+                    value={values.timezone}
+                    onChange={(e) => set("timezone", e.target.value)}
+                    className="rounded-xl px-4 py-3 text-sm outline-none focus:shadow-[0_0_0_3px_rgba(176,141,87,0.18)] transition-shadow duration-150"
+                    style={{ background: "var(--muted)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)" }}
+                  >
+                    <option value="WIB">WIB — Waktu Indonesia Barat (Jakarta, Bandung, Surabaya)</option>
+                    <option value="WITA">WITA — Waktu Indonesia Tengah (Bali, Makassar, Lombok)</option>
+                    <option value="WIT">WIT — Waktu Indonesia Timur (Ambon, Papua)</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Field label="Batas Waktu RSVP (opsional)">
+                    <input
+                      type="datetime-local"
+                      value={values.rsvp_closes_at}
+                      onChange={(e) => set("rsvp_closes_at", e.target.value)}
+                    />
+                  </Field>
+                  <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                    Setelah tanggal ini, formulir konfirmasi kehadiran tidak bisa diisi.
+                  </p>
+                </div>
                 <div className="flex flex-col gap-1.5">
                   <Field label="Link Undangan (slug)">
                     <input
