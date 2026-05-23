@@ -1,4 +1,4 @@
-# Wedding Invite
+# Hadirku
 
 Aplikasi undangan pernikahan digital berbasis web. Buat undangan, kelola daftar tamu, kirim via WhatsApp, dan pantau RSVP secara real-time.
 

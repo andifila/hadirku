@@ -11,8 +11,8 @@
 ## 1. Clone & Install
 
 ```bash
-git clone https://github.com/<username>/invitation-wedding.git
-cd invitation-wedding
+git clone https://github.com/<username>/hadirku.git
+cd hadirku
 npm install
 ```
 
@@ -50,7 +50,10 @@ Ini membuat bucket `covers` dan `music` dengan akses publik baca.
 Di menu *Authentication → Providers*:
 - Aktifkan **Email** (magic link sudah cukup untuk mulai)
 - Atur **Site URL** ke URL deploy kamu (atau `http://localhost:3000` untuk dev)
-- Tambahkan redirect URL: `http://localhost:3000/auth/callback`
+- Tambahkan redirect URL:
+  - Dev: `http://localhost:3000/auth/callback`
+  - Production: `https://andifila.github.io/hadirku/auth/callback/`
+- Atur **Site URL** production ke `https://andifila.github.io/hadirku`
 
 ---
 
@@ -84,10 +87,10 @@ Buka `http://localhost:3000`.
 `basePath` dan `assetPrefix` sudah dikonfigurasi otomatis untuk GitHub Pages:
 
 ```ts
-basePath: process.env.NODE_ENV === "production" ? "/invitation-wedding" : "",
+basePath: process.env.NODE_ENV === "production" ? "/hadirku" : "",
 ```
 
-Ganti `invitation-wedding` jika nama repo kamu berbeda.
+Ganti `hadirku` jika nama repo kamu berbeda.
 
 ### Build static
 
