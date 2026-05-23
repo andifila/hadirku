@@ -6,10 +6,10 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true, // required for static export
   },
-  // basePath for GitHub Pages: /invitation-wedding
-  basePath: process.env.NODE_ENV === "production" ? "/invitation-wedding" : "",
+  // basePath for GitHub Pages: /hadirku
+  basePath: process.env.NODE_ENV === "production" ? "/hadirku" : "",
   assetPrefix:
-    process.env.NODE_ENV === "production" ? "/invitation-wedding/" : "",
+    process.env.NODE_ENV === "production" ? "/hadirku/" : "",
 };
 
 export default nextConfig;

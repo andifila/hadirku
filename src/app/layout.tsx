@@ -17,7 +17,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NODE_ENV === "production"
-      ? "https://andifila.github.io/invitation-wedding"
+      ? "https://andifila.github.io/hadirku"
       : "http://localhost:3000"
   ),
   title: "Hadirku — Undangan Pernikahan Digital",
