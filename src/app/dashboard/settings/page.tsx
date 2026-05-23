@@ -2,12 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Menu, KeyRound, Bell, Trash2, Check, AlertTriangle } from "lucide-react";
+import { Loader2, KeyRound, Bell, Trash2, Check, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase/client";
 import { getUserInvitations } from "@/lib/supabase/invitations";
 import { deleteInvitation } from "@/lib/supabase/invitation-crud";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 
 // ── Card wrapper ──────────────────────────────────────────────────────────────
 
@@ -30,14 +29,6 @@ function Card({ children, danger }: { children: React.ReactNode; danger?: boolea
 
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
-  const [sidebarOpen,  setSidebarOpen]  = useState(false);
-  const [invitationId, setInvitationId] = useState<string | null>(null);
-
-  const loadInvitation = useCallback(async () => {
-    const stats = await getUserInvitations().catch(() => []);
-    if (stats.length) setInvitationId(stats[0].invitation_id);
-  }, []);
-  useEffect(() => { loadInvitation(); }, [loadInvitation]);
 
   // Password reset
   const [pwSending,  setPwSending]  = useState(false);
@@ -83,63 +74,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={invitationId} />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              key="overlay"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            />
-            <motion.div
-              key="drawer"
-              initial={{ x: -240 }} animate={{ x: 0 }} exit={{ x: -240 }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 lg:hidden"
-            >
-              <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} onClose={() => setSidebarOpen(false)} invitationId={invitationId} />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Content */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-        {/* Topbar */}
-        <header
-          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
-          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
-        >
-          <motion.button
-            onClick={() => setSidebarOpen(true)}
-            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.9, rotate: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2 lg:hidden"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            <Menu className="h-5 w-5" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Pengaturan</h1>
-            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Akun &amp; preferensi
-            </p>
-          </div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-xl px-4 py-6">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-5">
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col" style={{ background: "var(--muted)" }}>
+      <main className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-xl px-4 py-6">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-5">
 
               {/* Account info */}
               <Card>
@@ -340,10 +278,9 @@ export default function SettingsPage() {
                 </div>
               </Card>
 
-            </motion.div>
-          </div>
-        </main>
-      </div>
+          </motion.div>
+        </div>
+      </main>
     </div>
   );
 }

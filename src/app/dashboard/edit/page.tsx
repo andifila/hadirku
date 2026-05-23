@@ -3,10 +3,9 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Trash2, Menu, FileText } from "lucide-react";
+import { Loader2, Trash2, FileText } from "lucide-react";
 import { Toast } from "@/components/ui/Toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import InvitationForm, { type FormValues } from "@/components/invitation/InvitationForm";
 import {
   getInvitationById,
@@ -31,7 +30,7 @@ export default function EditInvitationPage() {
 function EditContent() {
   const params = useSearchParams();
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const id = params.get("id") ?? "";
 
   const [initial,           setInitial]           = useState<FormValues | null>(null);
@@ -40,7 +39,6 @@ function EditContent() {
   const [error,             setError]             = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting,          setDeleting]          = useState(false);
-  const [sidebarOpen,       setSidebarOpen]       = useState(false);
   const [toast,             setToast]             = useState(false);
 
   useEffect(() => {
@@ -142,68 +140,9 @@ function EditContent() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={id || null} />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              key="overlay"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            />
-            <motion.div
-              key="drawer"
-              initial={{ x: -240 }} animate={{ x: 0 }} exit={{ x: -240 }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 lg:hidden"
-            >
-              <Sidebar
-                userEmail={user?.email ?? ""}
-                onSignOut={signOut}
-                onClose={() => setSidebarOpen(false)}
-                invitationId={id || null}
-              />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Content */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-        {/* Topbar */}
-        <header
-          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
-          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
-        >
-          <motion.button
-            onClick={() => setSidebarOpen(true)}
-            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.9, rotate: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2 lg:hidden"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            <Menu className="h-5 w-5" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Undangan</h1>
-            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Edit konten &amp; pengaturan undangan
-            </p>
-          </div>
-        </header>
-
-        {/* Scrollable content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-2xl px-4 py-6">
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col" style={{ background: "var(--muted)" }}>
+      <main className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-2xl px-4 py-6">
 
             {loading ? (
               <div className="flex items-center justify-center py-24">
@@ -293,8 +232,7 @@ function EditContent() {
               </motion.div>
             )}
           </div>
-        </main>
-      </div>
+      </main>
 
       <Toast
         message="Undangan berhasil disimpan"

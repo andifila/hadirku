@@ -2,21 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Menu } from "lucide-react";
+import { motion } from "framer-motion";
 import { Toast } from "@/components/ui/Toast";
-import { useAuth } from "@/hooks/useAuth";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import InvitationForm, { type FormValues } from "@/components/invitation/InvitationForm";
 import { createInvitation, generateSlug } from "@/lib/supabase/invitation-crud";
 
 export default function NewInvitationPage() {
   const router = useRouter();
-  const { user, signOut } = useAuth();
-  const [submitting,  setSubmitting]  = useState(false);
-  const [error,       setError]       = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [toast,       setToast]       = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error,      setError]      = useState("");
+  const [toast,      setToast]      = useState(false);
 
   async function handleSubmit(values: FormValues) {
     setSubmitting(true);
@@ -65,82 +60,22 @@ export default function NewInvitationPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={null} />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              key="overlay"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            />
-            <motion.div
-              key="drawer"
-              initial={{ x: -240 }} animate={{ x: 0 }} exit={{ x: -240 }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 lg:hidden"
-            >
-              <Sidebar
-                userEmail={user?.email ?? ""}
-                onSignOut={signOut}
-                onClose={() => setSidebarOpen(false)}
-                invitationId={null}
-              />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Content */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-        {/* Topbar */}
-        <header
-          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
-          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col" style={{ background: "var(--muted)" }}>
+      <main className="flex-1 overflow-y-auto">
+        <motion.div
+          className="mx-auto max-w-2xl px-4 py-6"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <motion.button
-            onClick={() => setSidebarOpen(true)}
-            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.9, rotate: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2 lg:hidden"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            <Menu className="h-5 w-5" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Undangan</h1>
-            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Buat undangan pernikahan baru
-            </p>
-          </div>
-        </header>
-
-        {/* Scrollable content */}
-        <main className="flex-1 overflow-y-auto">
-          <motion.div
-            className="mx-auto max-w-2xl px-4 py-6"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          >
-            <InvitationForm
-              submitting={submitting}
-              error={error}
-              onSubmit={handleSubmit}
-              submitLabel="Buat Undangan"
-            />
-          </motion.div>
-        </main>
-      </div>
+          <InvitationForm
+            submitting={submitting}
+            error={error}
+            onSubmit={handleSubmit}
+            submitLabel="Buat Undangan"
+          />
+        </motion.div>
+      </main>
 
       <Toast
         message="Undangan berhasil dibuat"

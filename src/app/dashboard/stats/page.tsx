@@ -2,11 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Menu, MessageSquare, BarChart2, Users, RefreshCw } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Loader2, MessageSquare, BarChart2, Users, RefreshCw } from "lucide-react";
 import { getUserInvitations } from "@/lib/supabase/invitations";
 import { getInvitationGuests, type Guest } from "@/lib/supabase/guests";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -163,13 +161,11 @@ function BarChartLabels() {
 // ── StatsPage ──────────────────────────────────────────────────────────────────
 
 export default function StatsPage() {
-  const { user, signOut } = useAuth();
   const [invitationId, setInvitationId] = useState<string | null>(null);
   const [guests,       setGuests]       = useState<Guest[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [refreshing,   setRefreshing]   = useState(false);
   const [lastUpdated,  setLastUpdated]  = useState<Date | null>(null);
-  const [sidebarOpen,  setSidebarOpen]  = useState(false);
 
   const load = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -196,76 +192,36 @@ export default function StatsPage() {
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col" style={{ background: "var(--muted)" }}>
 
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={invitationId} />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              key="overlay"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            />
-            <motion.div
-              key="drawer"
-              initial={{ x: -240 }} animate={{ x: 0 }} exit={{ x: -240 }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 lg:hidden"
-            >
-              <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} onClose={() => setSidebarOpen(false)} invitationId={invitationId} />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Content */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-        {/* Topbar */}
-        <header
-          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
-          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
+      {/* Subheader */}
+      <header
+        className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
+        style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
+      >
+        <div className="flex-1">
+          <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Statistik</h1>
+          <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+            {lastUpdated
+              ? `Update: ${lastUpdated.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`
+              : "Data RSVP & ucapan tamu"}
+          </p>
+        </div>
+        <motion.button
+          onClick={() => load(true)}
+          disabled={refreshing || loading}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 18 }}
+          className="rounded-lg p-2 disabled:opacity-50"
+          style={{ color: "var(--muted-foreground)" }}
+          title="Refresh data"
         >
-          <motion.button
-            onClick={() => setSidebarOpen(true)}
-            whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.9, rotate: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2 lg:hidden"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            <Menu className="h-5 w-5" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Statistik</h1>
-            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              {lastUpdated
-                ? `Update: ${lastUpdated.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`
-                : "Data RSVP & ucapan tamu"}
-            </p>
-          </div>
+          <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+        </motion.button>
+      </header>
 
-          <motion.button
-            onClick={() => load(true)}
-            disabled={refreshing || loading}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2 disabled:opacity-50"
-            style={{ color: "var(--muted-foreground)" }}
-            title="Refresh data"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-          </motion.button>
-        </header>
-
-        <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-3xl px-4 py-6">
 
             {loading ? (
@@ -419,8 +375,7 @@ export default function StatsPage() {
               </motion.div>
             )}
           </div>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }

@@ -5,24 +5,22 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, ExternalLink, Loader2,
-  Link2, Check, Menu, Users, ArrowRight, Pencil,
+  Link2, Check, Users, ArrowRight, Pencil,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations, type InvitationStat } from "@/lib/supabase/invitations";
 import { getInvitationById, updateInvitation, type Invitation } from "@/lib/supabase/invitation-crud";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 
 const MotionLink = motion(Link);
 
 // ─── Dashboard ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const [invitationId, setInvitationId] = useState<string | null>(null);
   const [invitation,   setInvitation]   = useState<Invitation | null>(null);
   const [stat,         setStat]         = useState<InvitationStat | null>(null);
   const [loading,      setLoading]      = useState(true);
-  const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [linkCopied,   setLinkCopied]   = useState(false);
 
   const load = useCallback(async () => {
@@ -70,77 +68,9 @@ export default function DashboardPage() {
     new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
-
-      {/* ── Desktop Sidebar ── */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={invitationId} />
-      </div>
-
-      {/* ── Mobile Sidebar Drawer ── */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              key="overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            />
-            <motion.div
-              key="drawer"
-              initial={{ x: -240 }}
-              animate={{ x: 0 }}
-              exit={{ x: -240 }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 lg:hidden"
-            >
-              <Sidebar
-                userEmail={user?.email ?? ""}
-                onSignOut={signOut}
-                onClose={() => setSidebarOpen(false)}
-                invitationId={invitationId}
-              />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* ── Content Area ── */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-        {/* Topbar */}
-        <header
-          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
-          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
-        >
-          <motion.button
-            onClick={() => setSidebarOpen(true)}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.9, rotate: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2 lg:hidden"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            <Menu className="h-5 w-5" />
-          </motion.button>
-
-          <div className="flex-1">
-            <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
-              Dashboard
-            </h1>
-            <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
-              Ringkasan undangan &amp; statistik tamu
-            </p>
-          </div>
-
-        </header>
-
-        {/* Scrollable content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-4xl px-4 py-6">
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col" style={{ background: "var(--muted)" }}>
+      <main className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-4xl px-4 py-6">
 
             {loading ? (
               <div className="flex items-center justify-center py-24">
@@ -526,7 +456,6 @@ export default function DashboardPage() {
             )}
           </div>
         </main>
-      </div>
     </div>
   );
 }

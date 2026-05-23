@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Loader2, Menu, Plus, Search, X, Upload, Download,
+  Loader2, Plus, Search, X, Upload, Download,
   Trash2, UserPlus, Users,
 } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -14,7 +14,6 @@ import {
   getInvitationGuests, addGuest, removeGuest, bulkAddGuests,
   buildInviteUrl, toWaPhone, type Guest,
 } from "@/lib/supabase/guests";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 
 // ── Types & constants ─────────────────────────────────────────────────────────
 
@@ -276,14 +275,13 @@ function AddGuestForm({
 // ── GuestsPage ────────────────────────────────────────────────────────────────
 
 export default function GuestsPage() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [invitationId, setInvitationId] = useState<string | null>(null);
   const [invitation,   setInvitation]   = useState<Invitation | null>(null);
   const [guests,       setGuests]       = useState<Guest[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [adding,       setAdding]       = useState(false);
   const [uploading,    setUploading]    = useState(false);
-  const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [search,       setSearch]       = useState("");
   const [filter,       setFilter]       = useState<RsvpFilter>("all");
   const [flash, setFlash] = useState<{ type: "success" | "error"; msg: string } | null>(null);
@@ -375,7 +373,7 @@ export default function GuestsPage() {
   const blastGuest = pendingWithPhone[blastIdx] ?? null;
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "var(--muted)" }}>
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col" style={{ background: "var(--muted)" }}>
 
       {/* ── WA Blast Overlay ── */}
       <AnimatePresence>
@@ -496,61 +494,11 @@ export default function GuestsPage() {
         )}
       </AnimatePresence>
 
-      {/* ── Desktop Sidebar ── */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} invitationId={invitationId} />
-      </div>
-
-      {/* ── Mobile Sidebar Drawer ── */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              key="overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            />
-            <motion.div
-              key="drawer"
-              initial={{ x: -240 }}
-              animate={{ x: 0 }}
-              exit={{ x: -240 }}
-              transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 lg:hidden"
-            >
-              <Sidebar
-                userEmail={user?.email ?? ""}
-                onSignOut={signOut}
-                onClose={() => setSidebarOpen(false)}
-                invitationId={invitationId}
-              />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* ── Content Area ── */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-
-        {/* Topbar */}
-        <header
-          className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
-          style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
-        >
-          <motion.button
-            onClick={() => setSidebarOpen(true)}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.9, rotate: -8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="rounded-lg p-2 lg:hidden"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            <Menu className="h-5 w-5" />
-          </motion.button>
-
+      {/* ── Subheader ── */}
+      <header
+        className="flex flex-shrink-0 items-center gap-3 px-5 py-3.5"
+        style={{ background: "var(--background)", borderBottom: "1px solid var(--border)" }}
+      >
           <div className="flex-1">
             <h1 className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
               Daftar Tamu
@@ -647,10 +595,9 @@ export default function GuestsPage() {
               />
             </div>
           )}
-        </header>
+      </header>
 
-        {/* Scrollable content */}
-        <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-3xl px-4 py-6">
 
             {loading ? (
@@ -916,8 +863,7 @@ export default function GuestsPage() {
               </motion.div>
             )}
           </div>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
