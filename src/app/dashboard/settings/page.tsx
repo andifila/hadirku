@@ -106,7 +106,7 @@ export default function SettingsPage() {
               transition={{ type: "spring", damping: 28, stiffness: 300 }}
               className="fixed inset-y-0 left-0 z-50 lg:hidden"
             >
-              <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} onClose={() => setSidebarOpen(false)} />
+              <Sidebar userEmail={user?.email ?? ""} onSignOut={signOut} onClose={() => setSidebarOpen(false)} invitationId={invitationId} />
             </motion.div>
           </>
         )}

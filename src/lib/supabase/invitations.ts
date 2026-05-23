@@ -17,8 +17,3 @@ export async function getUserInvitations(): Promise<InvitationStat[]> {
   if (error) throw error;
   return data ?? [];
 }
-
-export async function deleteInvitation(id: string): Promise<void> {
-  const { error } = await supabase.from("invitations").delete().eq("id", id);
-  if (error) throw error;
-}

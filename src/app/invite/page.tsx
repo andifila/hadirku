@@ -595,7 +595,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
       {invite.custom_message && (
         <RevealSection>
           <section className="px-6 py-32"
-            style={{ background: `color-mix(in srgb, var(--primary) 5%, var(--background))` }}>
+            style={{ background: "var(--muted)" }}>
             <div className="mx-auto max-w-sm">
               <motion.p
                 initial={{ opacity: 0, y: 14 }}

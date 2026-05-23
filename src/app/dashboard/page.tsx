@@ -48,15 +48,22 @@ export default function DashboardPage() {
 
   const daysUntil = invitation ? getDaysUntil(invitation.event_date) : null;
 
-  const [publishing, setPublishing] = useState(false);
+  const [publishing,   setPublishing]   = useState(false);
+  const [publishError, setPublishError] = useState("");
 
   async function handleTogglePublish() {
     if (!invitationId || !invitation) return;
     setPublishing(true);
+    setPublishError("");
     try {
       await updateInvitation(invitationId, { is_published: !invitation.is_published });
       setInvitation((prev) => prev ? { ...prev, is_published: !prev.is_published } : prev);
-    } catch { } finally { setPublishing(false); }
+    } catch {
+      setPublishError("Gagal mengubah status. Coba lagi.");
+      setTimeout(() => setPublishError(""), 4000);
+    } finally {
+      setPublishing(false);
+    }
   }
 
   const formatDate = (d: string) =>
@@ -380,6 +387,11 @@ export default function DashboardPage() {
                           : invitation.is_published ? "Unpublish" : "Publish"}
                       </motion.button>
                     </div>
+                    {publishError && (
+                      <p className="mt-2 text-xs" style={{ color: "#fca5a5", fontFamily: "var(--font-inter)" }}>
+                        {publishError}
+                      </p>
+                    )}
                   </div>
                 </div>
 
