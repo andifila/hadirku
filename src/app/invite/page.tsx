@@ -169,6 +169,20 @@ function InviteContent() {
   );
 }
 
+// Template-specific style extras — visual differentiation beyond color
+const TEMPLATE_EXTRAS: Record<string, {
+  divider: "line" | "diamond" | "dots" | "floral" | "geometric";
+  headingWeight: 700 | 600;
+  headingLetterSpacing: string;
+  bgPattern: string;
+}> = {
+  "garden-bloom":   { divider: "floral",    headingWeight: 600, headingLetterSpacing: "0em",    bgPattern: "none" },
+  "rustic-gold":    { divider: "diamond",   headingWeight: 700, headingLetterSpacing: "-0.01em", bgPattern: "none" },
+  "modern-minimal": { divider: "geometric", headingWeight: 700, headingLetterSpacing: "-0.02em", bgPattern: "none" },
+  "royal-elegance": { divider: "dots",      headingWeight: 700, headingLetterSpacing: "0.01em",  bgPattern: "none" },
+  "floral-dream":   { divider: "floral",    headingWeight: 600, headingLetterSpacing: "0.01em",  bgPattern: "none" },
+};
+
 const TEMPLATE_THEMES: Record<string, { primary: string; muted: string; border: string; gradient: string }> = {
   "garden-bloom":   { primary: "#4a7c59", muted: "#e4ede6", border: "#b8d4be", gradient: "linear-gradient(135deg, #4a7c59 0%, #3a6347 100%)" },
   "rustic-gold":    { primary: "#b08d57", muted: "#ece8e0", border: "#e0dbd2", gradient: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)" },
@@ -176,6 +190,51 @@ const TEMPLATE_THEMES: Record<string, { primary: string; muted: string; border: 
   "royal-elegance": { primary: "#6b35a3", muted: "#ede8f5", border: "#c8b0e8", gradient: "linear-gradient(135deg, #6b35a3 0%, #582d8a 100%)" },
   "floral-dream":   { primary: "#c06080", muted: "#f5e8ee", border: "#e8b8c8", gradient: "linear-gradient(135deg, #c06080 0%, #a84e6b 100%)" },
 };
+
+// ─── Template Divider ─────────────────────────────────────────────────────────
+
+function TemplateDivider({ templateSlug, color, borderColor }: {
+  templateSlug: string; color: string; borderColor: string;
+}) {
+  const extra = TEMPLATE_EXTRAS[templateSlug] ?? TEMPLATE_EXTRAS["rustic-gold"];
+  switch (extra.divider) {
+    case "geometric":
+      return (
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+          <div className="h-2 w-2 rotate-45" style={{ background: color }} />
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+        </div>
+      );
+    case "dots":
+      return (
+        <div className="flex items-center gap-2">
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+          <span className="h-1 w-1 rounded-full" style={{ background: color }} />
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
+          <span className="h-1 w-1 rounded-full" style={{ background: color }} />
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+        </div>
+      );
+    case "floral":
+      return (
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+          <Heart className="h-3.5 w-3.5 flex-shrink-0" style={{ color }} fill="currentColor" />
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+        </div>
+      );
+    case "diamond":
+    default:
+      return (
+        <div className="flex items-center gap-4">
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+          <Heart className="h-4 w-4 flex-shrink-0" style={{ color }} fill="currentColor" />
+          <div className="h-px flex-1" style={{ background: borderColor }} />
+        </div>
+      );
+  }
+}
 
 // ─── Envelope Cover ───────────────────────────────────────────────────────────
 
@@ -291,6 +350,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
   autoPlay: boolean;
 }) {
   const theme = TEMPLATE_THEMES[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_THEMES["rustic-gold"];
+  const extra = TEMPLATE_EXTRAS[invite.template_slug ?? "rustic-gold"] ?? TEMPLATE_EXTRAS["rustic-gold"];
   const hasCover = !!invite.cover_image_url;
 
   const eventDate = new Date(invite.event_date);
@@ -525,9 +585,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               color: hasCover ? "#fff" : "var(--foreground)",
               fontFamily: "var(--font-playfair)",
               fontSize: "clamp(2.9rem, 12.5vw, 3.75rem)",
-              fontWeight: 700,
+              fontWeight: extra.headingWeight,
               lineHeight: 1,
-              letterSpacing: "-0.01em",
+              letterSpacing: extra.headingLetterSpacing,
             }}>
               <LetterReveal text={invite.bride_name} delay={0.38} />
             </h1>
@@ -553,9 +613,9 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
               color: hasCover ? "#fff" : "var(--foreground)",
               fontFamily: "var(--font-playfair)",
               fontSize: "clamp(2.9rem, 12.5vw, 3.75rem)",
-              fontWeight: 700,
+              fontWeight: extra.headingWeight,
               lineHeight: 1,
-              letterSpacing: "-0.01em",
+              letterSpacing: extra.headingLetterSpacing,
             }}>
               <LetterReveal text={invite.groom_name} delay={0.75} />
             </h2>
@@ -671,12 +731,11 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                 )}
               </motion.div>
 
-              <div className="flex items-center gap-4">
-                <div className="h-px flex-1" style={{ background: "var(--border)" }} />
-                <Heart className="h-3.5 w-3.5 flex-shrink-0"
-                  style={{ color: "var(--primary)" }} fill="currentColor" />
-                <div className="h-px flex-1" style={{ background: "var(--border)" }} />
-              </div>
+              <TemplateDivider
+                templateSlug={invite.template_slug ?? "rustic-gold"}
+                color={theme.primary}
+                borderColor={theme.border}
+              />
 
               <motion.div
                 initial={{ opacity: 0, x: 16 }}
@@ -957,7 +1016,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <img src={galleryUrls[1]} alt="" className="h-full w-full object-cover"
+                  <img src={galleryUrls[1]} alt="" loading="lazy" className="h-full w-full object-cover"
                     style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
                 </motion.div>
                 {/* Photo 3: atmospheric opacity only, no y movement */}
@@ -969,7 +1028,7 @@ function InvitationView({ invite, guestName, messages, onRsvpSuccess, autoPlay }
                   viewport={{ once: true }}
                   transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <img src={galleryUrls[2]} alt="" className="h-full w-full object-cover"
+                  <img src={galleryUrls[2]} alt="" loading="lazy" className="h-full w-full object-cover"
                     style={{ filter: "brightness(0.96) contrast(1.06) saturate(0.88)" }} />
                 </motion.div>
               </div>

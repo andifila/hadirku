@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowRight, Heart, BarChart2, MessageSquare, Loader2 } from "lucide-react";
+import { ArrowRight, Heart, BarChart2, MessageSquare, Loader2, Plus, Minus } from "lucide-react";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -14,6 +14,50 @@ const TEMPLATES = [
   { name: "Modern Minimal", mood: "Bersih & Kontemporer", primary: "#1a1a1a", muted: "#f0f0f0" },
   { name: "Royal Elegance", mood: "Mewah & Dramatis",      primary: "#6b35a3", muted: "#ede8f5" },
   { name: "Floral Dream",   mood: "Romantis & Feminin",   primary: "#c06080", muted: "#f5e8ee" },
+];
+
+const TESTIMONIALS = [
+  {
+    name: "Ayu & Bima",
+    date: "Maret 2025",
+    text: "Luar biasa! Tamu kami langsung bisa RSVP dari WhatsApp tanpa ribet. Semua konfirmasi kehadiran terkumpul rapi di dashboard.",
+    initials: "AB",
+  },
+  {
+    name: "Sinta & Doni",
+    date: "Januari 2025",
+    text: "Undangannya cantik banget dan mudah dikustomisasi. Fitur blast WA ke semua tamu pending sangat menghemat waktu.",
+    initials: "SD",
+  },
+  {
+    name: "Putri & Arya",
+    date: "April 2025",
+    text: "Desain elegannya bikin undangan digital kami terasa premium. Statistik RSVP real-time membantu kami merencanakan katering dengan tepat.",
+    initials: "PA",
+  },
+];
+
+const FAQS = [
+  {
+    q: "Apakah layanan ini gratis?",
+    a: "Ya, layanan Wedding Invite sepenuhnya gratis. Daftar dengan email dan langsung buat undangan.",
+  },
+  {
+    q: "Berapa banyak tamu yang bisa ditambahkan?",
+    a: "Tidak ada batasan jumlah tamu. Tambah satu per satu atau impor massal lewat file Excel.",
+  },
+  {
+    q: "Bagaimana cara mengirim undangan ke tamu?",
+    a: "Setiap tamu mendapat link unik yang bisa dikirim via WhatsApp. Gunakan fitur Blast WA untuk kirim ke semua tamu sekaligus.",
+  },
+  {
+    q: "Apakah tamu perlu mendaftar untuk RSVP?",
+    a: "Tidak. Tamu cukup buka link undangan, isi nama dan konfirmasi kehadiran — tanpa perlu akun.",
+  },
+  {
+    q: "Bisakah saya mengubah undangan setelah dipublikasikan?",
+    a: "Bisa. Undangan bisa diedit kapan saja. Perubahan langsung terlihat oleh tamu.",
+  },
 ];
 
 const FEATURES = [
@@ -40,6 +84,7 @@ export default function LandingPage() {
   const { user, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES[1]);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   useEffect(() => setMounted(true), []);
 
   const ctaHref  = !mounted || loading ? "#" : user ? "/dashboard" : "/login";
@@ -339,6 +384,119 @@ export default function LandingPage() {
                 </motion.button>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ─────────────────────────────────────────── */}
+      <section className="px-6 py-24" style={{ background: "var(--muted)" }}>
+        <div className="mx-auto max-w-lg">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-12 text-center"
+          >
+            <p className="mb-3 text-[9px] uppercase tracking-[0.4em]"
+              style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>Testimoni</p>
+            <h2 className="font-bold" style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(1.75rem, 6vw, 2.25rem)" }}>
+              Dipercaya pasangan bahagia
+            </h2>
+          </motion.div>
+
+          <div className="flex flex-col gap-4">
+            {TESTIMONIALS.map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.09 }}
+                className="rounded-2xl p-5"
+                style={{ background: "var(--background)", border: "1px solid var(--border)" }}
+              >
+                <p className="mb-4 leading-relaxed"
+                  style={{ fontFamily: "var(--font-inter)", fontSize: "0.875rem", color: "var(--foreground)", fontStyle: "italic" }}>
+                  &ldquo;{t.text}&rdquo;
+                </p>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                    style={{ background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
+                  >
+                    {t.initials}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>{t.name}</p>
+                    <p className="text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>{t.date}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────── */}
+      <section className="px-6 py-24" style={{ background: "var(--background)" }}>
+        <div className="mx-auto max-w-lg">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-12 text-center"
+          >
+            <p className="mb-3 text-[9px] uppercase tracking-[0.4em]"
+              style={{ color: "var(--primary)", fontFamily: "var(--font-inter)" }}>FAQ</p>
+            <h2 className="font-bold" style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(1.75rem, 6vw, 2.25rem)" }}>
+              Pertanyaan umum
+            </h2>
+          </motion.div>
+
+          <div className="flex flex-col gap-2">
+            {FAQS.map((faq, i) => (
+              <motion.div
+                key={faq.q}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+                className="overflow-hidden rounded-2xl"
+                style={{ border: "1px solid var(--border)" }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="flex w-full items-center justify-between px-5 py-4 text-left"
+                  style={{ background: openFaq === i ? "var(--muted)" : "var(--background)", transition: "background 0.2s" }}
+                >
+                  <p className="pr-4 text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>
+                    {faq.q}
+                  </p>
+                  <div className="flex-shrink-0" style={{ color: "var(--primary)" }}>
+                    {openFaq === i ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  </div>
+                </button>
+                <AnimatePresence initial={false}>
+                  {openFaq === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <p
+                        className="px-5 pb-4 text-sm leading-relaxed"
+                        style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}
+                      >
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

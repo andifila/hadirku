@@ -1,0 +1,16 @@
+{
+  "name": "Wedding Invite",
+  "short_name": "WeddingInvite",
+  "description": "Buat undangan pernikahan digital yang elegan",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ece8e0",
+  "theme_color": "#b08d57",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

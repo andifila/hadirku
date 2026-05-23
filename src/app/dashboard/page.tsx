@@ -6,13 +6,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, ExternalLink, Loader2,
   Link2, Check, Users, ArrowRight, Pencil,
-  UserCheck, UserX, Clock,
+  UserCheck, UserX, Clock, Download, QrCode, X,
 } from "lucide-react";
+import QRCode from "qrcode";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations, type InvitationStat } from "@/lib/supabase/invitations";
 import { getInvitationById, updateInvitation, type Invitation } from "@/lib/supabase/invitation-crud";
+import { getInvitationGuests, type Guest } from "@/lib/supabase/guests";
 
 const MotionLink = motion(Link);
+
+function WaIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+    </svg>
+  );
+}
 
 // ─── Dashboard ─────────────────────────────────────────────────────────────────
 
@@ -21,8 +31,11 @@ export default function DashboardPage() {
   const [invitationId, setInvitationId] = useState<string | null>(null);
   const [invitation,   setInvitation]   = useState<Invitation | null>(null);
   const [stat,         setStat]         = useState<InvitationStat | null>(null);
+  const [guests,       setGuests]       = useState<Guest[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [linkCopied,   setLinkCopied]   = useState(false);
+  const [qrDataUrl,    setQrDataUrl]    = useState<string | null>(null);
+  const [showQr,       setShowQr]       = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -31,8 +44,12 @@ export default function DashboardPage() {
       const first = stats[0];
       setInvitationId(first.invitation_id);
       setStat(first);
-      const inv = await getInvitationById(first.invitation_id);
+      const [inv, guestList] = await Promise.all([
+        getInvitationById(first.invitation_id),
+        getInvitationGuests(first.invitation_id),
+      ]);
       setInvitation(inv);
+      setGuests(guestList);
     } finally {
       setLoading(false);
     }
@@ -44,6 +61,17 @@ export default function DashboardPage() {
   const notAttending = stat?.not_attending ?? 0;
   const pending      = stat?.pending      ?? 0;
   const totalGuests  = stat?.total_guests ?? 0;
+  const headcount    = guests
+    .filter((g) => g.rsvp_status === "attending")
+    .reduce((sum, g) => sum + (g.guest_count ?? 1), 0);
+
+  useEffect(() => {
+    if (!invitation?.slug) return;
+    const link = getShareLink(invitation.slug);
+    QRCode.toDataURL(link, { width: 256, margin: 2, color: { dark: "#1a1a1a", light: "#ffffff" } })
+      .then(setQrDataUrl)
+      .catch(() => {});
+  }, [invitation?.slug]);
 
   const daysUntil = invitation ? getDaysUntil(invitation.event_date) : null;
 
@@ -119,6 +147,54 @@ export default function DashboardPage() {
               </motion.div>
 
             ) : (
+              <>
+              {/* ── QR Modal ── */}
+              <AnimatePresence>
+                {showQr && qrDataUrl && (
+                  <motion.div
+                    key="qr-modal"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-50 flex items-center justify-center px-4"
+                    style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+                    onClick={() => setShowQr(false)}
+                  >
+                    <motion.div
+                      initial={{ scale: 0.9, y: 16 }}
+                      animate={{ scale: 1, y: 0 }}
+                      exit={{ scale: 0.9, y: 16 }}
+                      transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                      className="flex w-full max-w-xs flex-col items-center gap-4 rounded-3xl p-6"
+                      style={{ background: "var(--background)", border: "1px solid var(--border)" }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex w-full items-center justify-between">
+                        <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>QR Code Undangan</p>
+                        <button onClick={() => setShowQr(false)} className="rounded-lg p-1" style={{ color: "var(--muted-foreground)" }}>
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <img src={qrDataUrl} alt="QR Code" className="h-48 w-48 rounded-lg" />
+                      <p className="text-center text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                        Tamu scan QR ini untuk membuka undangan
+                      </p>
+                      <motion.a
+                        href={qrDataUrl}
+                        download="qr_undangan.png"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-medium"
+                        style={{ background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
+                      >
+                        <Download className="h-4 w-4" />
+                        Unduh QR
+                      </motion.a>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -223,6 +299,46 @@ export default function DashboardPage() {
                         <Pencil className="h-3.5 w-3.5" />
                         Edit
                       </MotionLink>
+                      {/* WA Share */}
+                      <motion.a
+                        href={`https://wa.me/?text=${encodeURIComponent(`Yth. Anda diundang ke pernikahan kami 🎊\n${getShareLink(invitation.slug)}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.03, backgroundColor: "rgba(37,211,102,0.35)" }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-medium"
+                        style={{
+                          background: "rgba(37,211,102,0.2)",
+                          color: "#25D366",
+                          border: "1px solid rgba(37,211,102,0.35)",
+                          backdropFilter: "blur(6px)",
+                          fontFamily: "var(--font-inter)",
+                        }}
+                      >
+                        <WaIcon className="h-3.5 w-3.5" />
+                        Bagikan
+                      </motion.a>
+                      {/* QR Code */}
+                      {qrDataUrl && (
+                        <motion.button
+                          onClick={() => setShowQr(true)}
+                          whileHover={{ scale: 1.03, backgroundColor: "rgba(255,255,255,0.26)" }}
+                          whileTap={{ scale: 0.97 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                          className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-medium"
+                          style={{
+                            background: "rgba(255,255,255,0.18)",
+                            color: "#fff",
+                            border: "1px solid rgba(255,255,255,0.3)",
+                            backdropFilter: "blur(6px)",
+                            fontFamily: "var(--font-inter)",
+                          }}
+                        >
+                          <QrCode className="h-3.5 w-3.5" />
+                          QR Code
+                        </motion.button>
+                      )}
                       <motion.a
                         href={getShareLink(invitation.slug) + (!invitation.is_published ? "&preview=1" : "")}
                         target="_blank"
@@ -356,7 +472,7 @@ export default function DashboardPage() {
                 >
                   {[
                     { label: "Total Tamu",       value: totalGuests,  sub: "tamu diundang",        icon: Users,       iconBg: "rgba(176,141,87,0.12)", valueColor: "var(--primary)", subColor: "var(--muted-foreground)", bg: "var(--background)", border: "var(--border)" },
-                    { label: "Hadir",             value: attending,    sub: totalGuests > 0 ? `${Math.round((attending / totalGuests) * 100)}% dari total` : "0%",    icon: UserCheck, iconBg: "#dcfce7",               valueColor: "#16a34a", subColor: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
+                    { label: "Hadir",             value: attending,    sub: headcount > 0 ? `${headcount} orang hadir` : (totalGuests > 0 ? `${Math.round((attending / totalGuests) * 100)}%` : "0%"),    icon: UserCheck, iconBg: "#dcfce7",               valueColor: "#16a34a", subColor: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
                     { label: "Tidak Hadir",       value: notAttending, sub: totalGuests > 0 ? `${Math.round((notAttending / totalGuests) * 100)}% dari total` : "0%", icon: UserX,     iconBg: "#fee2e2",               valueColor: "#dc2626", subColor: "#dc2626", bg: "#fef2f2", border: "#fecaca" },
                     { label: "Belum Konfirmasi",  value: pending,      sub: totalGuests > 0 ? `${Math.round((pending / totalGuests) * 100)}% dari total` : "0%",      icon: Clock,     iconBg: "#fef9c3",               valueColor: "#d97706", subColor: "#d97706", bg: "#fffbeb", border: "#fde68a" },
                   ].map((s) => (
@@ -431,6 +547,50 @@ export default function DashboardPage() {
                   </div>
                 )}
 
+                {/* ── Onboarding Checklist ── */}
+                {!(totalGuests > 0 && invitation.is_published && attending > 0) && (
+                  <div
+                    className="rounded-2xl p-5"
+                    style={{ background: "var(--background)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}
+                  >
+                    <p className="mb-3 text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Checklist Persiapan</p>
+                    <div className="flex flex-col gap-2">
+                      {[
+                        { label: "Buat undangan",              done: true },
+                        { label: "Tambah tamu pertama",        done: totalGuests > 0 },
+                        { label: "Publikasikan undangan",      done: invitation.is_published },
+                        { label: "Kirim & konfirmasi pertama", done: attending > 0 },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center gap-3">
+                          <div
+                            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+                            style={{
+                              background: item.done ? "#16a34a" : "var(--muted)",
+                              border: item.done ? "none" : "1px solid var(--border)",
+                            }}
+                          >
+                            {item.done && (
+                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            )}
+                          </div>
+                          <p
+                            className="text-sm"
+                            style={{
+                              fontFamily: "var(--font-inter)",
+                              color: item.done ? "var(--muted-foreground)" : "var(--foreground)",
+                              textDecoration: item.done ? "line-through" : "none",
+                            }}
+                          >
+                            {item.label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* ── Guests entry point ── */}
                 <MotionLink
                   href="/dashboard/guests"
@@ -460,6 +620,7 @@ export default function DashboardPage() {
                 </MotionLink>
 
               </motion.div>
+              </>
             )}
           </div>
         </main>

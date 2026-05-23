@@ -60,6 +60,18 @@ export function toWaPhone(phone: string): string {
   return "62" + digits;
 }
 
+export async function updateGuest(
+  id: string,
+  updates: { name?: string; phone?: string | null }
+): Promise<void> {
+  const payload: Record<string, unknown> = {};
+  if (updates.name !== undefined) payload.name = updates.name.trim();
+  if (updates.phone !== undefined) payload.phone = updates.phone?.trim() || null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("guests") as any).update(payload).eq("id", id);
+  if (error) throw error;
+}
+
 export function buildInviteUrl(slug: string, guestName: string): string {
   if (typeof window === "undefined") return "";
   const base =

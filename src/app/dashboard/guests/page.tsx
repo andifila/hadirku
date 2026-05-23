@@ -4,14 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Loader2, Plus, Search, X, Upload, Download,
-  Trash2, UserPlus, Users, UserCheck, UserX, Clock,
+  Trash2, UserPlus, Users, UserCheck, UserX, Clock, Pencil, Check,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserInvitations } from "@/lib/supabase/invitations";
 import { getInvitationById, type Invitation } from "@/lib/supabase/invitation-crud";
 import {
-  getInvitationGuests, addGuest, removeGuest, bulkAddGuests,
+  getInvitationGuests, addGuest, removeGuest, bulkAddGuests, updateGuest,
   buildInviteUrl, toWaPhone, type Guest,
 } from "@/lib/supabase/guests";
 
@@ -110,10 +110,12 @@ function GuestTable({
   guests,
   slug,
   onRemove,
+  onEdit,
 }: {
   guests: Guest[];
   slug: string;
   onRemove: (id: string) => void;
+  onEdit: (guest: Guest) => void;
 }) {
   return (
     <div
@@ -193,6 +195,17 @@ function GuestTable({
                       </motion.a>
                     )}
                     <motion.button
+                      onClick={() => onEdit(guest)}
+                      whileHover={{ scale: 1.12 }}
+                      whileTap={{ scale: 0.88 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                      className="rounded-lg p-1.5"
+                      style={{ color: "var(--muted-foreground)" }}
+                      title="Edit tamu"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </motion.button>
+                    <motion.button
                       onClick={() => onRemove(guest.id)}
                       whileHover={{ scale: 1.12 }}
                       whileTap={{ scale: 0.88 }}
@@ -220,10 +233,12 @@ function GuestCard({
   guest,
   slug,
   onRemove,
+  onEdit,
 }: {
   guest: Guest;
   slug: string;
   onRemove: (id: string) => void;
+  onEdit: (guest: Guest) => void;
 }) {
   const cfg = RSVP_CONFIG[guest.rsvp_status];
   const waUrl = guest.phone
@@ -294,6 +309,17 @@ function GuestCard({
             <WaIcon className="h-4 w-4" />
           </motion.a>
         )}
+        <motion.button
+          onClick={() => onEdit(guest)}
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.88 }}
+          transition={{ type: "spring", stiffness: 400, damping: 18 }}
+          className="rounded-lg p-1.5"
+          style={{ color: "var(--muted-foreground)" }}
+          title="Edit tamu"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </motion.button>
         <motion.button
           onClick={() => onRemove(guest.id)}
           whileHover={{ scale: 1.12 }}
@@ -397,6 +423,10 @@ export default function GuestsPage() {
   const [flash, setFlash] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [blastMode, setBlastMode] = useState(false);
   const [blastIdx,  setBlastIdx]  = useState(0);
+  const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
+  const [editName,     setEditName]     = useState("");
+  const [editPhone,    setEditPhone]    = useState("");
+  const [saving,       setSaving]       = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -449,6 +479,33 @@ export default function GuestsPage() {
     }
   }
 
+  function handleOpenEdit(guest: Guest) {
+    setEditingGuest(guest);
+    setEditName(guest.name);
+    setEditPhone(guest.phone ?? "");
+  }
+
+  async function handleSaveEdit() {
+    if (!editingGuest || !editName.trim()) return;
+    setSaving(true);
+    try {
+      await updateGuest(editingGuest.id, { name: editName.trim(), phone: editPhone.trim() || null });
+      setGuests((prev) =>
+        prev.map((g) =>
+          g.id === editingGuest.id
+            ? { ...g, name: editName.trim(), phone: editPhone.trim() || null }
+            : g
+        )
+      );
+      setEditingGuest(null);
+      showFlash("success", "Data tamu berhasil diperbarui.");
+    } catch (e) {
+      showFlash("error", e instanceof Error ? e.message : "Gagal mengubah tamu.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function handleRemoveGuest(id: string) {
     setGuests((prev) => prev.filter((g) => g.id !== id));
     try {
@@ -484,6 +541,86 @@ export default function GuestsPage() {
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col" style={{ background: "var(--muted)" }}>
+
+      {/* ── Edit Guest Modal ── */}
+      <AnimatePresence>
+        {editingGuest && (
+          <motion.div
+            key="edit-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
+            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+            onClick={() => setEditingGuest(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, y: 16 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.92, y: 16 }}
+              transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              className="w-full max-w-sm rounded-3xl p-6"
+              style={{ background: "var(--background)", border: "1px solid var(--border)", boxShadow: "0 24px 48px rgba(0,0,0,0.2)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm font-semibold" style={{ fontFamily: "var(--font-inter)" }}>Edit Tamu</p>
+                <button onClick={() => setEditingGuest(null)} className="rounded-lg p-1" style={{ color: "var(--muted-foreground)" }}>
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium" style={{ fontFamily: "var(--font-inter)", color: "var(--muted-foreground)" }}>
+                    Nama *
+                  </label>
+                  <input
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    placeholder="Nama tamu"
+                    className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
+                    style={{ background: "var(--muted)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)", color: "var(--foreground)" }}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium" style={{ fontFamily: "var(--font-inter)", color: "var(--muted-foreground)" }}>
+                    No. HP
+                  </label>
+                  <input
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    placeholder="08xxxxxxxxxx (opsional)"
+                    className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
+                    style={{ background: "var(--muted)", border: "1px solid var(--border)", fontFamily: "var(--font-inter)", color: "var(--foreground)" }}
+                  />
+                </div>
+                <div className="mt-1 flex gap-2">
+                  <motion.button
+                    onClick={handleSaveEdit}
+                    disabled={saving || !editName.trim()}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold disabled:opacity-60"
+                    style={{ background: "linear-gradient(135deg, #b08d57 0%, #9a7040 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}
+                  >
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                    Simpan
+                  </motion.button>
+                  <motion.button
+                    onClick={() => setEditingGuest(null)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex-1 rounded-2xl py-3 text-sm font-medium"
+                    style={{ background: "var(--muted)", color: "var(--foreground)", fontFamily: "var(--font-inter)", border: "1px solid var(--border)" }}
+                  >
+                    Batal
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── WA Blast Overlay ── */}
       <AnimatePresence>
@@ -980,6 +1117,7 @@ export default function GuestsPage() {
                         guests={filtered}
                         slug={invitation.slug}
                         onRemove={handleRemoveGuest}
+                        onEdit={handleOpenEdit}
                       />
                     </div>
 
@@ -992,6 +1130,7 @@ export default function GuestsPage() {
                             guest={guest}
                             slug={invitation.slug}
                             onRemove={handleRemoveGuest}
+                            onEdit={handleOpenEdit}
                           />
                         ))}
                       </AnimatePresence>

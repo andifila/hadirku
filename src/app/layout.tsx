@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   title: "Wedding Invite — Undangan Pernikahan Digital",
   description:
     "Buat undangan pernikahan digital yang indah. Bagikan ke tamu via WhatsApp. Pantau RSVP secara real-time.",
+  manifest: "/manifest.json",
   openGraph: {
     title: "Wedding Invite — Undangan Pernikahan Digital",
     description: "Buat undangan digital elegan, bagikan via WhatsApp, pantau RSVP tamu secara real-time.",
