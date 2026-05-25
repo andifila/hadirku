@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import QRCode from "qrcode";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase/client";
 import { getUserInvitations, type InvitationStat } from "@/lib/supabase/invitations";
 import { getInvitationById, updateInvitation, type Invitation } from "@/lib/supabase/invitation-crud";
 import { getInvitationGuests, type Guest } from "@/lib/supabase/guests";
@@ -36,7 +37,7 @@ export default function DashboardPage() {
   const [linkCopied,   setLinkCopied]   = useState(false);
   const [qrDataUrl,    setQrDataUrl]    = useState<string | null>(null);
   const [showQr,       setShowQr]       = useState(false);
-
+  const [isLive,       setIsLive]       = useState(false);
   const load = useCallback(async () => {
     try {
       const stats = await getUserInvitations();
@@ -56,6 +57,25 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!invitationId) return;
+    const channel = supabase
+      .channel(`dashboard-guests-${invitationId}`)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "guests",
+        filter: `invitation_id=eq.${invitationId}`,
+      }, () => { load(); })
+      .subscribe((status) => {
+        setIsLive(status === "SUBSCRIBED");
+      });
+    return () => {
+      supabase.removeChannel(channel);
+      setIsLive(false);
+    };
+  }, [invitationId, load]);
 
   const attending    = stat?.attending    ?? 0;
   const notAttending = stat?.not_attending ?? 0;
@@ -464,6 +484,17 @@ export default function DashboardPage() {
                 )}
 
                 {/* ── Quick Stats ── */}
+                {isLive && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style={{ background: "#16a34a" }} />
+                      <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: "#16a34a" }} />
+                    </span>
+                    <span className="text-[10px] uppercase tracking-[0.15em]" style={{ color: "#16a34a", fontFamily: "var(--font-inter)" }}>
+                      Live
+                    </span>
+                  </div>
+                )}
                 <motion.div
                   variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
                   initial="hidden"

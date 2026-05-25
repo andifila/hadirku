@@ -37,6 +37,20 @@ export const metadata: Metadata = {
   },
 };
 
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' https:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "frame-src https://maps.google.com https://www.google.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ");
+
 export default function RootLayout({
   children,
 }: {
@@ -44,6 +58,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${playfair.variable} ${inter.variable} h-full`}>
+      <head>
+        <meta httpEquiv="Content-Security-Policy" content={CSP} />
+        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+        <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+      </head>
       <body className="min-h-full antialiased">{children}</body>
     </html>
   );

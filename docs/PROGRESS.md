@@ -1,6 +1,6 @@
-# Progress — Wedding Invite App
+# Progress — Hadirku
 
-> Terakhir diperbarui: 20 Mei 2026
+> Terakhir diperbarui: 25 Mei 2026
 
 ## Tech Stack
 
@@ -28,8 +28,7 @@
 - [x] Warning banner jika undangan masih draft
 - [x] Tombol Lihat — otomatis preview mode untuk draft
 - [x] Statistik RSVP: Hadir / Tidak Hadir / Belum (Quick Stats cards + Response Rate bar)
-- [x] Sidebar nav clickable — pakai `MotionLink` langsung, bukan `Link > motion.div`
-- [x] Sidebar "Undangan" link mengarah ke halaman edit undangan aktif
+- [x] Sidebar nav clickable
 - [x] Daftar tamu inline + search/filter nama
 - [x] Tambah tamu manual (form inline dengan animasi)
 - [x] Upload tamu via Excel (`.xlsx` / `.xls`)
@@ -37,60 +36,77 @@
 - [x] Per tamu: kirim WhatsApp, salin link, hapus (dengan konfirmasi Ya/Batal)
 - [x] Tampil pesan/ucapan tamu
 - [x] Empty state saat belum ada undangan
+- [x] **Supabase Realtime** — stats update otomatis saat RSVP baru masuk (indikator "Live" pulse hijau)
 
 ### Form Buat / Edit Undangan
 - [x] Pilih tema dengan preview warna (5 tema)
+- [x] Warna aksen kustom per undangan — 9 preset + color picker bebas
 - [x] Input nama pengantin + nama ayah & ibu masing-masing mempelai
 - [x] Tanggal & waktu resepsi, venue nama & alamat
-- [x] Seksi Akad Nikah (toggle — muncul jika ada acara akad): tanggal, waktu, venue, alamat
+- [x] Seksi Akad Nikah (toggle)
 - [x] Warning tanggal lampau
-- [x] Input dresscode
-- [x] Input kutipan kustom
-- [x] Upload foto cover (Supabase Storage, maks 5 MB) — file lama auto-hapus
-- [x] Upload 3 foto galeri (Supabase Storage, reuse bucket `covers`)
-- [x] Upload musik background (Supabase Storage, maks 8 MB) — file lama auto-hapus
-- [x] Rekening/Angpao: tambah hingga 4 rekening (bank, nama, nomor) dengan dropdown bank umum + upload QRIS per rekening
+- [x] Input dresscode, kutipan kustom
+- [x] Upload foto cover (Supabase Storage, maks 5 MB)
+- [x] Upload 6 foto galeri
+- [x] Upload musik background (maks 8 MB)
+- [x] Rekening/Angpao + QRIS (hingga 4 rekening)
 - [x] Alamat pengiriman hadiah fisik
-- [x] Nomor WhatsApp owner untuk konfirmasi tamu
-- [x] Gelar/credentials per mempelai (cth. S.E., M.Kom.)
-- [x] Instagram handle per mempelai
+- [x] Nomor WhatsApp owner
+- [x] Gelar & Instagram handle per mempelai
+- [x] Zona waktu (WIB / WITA / WIT)
+- [x] Batas waktu RSVP (rsvp_closes_at)
 - [x] Slug kustom dengan validasi reserved words
-- [x] Slug tersimpan dengan benar saat edit
 - [x] Toggle publish / draft
 
+### Manajemen Tamu (`/dashboard/guests`)
+- [x] Tabel desktop + kartu mobile
+- [x] Kolom Kursi — tampilkan guest_count per tamu hadir
+- [x] Search + filter per status RSVP
+- [x] Edit nama & nomor telepon inline
+- [x] Import Excel massal
+- [x] WA Blast — step 1: edit template pesan (placeholder `{nama}` & `{link}`), step 2: kirim satu per satu dengan progress bar + tombol Lewati
+- [x] **Paginasi** — 50 tamu per halaman, kontrol Sebelumnya / Berikutnya, reset saat filter/search berubah
+
+### Statistik (`/dashboard/stats`)
+- [x] Donut chart RSVP
+- [x] RSVP per hari (14 hari terakhir)
+- [x] Badge "N orang hadir" (total kursi dari guest_count)
+- [x] Live feed ucapan tamu
+- [x] QR Code undangan
+- [x] Export Excel ucapan tamu (kolom: Nama, Status, Kursi, Ucapan, Tanggal)
+
 ### Halaman Undangan Publik (`/invite?s=<slug>&to=<nama>`)
-- [x] Amplop animasi dengan tombol "Buka Undangan" full-width
-- [x] Skeleton loading saat data belum siap
-- [x] Fix iOS Safari touch fall-through — InvitationView hanya di-mount setelah amplop dibuka
-- [x] Personalisasi nama tamu ("Kepada Yth.")
-- [x] 5 tema warna
-- [x] Hero: nama pengantin + nama orang tua, tanggal, scroll indicator
-- [x] Kutipan kustom
-- [x] Seksi Akad Nikah (conditional — hanya tampil jika `akad_date` diisi)
-- [x] Seksi Resepsi + dresscode badge + Google Maps embed + tombol Buka Maps
-- [x] Countdown real-time menuju hari H — fallback "Alhamdulillah, acara telah berlangsung" jika sudah lewat
-- [x] Galeri foto (grid, conditional — hanya tampil jika minimal 1 foto galeri diisi)
-- [x] RSVP form — validasi nomor telepon 9–15 digit, dedup server-side, input jumlah tamu (stepper)
-- [x] Hadiah & Angpao — kartu rekening per bank dengan tombol salin nomor + toggle QRIS image
-- [x] Hadiah fisik — alamat pengiriman (conditional)
-- [x] Konfirmasi via WhatsApp — tombol langsung ke nomor owner (conditional) di form RSVP & setelah submit
-- [x] Add to Calendar — Google Calendar link + iCal download per acara (Akad & Resepsi)
-- [x] Instagram links per mempelai di hero & footer
-- [x] Ucapan & Doa dari tamu
-- [x] Musik background (auto-play saat amplop dibuka, toggle play/pause)
-- [x] WhatsApp share
-- [x] Preview mode (`?preview=1`) untuk owner melihat draft
-- [x] Network error ditangani — tidak hang, tampil pesan tidak ditemukan
+- [x] Amplop animasi
+- [x] Personalisasi nama tamu
+- [x] **5 tema dengan diferensiasi visual nyata:**
+  - Garden Bloom: ornamen kelopak bunga, countdown kotak, separator ✿, ikon 🌿
+  - Rustic Gold: ornamen lingkaran klasik, countdown kotak, separator ♥, ikon ◇
+  - Modern Minimal: grid garis statis, countdown teks besar, separator garis, tanpa ikon
+  - Royal Elegance: ornamen mandala 12 jari, countdown pill, separator ✦, ikon ♛
+  - Floral Dream: ornamen bunga 6 kelopak, countdown pill, separator ✿, ikon ✿
+- [x] RSVP form dengan stepper jumlah tamu (guest_count)
+- [x] Countdown real-time (box / pill / text sesuai tema)
+- [x] Galeri foto (6 foto)
+- [x] Hadiah & Angpao, alamat fisik
+- [x] Musik background + WhatsApp share
+- [x] Add to Calendar (Google + iCal)
+- [x] Ucapan & Doa
+- [x] Preview mode untuk owner draft
 
 ### Infrastruktur
 - [x] GitHub Actions: auto-deploy ke GitHub Pages saat push ke `main`
-- [x] GitHub Actions: keep-alive ping Supabase setiap 3 hari (cegah free tier pause)
+- [x] GitHub Actions: keep-alive ping Supabase setiap 3 hari
 - [x] Clipboard fallback untuk HTTP
 
 ### Keamanan / Data
-- [x] RLS pada semua tabel (`profiles`, `templates`, `invitations`, `guests`)
-- [x] `getUserInvitations` filter by `user_id` — data user tidak bocor ke user lain
-- [x] RSVP dedup server-side via `ilike` query
+- [x] RLS pada semua tabel
+- [x] `getUserInvitations` filter by `user_id`
+- [x] RSVP dedup server-side
+- [x] **Edge Function `submit-rsvp`** — validasi server-side: published check, deadline check, rate limiting 15/menit, dedup by phone+name, insert
+- [x] **Rate limiting RSVP** — 15 request/menit per `invitation_id` di Edge Function
+- [x] **HTML injection prevention** — `escapeHtml()` di `notify-rsvp` untuk semua field user-supplied
+- [x] **CSP via meta tag** — Content-Security-Policy di `layout.tsx` (GitHub Pages tidak support HTTP headers)
+- [x] **Refactor `invite/page.tsx`** — dipecah dari 2032 baris ke ~700 baris + 9 komponen terpisah di `src/components/invitation/`
 
 ---
 
@@ -98,47 +114,30 @@
 
 ### High Priority
 - [ ] **404 page custom** — GitHub Pages tampilkan 404 generik. Perlu `public/404.html` yang redirect ke `/login`
-- [ ] **RLS pada view `invitation_stats`** — perlu tambah `WITH (security_invoker = true)` di SQL Supabase agar RLS tabel `invitations` berlaku saat query view
-- [ ] **OG meta tags dinamis** — link undangan yang dibagikan di WA/sosmed preview-nya masih generic. Butuh SSR atau solusi workaround (tidak bisa di static export)
+- [ ] **RLS pada view `invitation_stats`** — perlu tambah `WITH (security_invoker = true)` di SQL Supabase
+- [ ] **Supabase magic link redirect URL** — update di Supabase Dashboard → Auth → URL Configuration ke `https://andifila.github.io/hadirku` dan `https://andifila.github.io/hadirku/auth/callback/`
 
 ### Medium Priority
-- [ ] Rate limiting RSVP — dedup per nama ada, tapi belum ada proteksi spam banyak nama
-- [ ] Multiple undangan per akun (saat ini hanya 1)
-- [ ] Enforcement plan free vs premium (kolom `plan` sudah ada di DB, belum dipakai)
-- [ ] Template thumbnails (saat ini hanya dot warna, tidak ada gambar preview)
-- [ ] Notifikasi ke owner saat ada RSVP masuk (email / WA)
+- [ ] Enforcement plan free vs premium (kolom `plan` sudah ada di DB)
+- [ ] Template thumbnails (saat ini hanya dot warna)
+- [ ] Notifikasi email ke owner saat RSVP masuk (Edge Function `notify-rsvp` sudah ada, perlu deploy manual)
 - [ ] Analytics — jumlah view undangan
 
 ### Low Priority
+- [ ] Multiple undangan per akun
 - [ ] Custom domain untuk link undangan
-- [ ] Paginasi daftar tamu (untuk 100+ tamu)
-- [ ] Export daftar tamu + status RSVP ke Excel
 
 ---
 
-## Catatan Penting
+## Migration SQL (jalankan di Supabase SQL Editor)
 
-### Supabase Free Tier — Pause Prevention
-Project Supabase pause otomatis setelah 7 hari tidak ada request.
-Keep-alive workflow di `.github/workflows/keep-alive.yml` ping setiap 3 hari.
-Jika terlanjur pause: `https://supabase.com/dashboard` → Resume project.
-
-### Alur Publish Undangan (wajib diikuti)
-1. Buat undangan → status **Draft**
-2. Edit → aktifkan toggle **Dipublikasikan** → Simpan
-3. Baru bisa diakses lewat link publik `/invite?s=<slug>`
-
-Dashboard menampilkan warning banner jika undangan masih draft.
-
-### Slug Update (fix: 19 Mei 2026)
-Edit slug di form sekarang tersimpan dengan benar. Jika slug tidak berubah sebelumnya, buka Edit dan simpan ulang.
-
-### Dashboard Sidebar Fix (20 Mei 2026)
-Sidebar nav sebelumnya tidak bisa diklik karena `<Link>` membungkus `<motion.div whileTap>` — Framer Motion gesture absorb pointer events. Solusi: ganti ke `MotionLink = motion(Link)` langsung. `NAV` constant juga sudah dihapus, nav items kini didefinisikan di dalam `Sidebar` component dengan `invitationId` prop untuk dynamic href.
-
-### RLS `invitation_stats` View — Action Required
-Jalankan di Supabase SQL Editor untuk keamanan penuh:
 ```sql
+-- Kolom baru (23 Mei 2026)
+alter table invitations add column if not exists primary_color text;
+alter table guests      add column if not exists guest_count      integer not null default 1;
+alter table guests      add column if not exists is_message_public boolean not null default true;
+
+-- RLS view (keamanan penuh)
 CREATE OR REPLACE VIEW invitation_stats
 WITH (security_invoker = true) AS
 SELECT
@@ -149,11 +148,63 @@ SELECT
   i.groom_name,
   i.event_date,
   i.is_published,
-  count(g.id)                                                  AS total_guests,
-  count(g.id) FILTER (WHERE g.rsvp_status = 'attending')      AS attending,
-  count(g.id) FILTER (WHERE g.rsvp_status = 'not_attending')  AS not_attending,
-  count(g.id) FILTER (WHERE g.rsvp_status = 'pending')        AS pending
+  count(g.id)                                                                         AS total_guests,
+  count(g.id) FILTER (WHERE g.rsvp_status = 'attending')                              AS attending,
+  count(g.id) FILTER (WHERE g.rsvp_status = 'not_attending')                          AS not_attending,
+  count(g.id) FILTER (WHERE g.rsvp_status = 'pending')                                AS pending,
+  coalesce(sum(g.guest_count) FILTER (WHERE g.rsvp_status = 'attending'), 0)          AS total_seats
 FROM invitations i
 LEFT JOIN guests g ON g.invitation_id = i.id
 GROUP BY i.id;
 ```
+
+---
+
+## Arsitektur Komponen Undangan
+
+File `src/app/invite/page.tsx` dipecah menjadi komponen-komponen berikut:
+
+| File | Tanggung Jawab |
+|---|---|
+| `src/components/invitation/template-config.ts` | Konstanta tema & helper `resolveTheme()` / `resolveExtra()` |
+| `src/components/invitation/shared.tsx` | `RevealSection`, `SectionTitle`, `LetterReveal` |
+| `src/components/invitation/HeroOrnament.tsx` | SVG ornamen animasi per template |
+| `src/components/invitation/TemplateDivider.tsx` | Separator antar nama mempelai per template |
+| `src/components/invitation/ConfettiBurst.tsx` | Animasi confetti 64 partikel saat buka amplop |
+| `src/components/invitation/RsvpSection.tsx` | Form RSVP lengkap dengan state management |
+| `src/components/invitation/MessageWall.tsx` | Tampilan ucapan tamu |
+| `src/components/invitation/BankCard.tsx` | Kartu rekening + copy + QRIS toggle |
+| `src/components/invitation/ShareButton.tsx` | Tombol share / salin link |
+
+## Edge Functions (Supabase Deno)
+
+| Function | Tanggung Jawab |
+|---|---|
+| `submit-rsvp` | Validasi & insert RSVP server-side (published, deadline, rate limit, dedup) |
+| `notify-rsvp` | Kirim email notifikasi ke owner saat RSVP baru masuk |
+
+### Deploy Edge Functions
+```bash
+supabase functions deploy submit-rsvp
+supabase functions deploy notify-rsvp
+```
+
+---
+
+## Catatan Penting
+
+### Supabase Free Tier — Pause Prevention
+Project Supabase pause otomatis setelah 7 hari tidak ada request.
+Keep-alive workflow di `.github/workflows/keep-alive.yml` ping setiap 3 hari.
+Jika terlanjur pause: `https://supabase.com/dashboard` → Resume project.
+
+### Alur Publish Undangan
+1. Buat undangan → status **Draft**
+2. Edit → aktifkan toggle **Dipublikasikan** → Simpan
+3. Baru bisa diakses lewat link publik `/invite?s=<slug>`
+
+### Rename dari invitation-wedding ke hadirku (23 Mei 2026)
+- GitHub repo: `andifila/hadirku`
+- URL live: `https://andifila.github.io/hadirku`
+- basePath: `/hadirku`
+- Supabase redirect URL wajib diupdate manual (lihat High Priority di atas)

@@ -1,18 +1,16 @@
 import { supabase } from "./client";
-import type { RsvpStatus } from "./types";
 
 export type RsvpPayload = {
   invitation_id: string;
   name: string;
   phone?: string;
-  rsvp_status: RsvpStatus;
+  rsvp_status: "attending" | "not_attending" | "pending";
   message?: string;
   guest_count?: number;
-  rsvp_closes_at?: string | null;
 };
 
 const RATE_LIMIT_KEY = "rsvp_submitted";
-const RATE_LIMIT_MS  = 24 * 60 * 60 * 1000; // 24 hours
+const RATE_LIMIT_MS  = 24 * 60 * 60 * 1000;
 
 export function checkRsvpRateLimit(invitationId: string): boolean {
   try {
@@ -31,49 +29,38 @@ export function markRsvpSubmitted(invitationId: string): void {
   } catch {}
 }
 
+// Error codes returned by the submit-rsvp Edge Function
+const KNOWN_ERRORS = new Set([
+  "RSVP_CLOSED",
+  "ALREADY_SUBMITTED",
+  "RATE_LIMITED",
+  "NOT_FOUND",
+  "NOT_PUBLISHED",
+  "INVALID_PAYLOAD",
+]);
+
 export async function submitRsvp(payload: RsvpPayload): Promise<void> {
-  if (payload.rsvp_closes_at && new Date(payload.rsvp_closes_at) < new Date()) {
-    throw new Error("RSVP_CLOSED");
-  }
-
-  const trimmedName  = payload.name.trim();
-  const trimmedPhone = payload.phone?.trim() || null;
-
-  // Check by phone first (more accurate), then fall back to name match
-  let existing: { id: string } | null = null;
-
-  if (trimmedPhone) {
-    const { data } = await supabase
-      .from("guests")
-      .select("id")
-      .eq("invitation_id", payload.invitation_id)
-      .eq("phone", trimmedPhone)
-      .maybeSingle();
-    existing = data;
-  }
-
-  if (!existing) {
-    const { data } = await supabase
-      .from("guests")
-      .select("id")
-      .eq("invitation_id", payload.invitation_id)
-      .ilike("name", trimmedName)
-      .maybeSingle();
-    existing = data;
-  }
-
-  if (existing) throw new Error("ALREADY_SUBMITTED");
-
-  const { error } = await supabase.from("guests").insert({
-    invitation_id: payload.invitation_id,
-    name:          trimmedName,
-    phone:         trimmedPhone,
-    rsvp_status:   payload.rsvp_status,
-    message:       payload.message?.trim() || null,
-    guest_count:   payload.rsvp_status === "attending" ? (payload.guest_count ?? 1) : null,
+  const { data, error } = await supabase.functions.invoke("submit-rsvp", {
+    body: {
+      invitation_id: payload.invitation_id,
+      name:          payload.name,
+      phone:         payload.phone,
+      rsvp_status:   payload.rsvp_status,
+      message:       payload.message,
+      guest_count:   payload.guest_count,
+    },
   });
 
-  if (error) throw error;
+  if (error) {
+    // FunctionsHttpError carries the response body in error.context
+    const errCode = (data as { error?: string } | null)?.error ?? error.message;
+    throw new Error(KNOWN_ERRORS.has(errCode) ? errCode : "UNKNOWN_ERROR");
+  }
+
+  if ((data as { error?: string } | null)?.error) {
+    const errCode = (data as { error: string }).error;
+    throw new Error(KNOWN_ERRORS.has(errCode) ? errCode : "UNKNOWN_ERROR");
+  }
 
   markRsvpSubmitted(payload.invitation_id);
 }

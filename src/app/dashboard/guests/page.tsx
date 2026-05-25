@@ -19,6 +19,8 @@ import {
 
 type RsvpFilter = "all" | "attending" | "not_attending" | "pending";
 
+const PAGE_SIZE = 50;
+
 const RSVP_CONFIG = {
   attending:     { label: "Hadir",            color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
   not_attending: { label: "Tidak Hadir",      color: "#dc2626", bg: "#fef2f2", border: "#fecaca" },
@@ -437,6 +439,7 @@ export default function GuestsPage() {
   const [editName,     setEditName]     = useState("");
   const [editPhone,    setEditPhone]    = useState("");
   const [saving,       setSaving]       = useState(false);
+  const [page,         setPage]         = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -475,6 +478,12 @@ export default function GuestsPage() {
     const matchFilter = filter === "all" || g.rsvp_status === filter;
     return matchSearch && matchFilter;
   });
+
+  const totalPages    = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage      = Math.min(page, totalPages);
+  const paginatedGuests = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  useEffect(() => { setPage(1); }, [search, filter]);
 
   async function handleAddGuest(name: string, phone: string) {
     if (!invitationId) return;
@@ -1191,12 +1200,13 @@ export default function GuestsPage() {
                     <p className="px-1 text-xs" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
                       {filtered.length} tamu
                       {filtered.length !== guests.length ? ` (dari ${guests.length})` : ""}
+                      {totalPages > 1 && ` · halaman ${safePage} dari ${totalPages}`}
                     </p>
 
                     {/* Desktop table */}
                     <div className="hidden sm:block">
                       <GuestTable
-                        guests={filtered}
+                        guests={paginatedGuests}
                         slug={invitation.slug}
                         onRemove={handleRemoveGuest}
                         onEdit={handleOpenEdit}
@@ -1206,7 +1216,7 @@ export default function GuestsPage() {
                     {/* Mobile cards */}
                     <motion.div layout className="flex flex-col gap-2 sm:hidden">
                       <AnimatePresence mode="popLayout">
-                        {filtered.map((guest) => (
+                        {paginatedGuests.map((guest) => (
                           <GuestCard
                             key={guest.id}
                             guest={guest}
@@ -1217,6 +1227,47 @@ export default function GuestsPage() {
                         ))}
                       </AnimatePresence>
                     </motion.div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between pt-2">
+                        <motion.button
+                          onClick={() => setPage((p) => Math.max(1, p - 1))}
+                          disabled={safePage === 1}
+                          whileHover={{ scale: safePage === 1 ? 1 : 1.03 }}
+                          whileTap={{ scale: safePage === 1 ? 1 : 0.97 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                          className="rounded-xl px-4 py-2 text-xs font-medium disabled:opacity-40"
+                          style={{
+                            background: "var(--background)",
+                            border: "1px solid var(--border)",
+                            fontFamily: "var(--font-inter)",
+                            color: "var(--foreground)",
+                          }}
+                        >
+                          ← Sebelumnya
+                        </motion.button>
+                        <span className="text-xs tabular-nums" style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-inter)" }}>
+                          {safePage} / {totalPages}
+                        </span>
+                        <motion.button
+                          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                          disabled={safePage === totalPages}
+                          whileHover={{ scale: safePage === totalPages ? 1 : 1.03 }}
+                          whileTap={{ scale: safePage === totalPages ? 1 : 0.97 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                          className="rounded-xl px-4 py-2 text-xs font-medium disabled:opacity-40"
+                          style={{
+                            background: "var(--background)",
+                            border: "1px solid var(--border)",
+                            fontFamily: "var(--font-inter)",
+                            color: "var(--foreground)",
+                          }}
+                        >
+                          Berikutnya →
+                        </motion.button>
+                      </div>
+                    )}
                   </div>
                 )}
 
