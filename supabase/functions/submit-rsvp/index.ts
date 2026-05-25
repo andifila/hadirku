@@ -144,6 +144,27 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "INSERT_FAILED" }), { status: 500, headers: CORS });
     }
 
+    // Fire-and-forget: notify owner via notify-rsvp
+    const notifyUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/notify-rsvp`;
+    const webhookSecret = Deno.env.get("WEBHOOK_SECRET");
+    fetch(notifyUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(webhookSecret ? { Authorization: `Bearer ${webhookSecret}` } : {}),
+      },
+      body: JSON.stringify({
+        record: {
+          invitation_id,
+          name:        trimmedName,
+          phone:       trimmedPhone,
+          rsvp_status,
+          message:     message?.trim() || null,
+          guest_count: rsvp_status === "attending" ? (Number(guest_count) || 1) : null,
+        },
+      }),
+    }).catch((e) => console.error("notify-rsvp error:", e));
+
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: CORS });
   } catch (err) {
     console.error("Unexpected error:", err);
