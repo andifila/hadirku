@@ -37,6 +37,96 @@ const TEMPLATE_COLORS: Record<string, { primary: string; muted: string }> = {
 
 const RESERVED_SLUGS = ["dashboard", "login", "auth", "invite", "api", "admin", "new", "edit"];
 
+// ─── Template Thumbnail ───────────────────────────────────────────────────────
+
+function TemplateThumbnail({ slug }: { slug: string }) {
+  switch (slug) {
+    case "garden-bloom":
+      return (
+        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" className="flex-shrink-0">
+          <rect width="32" height="40" rx="3" fill="#c8e6c8"/>
+          <rect width="32" height="18" rx="3" fill="#a8d4a8"/>
+          <g transform="translate(16,11)">
+            <ellipse cx="0" cy="-6" rx="2.5" ry="5" fill="#4a7c59" opacity="0.9"/>
+            <ellipse cx="0" cy="-6" rx="2.5" ry="5" fill="#4a7c59" opacity="0.9" transform="rotate(72)"/>
+            <ellipse cx="0" cy="-6" rx="2.5" ry="5" fill="#4a7c59" opacity="0.9" transform="rotate(144)"/>
+            <ellipse cx="0" cy="-6" rx="2.5" ry="5" fill="#4a7c59" opacity="0.9" transform="rotate(216)"/>
+            <ellipse cx="0" cy="-6" rx="2.5" ry="5" fill="#4a7c59" opacity="0.9" transform="rotate(288)"/>
+            <circle cx="0" cy="0" r="2.5" fill="#4a7c59"/>
+          </g>
+          <rect x="6" y="23" width="20" height="1.5" rx="0.75" fill="#4a7c59" opacity="0.4"/>
+          <text x="16" y="32" textAnchor="middle" fill="#4a7c59" fontSize="5">✿</text>
+          <rect x="8" y="35" width="16" height="1.5" rx="0.75" fill="#4a7c59" opacity="0.3"/>
+        </svg>
+      );
+    case "rustic-gold":
+      return (
+        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" className="flex-shrink-0">
+          <rect width="32" height="40" rx="3" fill="#f5ecd5"/>
+          <rect width="32" height="18" rx="3" fill="#e8d9b8"/>
+          <circle cx="16" cy="11" r="7.5" stroke="#b08d57" strokeWidth="1" fill="none"/>
+          <circle cx="16" cy="11" r="5" stroke="#b08d57" strokeWidth="0.7" fill="none"/>
+          <rect x="6" y="23" width="20" height="1.5" rx="0.75" fill="#b08d57" opacity="0.5"/>
+          <text x="16" y="32" textAnchor="middle" fill="#b08d57" fontSize="5">♥</text>
+          <rect x="8" y="35" width="16" height="1.5" rx="0.75" fill="#b08d57" opacity="0.35"/>
+        </svg>
+      );
+    case "modern-minimal":
+      return (
+        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" className="flex-shrink-0">
+          <rect width="32" height="40" rx="3" fill="#f5f5f5"/>
+          <line x1="8"  y1="0" x2="8"  y2="18" stroke="#ccc" strokeWidth="0.5"/>
+          <line x1="16" y1="0" x2="16" y2="18" stroke="#ccc" strokeWidth="0.5"/>
+          <line x1="24" y1="0" x2="24" y2="18" stroke="#ccc" strokeWidth="0.5"/>
+          <line x1="0" y1="6"  x2="32" y2="6"  stroke="#ccc" strokeWidth="0.5"/>
+          <line x1="0" y1="12" x2="32" y2="12" stroke="#ccc" strokeWidth="0.5"/>
+          <line x1="4" y1="22" x2="28" y2="22" stroke="#1a1a1a" strokeWidth="0.8"/>
+          <rect x="6" y="25" width="20" height="1.5" fill="#1a1a1a" opacity="0.65"/>
+          <line x1="8" y1="30" x2="24" y2="30" stroke="#1a1a1a" strokeWidth="0.5"/>
+          <rect x="9" y="33" width="14" height="1.5" fill="#1a1a1a" opacity="0.4"/>
+        </svg>
+      );
+    case "royal-elegance":
+      return (
+        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" className="flex-shrink-0">
+          <rect width="32" height="40" rx="3" fill="#f5f0fa"/>
+          <rect width="32" height="18" rx="3" fill="#e8d5f5"/>
+          <g transform="translate(16,11)">
+            <line x1="0" y1="-8" x2="0" y2="8" stroke="#6b35a3" strokeWidth="1" opacity="0.8"/>
+            <line x1="-8" y1="0" x2="8" y2="0" stroke="#6b35a3" strokeWidth="1" opacity="0.8"/>
+            <line x1="-5.66" y1="-5.66" x2="5.66" y2="5.66" stroke="#6b35a3" strokeWidth="0.7" opacity="0.65"/>
+            <line x1="5.66" y1="-5.66" x2="-5.66" y2="5.66" stroke="#6b35a3" strokeWidth="0.7" opacity="0.65"/>
+            <circle cx="0" cy="0" r="2.5" fill="#6b35a3"/>
+          </g>
+          <rect x="6" y="23" width="20" height="1.5" rx="0.75" fill="#6b35a3" opacity="0.45"/>
+          <text x="16" y="32" textAnchor="middle" fill="#6b35a3" fontSize="4.5">✦</text>
+          <rect x="8" y="35" width="16" height="1.5" rx="0.75" fill="#6b35a3" opacity="0.35"/>
+        </svg>
+      );
+    case "floral-dream":
+      return (
+        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" className="flex-shrink-0">
+          <rect width="32" height="40" rx="3" fill="#fde8f0"/>
+          <rect width="32" height="18" rx="3" fill="#f8c8dc"/>
+          <g transform="translate(16,11)">
+            <ellipse cx="0" cy="-5.5" rx="2.5" ry="4.5" fill="#c06080" opacity="0.85"/>
+            <ellipse cx="0" cy="-5.5" rx="2.5" ry="4.5" fill="#c06080" opacity="0.85" transform="rotate(60)"/>
+            <ellipse cx="0" cy="-5.5" rx="2.5" ry="4.5" fill="#c06080" opacity="0.85" transform="rotate(120)"/>
+            <ellipse cx="0" cy="-5.5" rx="2.5" ry="4.5" fill="#c06080" opacity="0.85" transform="rotate(180)"/>
+            <ellipse cx="0" cy="-5.5" rx="2.5" ry="4.5" fill="#c06080" opacity="0.85" transform="rotate(240)"/>
+            <ellipse cx="0" cy="-5.5" rx="2.5" ry="4.5" fill="#c06080" opacity="0.85" transform="rotate(300)"/>
+            <circle cx="0" cy="0" r="2.5" fill="#c06080"/>
+          </g>
+          <rect x="6" y="23" width="20" height="1.5" rx="0.75" fill="#c06080" opacity="0.45"/>
+          <text x="16" y="32" textAnchor="middle" fill="#c06080" fontSize="5">✿</text>
+          <rect x="8" y="35" width="16" height="1.5" rx="0.75" fill="#c06080" opacity="0.35"/>
+        </svg>
+      );
+    default:
+      return <div className="h-10 w-8 flex-shrink-0 rounded" style={{ background: "#b08d57" }}/>;
+  }
+}
+
 const COMMON_BANKS = ["BCA", "BNI", "BRI", "Mandiri", "CIMB Niaga", "GoPay", "OVO", "DANA", "ShopeePay", "Lainnya"];
 
 const TABS = [
@@ -343,7 +433,7 @@ export default function InvitationForm({ initial, submitting, error, onSubmit, s
                           fontFamily: "var(--font-inter)",
                         }}
                       >
-                        <div className="h-5 w-5 flex-shrink-0 rounded-full" style={{ background: colors.primary }} />
+                        <TemplateThumbnail slug={t.slug} />
                         <span className="flex-1 text-xs font-medium" style={{ color: selected ? colors.primary : "var(--foreground)" }}>
                           {t.name}
                         </span>

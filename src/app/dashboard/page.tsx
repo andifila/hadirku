@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, ExternalLink, Loader2,
   Link2, Check, Users, ArrowRight, Pencil,
-  UserCheck, UserX, Clock, Download, QrCode, X,
+  UserCheck, UserX, Clock, Download, QrCode, X, Eye,
 } from "lucide-react";
 import QRCode from "qrcode";
 import { useAuth } from "@/hooks/useAuth";
@@ -269,6 +269,12 @@ export default function DashboardPage() {
                       <span className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
                         {invitation.venue_name}
                       </span>
+                      {(invitation.view_count ?? 0) > 0 && (
+                        <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>
+                          <Eye className="h-3 w-3" />
+                          {(invitation.view_count ?? 0).toLocaleString("id-ID")} kunjungan
+                        </span>
+                      )}
                     </div>
 
                     {daysUntil !== null && (

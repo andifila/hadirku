@@ -104,6 +104,7 @@ export type Database = {
           primary_color: string | null;
           // Status
           is_published: boolean;
+          view_count: number;
           created_at: string;
           updated_at: string;
         };
@@ -257,11 +258,17 @@ export type Database = {
           not_attending: number;
           pending: number;
           total_seats: number;
+          view_count: number;
         };
         Relationships: [];
       };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      increment_view_count: {
+        Args: { p_invitation_id: string };
+        Returns: void;
+      };
+    };
     Enums: {
       plan_type: PlanType;
       rsvp_status: RsvpStatus;

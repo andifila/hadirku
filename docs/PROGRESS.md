@@ -1,6 +1,6 @@
 # Progress — Hadirku
 
-> Terakhir diperbarui: 25 Mei 2026 (review ke-2)
+> Terakhir diperbarui: 25 Mei 2026 (review ke-3)
 
 ## Tech Stack
 
@@ -121,17 +121,17 @@
 
 ### High Priority
 - [x] **404 page custom** — `public/404.html` branded, auto-redirect ke `/hadirku/` dalam 5 detik
-- [ ] **RLS pada view `invitation_stats`** — perlu `WITH (security_invoker = true)` di SQL Supabase
-- [ ] **ON DELETE CASCADE pada `guests.invitation_id`** — saat ini `deleteInvitation` hapus guests manual; SQL: `ALTER TABLE guests DROP CONSTRAINT IF EXISTS guests_invitation_id_fkey; ALTER TABLE guests ADD CONSTRAINT guests_invitation_id_fkey FOREIGN KEY (invitation_id) REFERENCES invitations(id) ON DELETE CASCADE;`
+- [x] **RLS pada view `invitation_stats`** — SQL ada di `supabase/migrations/002_cascade_rls_analytics.sql`
+- [x] **ON DELETE CASCADE pada `guests.invitation_id`** — SQL ada di `supabase/migrations/002_cascade_rls_analytics.sql`
 - [ ] **Set `WEBHOOK_SECRET` di Supabase Edge Function env** — untuk autentikasi webhook `notify-rsvp`
 - [ ] **Set `SITE_URL` di Supabase Edge Function env** — nilai: `https://andifila.github.io/hadirku`
 - [ ] **Supabase magic link redirect URL** — update di Supabase Dashboard → Auth → URL Configuration ke `https://andifila.github.io/hadirku` dan `https://andifila.github.io/hadirku/auth/callback/`
 
 ### Medium Priority
 - [ ] Enforcement plan free vs premium (kolom `plan` sudah ada di DB)
-- [ ] Template thumbnails (saat ini hanya dot warna)
+- [x] **Template thumbnails** — SVG mini-mockup per template di `InvitationForm` (ganti dot warna)
 - [ ] Notifikasi email ke owner saat RSVP masuk (Edge Function `notify-rsvp` sudah ada, perlu deploy manual)
-- [ ] Analytics — jumlah view undangan
+- [x] **Analytics view_count** — kolom `view_count` di `invitations`, RPC `increment_view_count`, dipanggil dari invite/page.tsx; ditampilkan di dashboard hero
 
 ### Low Priority
 - [ ] Multiple undangan per akun
@@ -141,31 +141,22 @@
 
 ## Migration SQL (jalankan di Supabase SQL Editor)
 
+File migrasi ada di `supabase/migrations/`. Jalankan secara berurutan:
+
+**001 — Kolom baru (23 Mei 2026)** — `supabase/migrations/001_additional_columns.sql`
 ```sql
--- Kolom baru (23 Mei 2026)
 alter table invitations add column if not exists primary_color text;
 alter table guests      add column if not exists guest_count      integer not null default 1;
 alter table guests      add column if not exists is_message_public boolean not null default true;
+```
 
--- RLS view (keamanan penuh)
-CREATE OR REPLACE VIEW invitation_stats
-WITH (security_invoker = true) AS
-SELECT
-  i.id              AS invitation_id,
-  i.user_id,
-  i.slug,
-  i.bride_name,
-  i.groom_name,
-  i.event_date,
-  i.is_published,
-  count(g.id)                                                                         AS total_guests,
-  count(g.id) FILTER (WHERE g.rsvp_status = 'attending')                              AS attending,
-  count(g.id) FILTER (WHERE g.rsvp_status = 'not_attending')                          AS not_attending,
-  count(g.id) FILTER (WHERE g.rsvp_status = 'pending')                                AS pending,
-  coalesce(sum(g.guest_count) FILTER (WHERE g.rsvp_status = 'attending'), 0)          AS total_seats
-FROM invitations i
-LEFT JOIN guests g ON g.invitation_id = i.id
-GROUP BY i.id;
+**002 — CASCADE, RLS, Analytics (25 Mei 2026)** — `supabase/migrations/002_cascade_rls_analytics.sql`
+```sql
+-- ON DELETE CASCADE pada guests FK
+-- invitation_stats view dengan security_invoker = true + view_count
+-- view_count column pada invitations
+-- RPC increment_view_count(uuid)
+-- Lihat file lengkap di supabase/migrations/002_cascade_rls_analytics.sql
 ```
 
 ---

@@ -18,6 +18,7 @@ import {
   type PublicInvitation,
   type GuestMessage,
 } from "@/lib/supabase/public-invitation";
+import { supabase } from "@/lib/supabase/client";
 import { resolveTheme, resolveExtra } from "@/components/invitation/template-config";
 import { TemplateDivider } from "@/components/invitation/TemplateDivider";
 import { HeroOrnament } from "@/components/invitation/HeroOrnament";
@@ -111,6 +112,9 @@ function InviteContent() {
       .then((data) => {
         if (!data) { setNotFound(true); return; }
         setInvite(data);
+        if (!isPreview) {
+          void supabase.rpc("increment_view_count", { p_invitation_id: data.id });
+        }
         return getPublicMessages(data.id);
       })
       .then((msgs) => { if (msgs) setMessages(msgs); })
