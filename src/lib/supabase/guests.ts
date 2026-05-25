@@ -12,7 +12,8 @@ export async function getInvitationGuests(invitationId: string): Promise<Guest[]
     .from("guests")
     .select("*")
     .eq("invitation_id", invitationId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(2000);
 
   if (error) throw error;
   return data ?? [];
@@ -71,11 +72,10 @@ export async function updateGuest(
   id: string,
   updates: { name?: string; phone?: string | null }
 ): Promise<void> {
-  const payload: Record<string, unknown> = {};
+  const payload: Database["public"]["Tables"]["guests"]["Update"] = {};
   if (updates.name !== undefined) payload.name = updates.name.trim();
   if (updates.phone !== undefined) payload.phone = updates.phone?.trim() || null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from("guests") as any).update(payload).eq("id", id);
+  const { error } = await supabase.from("guests").update(payload).eq("id", id);
   if (error) throw error;
 }
 

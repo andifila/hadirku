@@ -228,9 +228,12 @@ export type Database = {
           is_message_public?: boolean;
         };
         Update: {
+          name?: string;
+          phone?: string | null;
           rsvp_status?: RsvpStatus;
           message?: string | null;
           guest_count?: number | null;
+          is_message_public?: boolean;
         };
         Relationships: [
           {
@@ -253,12 +256,12 @@ export type Database = {
           groom_name: string;
           event_date: string;
           is_published: boolean;
+          view_count: number;
           total_guests: number;
           attending: number;
           not_attending: number;
           pending: number;
           total_seats: number;
-          view_count: number;
         };
         Relationships: [];
       };

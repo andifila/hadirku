@@ -57,12 +57,6 @@ export async function getInvitationById(id: string): Promise<Invitation | null> 
 }
 
 export async function deleteInvitation(id: string): Promise<void> {
-  // Delete guests first because the FK has no ON DELETE CASCADE yet.
-  // SQL migration needed: ALTER TABLE guests ADD CONSTRAINT fk_inv_cascade
-  //   FOREIGN KEY (invitation_id) REFERENCES invitations(id) ON DELETE CASCADE;
-  // Once that's in place this manual step can be removed.
-  const { error: guestErr } = await supabase.from("guests").delete().eq("invitation_id", id);
-  if (guestErr) throw guestErr;
   const { error } = await supabase.from("invitations").delete().eq("id", id);
   if (error) throw error;
 }

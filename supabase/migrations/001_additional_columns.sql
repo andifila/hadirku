@@ -21,10 +21,3 @@ ALTER TABLE invitations
   ADD COLUMN IF NOT EXISTS gallery_url_5 text,
   ADD COLUMN IF NOT EXISTS gallery_url_6 text;
 
--- After running this migration:
--- 1. Regenerate Supabase TypeScript types:
---    npx supabase gen types typescript --project-id <YOUR_PROJECT_ID> > src/lib/supabase/types.ts
--- 2. Update getPublicMessages() in public-invitation.ts to respect is_message_public
--- 3. Update submitRsvp() in rsvp.ts to check rsvp_closes_at before accepting RSVP
--- 4. Add timezone selector UI in InvitationForm (Pengaturan tab)
--- 5. Use invite.timezone in formatTime() in invite/page.tsx

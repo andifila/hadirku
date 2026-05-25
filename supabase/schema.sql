@@ -145,6 +145,7 @@ create table invitations (
   primary_color        text,
   -- Status
   is_published         boolean not null default false,
+  view_count           integer not null default 0,
   created_at           timestamptz not null default now(),
   updated_at           timestamptz not null default now()
 );
@@ -266,7 +267,11 @@ create policy "guests: public read own"
 -- ─────────────────────────────────────────
 -- HELPER VIEWS
 -- ─────────────────────────────────────────
-create or replace view invitation_stats as
+-- security_invoker = true: RLS on invitations is applied when the view is queried,
+-- preventing cross-user data leakage.
+drop view if exists invitation_stats;
+create view invitation_stats
+with (security_invoker = true) as
 select
   i.id              as invitation_id,
   i.user_id,
@@ -275,6 +280,7 @@ select
   i.groom_name,
   i.event_date,
   i.is_published,
+  i.view_count,
   count(g.id)                                                                          as total_guests,
   count(g.id) filter (where g.rsvp_status = 'attending')                              as attending,
   count(g.id) filter (where g.rsvp_status = 'not_attending')                          as not_attending,
@@ -283,3 +289,23 @@ select
 from invitations i
 left join guests g on g.invitation_id = i.id
 group by i.id;
+
+-- ─────────────────────────────────────────
+-- ANALYTICS RPC
+-- ─────────────────────────────────────────
+-- Atomically increment view_count for published invitations.
+-- SECURITY DEFINER so anon callers can run it without direct table access.
+create or replace function increment_view_count(p_invitation_id uuid)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update invitations
+  set view_count = view_count + 1
+  where id = p_invitation_id
+    and is_published = true;
+$$;
+
+grant execute on function increment_view_count(uuid) to anon;
+grant execute on function increment_view_count(uuid) to authenticated;
