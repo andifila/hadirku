@@ -113,7 +113,7 @@
 ## Yang Belum / Perlu Dikerjakan
 
 ### High Priority
-- [ ] **404 page custom** — GitHub Pages tampilkan 404 generik. Perlu `public/404.html` yang redirect ke `/login`
+- [x] **404 page custom** — `public/404.html` branded, auto-redirect ke `/hadirku/` dalam 5 detik
 - [ ] **RLS pada view `invitation_stats`** — perlu tambah `WITH (security_invoker = true)` di SQL Supabase
 - [ ] **Supabase magic link redirect URL** — update di Supabase Dashboard → Auth → URL Configuration ke `https://andifila.github.io/hadirku` dan `https://andifila.github.io/hadirku/auth/callback/`
 
