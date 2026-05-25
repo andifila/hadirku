@@ -127,14 +127,14 @@
 - [x] **404 page custom** — `public/404.html` branded, auto-redirect ke `/hadirku/` dalam 5 detik
 - [x] **RLS pada view `invitation_stats`** — SQL ada di `supabase/migrations/002_cascade_rls_analytics.sql`
 - [x] **ON DELETE CASCADE pada `guests.invitation_id`** — SQL ada di `supabase/migrations/002_cascade_rls_analytics.sql`
-- [ ] **Set `WEBHOOK_SECRET` di Supabase Edge Function env** — untuk autentikasi webhook `notify-rsvp`
-- [ ] **Set `SITE_URL` di Supabase Edge Function env** — nilai: `https://andifila.github.io/hadirku`
+- [x] **Set `WEBHOOK_SECRET` di Supabase Edge Function env** — untuk autentikasi webhook `notify-rsvp`
+- [x] **Set `SITE_URL` di Supabase Edge Function env** — nilai: `https://andifila.github.io/hadirku`
 - [ ] **Supabase magic link redirect URL** — update di Supabase Dashboard → Auth → URL Configuration ke `https://andifila.github.io/hadirku` dan `https://andifila.github.io/hadirku/auth/callback/`
 
 ### Medium Priority
 - [ ] Enforcement plan free vs premium (kolom `plan` sudah ada di DB)
 - [x] **Template thumbnails** — SVG mini-mockup per template di `InvitationForm` (ganti dot warna)
-- [ ] Notifikasi email ke owner saat RSVP masuk (Edge Function `notify-rsvp` sudah ada, perlu deploy manual)
+- [x] Notifikasi email ke owner saat RSVP masuk — `notify-rsvp` deployed, dipanggil langsung dari `submit-rsvp` (fire-and-forget)
 - [x] **Analytics view_count** — kolom `view_count` di `invitations`, RPC `increment_view_count`, dipanggil dari invite/page.tsx; ditampilkan di dashboard hero
 
 ### Low Priority
