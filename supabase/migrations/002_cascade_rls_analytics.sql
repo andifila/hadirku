@@ -18,7 +18,9 @@ ALTER TABLE invitations
 -- Recreate invitation_stats view with security_invoker so RLS on invitations
 -- is applied when the view is queried (prevents cross-user data leakage).
 -- Also exposes view_count for the dashboard.
-CREATE OR REPLACE VIEW invitation_stats
+-- Must DROP first because CREATE OR REPLACE cannot reorder/add mid-list columns.
+DROP VIEW IF EXISTS invitation_stats;
+CREATE VIEW invitation_stats
 WITH (security_invoker = true) AS
 SELECT
   i.id              AS invitation_id,
