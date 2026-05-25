@@ -88,12 +88,19 @@ Data undangan milik user.
 | `gallery_url_1` | text | URL foto galeri 1 (Supabase Storage `covers`) |
 | `gallery_url_2` | text | URL foto galeri 2 (Supabase Storage `covers`) |
 | `gallery_url_3` | text | URL foto galeri 3 (Supabase Storage `covers`) |
+| `gallery_url_4` | text | URL foto galeri 4 |
+| `gallery_url_5` | text | URL foto galeri 5 |
+| `gallery_url_6` | text | URL foto galeri 6 |
 | `music_url` | text | URL musik background (Supabase Storage `music`) |
 | `custom_message` | text | Kutipan/pesan kustom |
 | `bank_accounts` | jsonb | Array rekening angpao: `[{bank, account_name, account_number, qris_url?}]` |
 | `gift_address` | text | Alamat pengiriman hadiah fisik (opsional) |
 | `owner_whatsapp` | text | Nomor WA owner untuk konfirmasi tamu (opsional) |
+| `timezone` | text | Zona waktu acara: `'WIB'`, `'WITA'`, `'WIT'` (default: `'WIB'`) |
+| `rsvp_closes_at` | timestamptz | Batas waktu RSVP (opsional); setelah ini RSVP ditolak |
+| `primary_color` | text | Warna aksen kustom (hex, opsional) |
 | `is_published` | boolean | Apakah undangan bisa diakses publik |
+| `view_count` | integer | Jumlah kunjungan halaman undangan (increment via RPC) |
 | `created_at` | timestamptz | |
 | `updated_at` | timestamptz | Auto-update via trigger |
 
@@ -114,6 +121,8 @@ Daftar tamu per undangan. Diisi oleh owner (manual/Excel) atau tamu sendiri (RSV
 | `phone` | text | Nomor WhatsApp (opsional) |
 | `rsvp_status` | rsvp_status | Status konfirmasi (default: `'pending'`) |
 | `message` | text | Ucapan/doa dari tamu |
+| `guest_count` | integer | Jumlah orang yang dibawa (default: 1, null jika tidak hadir) |
+| `is_message_public` | boolean | `true` = ucapan tampil publik; `false` = hanya owner (default: `true`) |
 | `created_at` | timestamptz | |
 
 **RLS:**
@@ -128,6 +137,8 @@ Daftar tamu per undangan. Diisi oleh owner (manual/Excel) atau tamu sendiri (RSV
 ### `invitation_stats`
 Agregasi statistik per undangan. Dipakai di dashboard.
 
+Dibuat dengan `security_invoker = true` — RLS pada tabel `invitations` tetap aktif saat view di-query, mencegah kebocoran data antar user.
+
 | Kolom | Keterangan |
 |---|---|
 | `invitation_id` | ID undangan |
@@ -137,10 +148,25 @@ Agregasi statistik per undangan. Dipakai di dashboard.
 | `groom_name` | Nama mempelai pria |
 | `event_date` | Tanggal acara |
 | `is_published` | Status publish |
+| `view_count` | Total kunjungan halaman |
 | `total_guests` | Total tamu terdaftar |
 | `attending` | Jumlah konfirmasi hadir |
 | `not_attending` | Jumlah konfirmasi tidak hadir |
 | `pending` | Jumlah belum konfirmasi |
+| `total_seats` | Total kursi (sum `guest_count` dari tamu yang hadir) |
+
+---
+
+## RPC Functions
+
+### `increment_view_count(p_invitation_id uuid)`
+Tambah `view_count` pada undangan yang sudah dipublish secara atomik.
+
+- `SECURITY DEFINER` — anon bisa memanggil tanpa akses langsung ke tabel
+- Hanya update jika `is_published = true`
+- Grant EXECUTE ke `anon` dan `authenticated`
+
+Dipanggil dari `invite/page.tsx` setiap kali halaman undangan dibuka.
 
 ---
 
@@ -158,36 +184,13 @@ Setup bucket ada di [`supabase/storage-setup.sql`](../supabase/storage-setup.sql
 
 ---
 
-## Migrasi — Kolom Baru (19 Mei 2026)
+## Migrasi Live Database
 
-Jalankan di Supabase SQL Editor untuk menambah kolom yang diperlukan fitur terbaru:
+Setup fresh: jalankan `supabase/schema.sql` (sudah include semua kolom + view + RPC).
 
-```sql
--- Batch 1 (19 Mei 2026)
-ALTER TABLE invitations
-  ADD COLUMN IF NOT EXISTS bride_father_name  text,
-  ADD COLUMN IF NOT EXISTS bride_mother_name  text,
-  ADD COLUMN IF NOT EXISTS groom_father_name  text,
-  ADD COLUMN IF NOT EXISTS groom_mother_name  text,
-  ADD COLUMN IF NOT EXISTS akad_date          date,
-  ADD COLUMN IF NOT EXISTS akad_time          time,
-  ADD COLUMN IF NOT EXISTS akad_venue_name    text,
-  ADD COLUMN IF NOT EXISTS akad_venue_address text,
-  ADD COLUMN IF NOT EXISTS dresscode          text,
-  ADD COLUMN IF NOT EXISTS bank_accounts      jsonb DEFAULT '[]',
-  ADD COLUMN IF NOT EXISTS gallery_url_1      text,
-  ADD COLUMN IF NOT EXISTS gallery_url_2      text,
-  ADD COLUMN IF NOT EXISTS gallery_url_3      text;
+Untuk database yang sudah berjalan, jalankan file migrasi secara berurutan:
 
--- Batch 2 (20 Mei 2026)
-ALTER TABLE invitations
-  ADD COLUMN IF NOT EXISTS bride_title     text,
-  ADD COLUMN IF NOT EXISTS groom_title     text,
-  ADD COLUMN IF NOT EXISTS bride_instagram text,
-  ADD COLUMN IF NOT EXISTS groom_instagram text,
-  ADD COLUMN IF NOT EXISTS gift_address    text,
-  ADD COLUMN IF NOT EXISTS owner_whatsapp  text;
-
-ALTER TABLE guests
-  ADD COLUMN IF NOT EXISTS guest_count integer DEFAULT 1;
-```
+| File | Tanggal | Isi |
+|---|---|---|
+| `supabase/migrations/001_additional_columns.sql` | 23 Mei 2026 | `timezone`, `rsvp_closes_at`, `gallery_url_4/5/6` di invitations; `is_message_public` di guests |
+| `supabase/migrations/002_cascade_rls_analytics.sql` | 25 Mei 2026 | ON DELETE CASCADE pada guests FK; `view_count` di invitations; `invitation_stats` view dengan `security_invoker = true`; RPC `increment_view_count` |

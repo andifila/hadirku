@@ -113,7 +113,11 @@
 - [x] **Dead code** — `markRsvpSubmitted`, `checkRsvpRateLimit`, `buildInviteUrl` dihapus
 - [x] **`bulkAddGuests` chunking** — insert per 500 baris agar tidak melebihi batas request Supabase
 - [x] **Dashboard optimasi** — hapus `guests` state; Realtime callback hanya re-fetch stats; headcount dari `total_seats` di view
-- [x] **`types.ts`** — tambah `total_seats` ke `invitation_stats` view type
+- [x] **`types.ts`** — tambah `total_seats` ke `invitation_stats` view type; fix `guests.Update` type (tambah `name`, `phone`, `is_message_public`); reorder `invitation_stats.Row` sesuai urutan kolom view SQL
+- [x] **Dead code** — hapus manual guest deletion di `deleteInvitation` (sudah ditangani FK ON DELETE CASCADE)
+- [x] **`as any` removal** — `updateGuest` di `guests.ts` tidak lagi butuh cast setelah `guests.Update` type diperbaiki
+- [x] **Guest list safeguard** — `.limit(2000)` pada `getInvitationGuests` sebagai batas atas memori
+- [x] **Deno std update** — Edge Functions naik dari `0.168.0` ke `0.224.0`
 
 ---
 
