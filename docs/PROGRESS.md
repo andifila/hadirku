@@ -129,7 +129,7 @@
 - [x] **ON DELETE CASCADE pada `guests.invitation_id`** — SQL ada di `supabase/migrations/002_cascade_rls_analytics.sql`
 - [x] **Set `WEBHOOK_SECRET` di Supabase Edge Function env** — untuk autentikasi webhook `notify-rsvp`
 - [x] **Set `SITE_URL` di Supabase Edge Function env** — nilai: `https://andifila.github.io/hadirku`
-- [ ] **Supabase magic link redirect URL** — update di Supabase Dashboard → Auth → URL Configuration ke `https://andifila.github.io/hadirku` dan `https://andifila.github.io/hadirku/auth/callback/`
+- [x] **Supabase magic link redirect URL** — Site URL dan redirect URL sudah diset di Auth → URL Configuration
 
 ### Medium Priority
 - [ ] Enforcement plan free vs premium (kolom `plan` sudah ada di DB)
