@@ -38,6 +38,8 @@ export async function removeGuest(id: string): Promise<void> {
   if (error) throw error;
 }
 
+const BULK_CHUNK_SIZE = 500;
+
 export async function bulkAddGuests(
   invitationId: string,
   rows: Array<{ name: string; phone: string }>
@@ -45,12 +47,17 @@ export async function bulkAddGuests(
   if (!rows.length) return 0;
   const inserts = rows.map((g) => ({
     invitation_id: invitationId,
-    name: g.name.trim(),
+    name:  g.name.trim(),
     phone: g.phone?.trim() || null,
   }));
-  const { data, error } = await supabase.from("guests").insert(inserts).select("id");
-  if (error) throw error;
-  return data?.length ?? inserts.length;
+  let total = 0;
+  for (let i = 0; i < inserts.length; i += BULK_CHUNK_SIZE) {
+    const chunk = inserts.slice(i, i + BULK_CHUNK_SIZE);
+    const { data, error } = await supabase.from("guests").insert(chunk).select("id");
+    if (error) throw error;
+    total += data?.length ?? chunk.length;
+  }
+  return total;
 }
 
 export function toWaPhone(phone: string): string {
@@ -72,10 +79,3 @@ export async function updateGuest(
   if (error) throw error;
 }
 
-export function buildInviteUrl(slug: string, guestName: string): string {
-  if (typeof window === "undefined") return "";
-  const base =
-    process.env.NODE_ENV === "production" ? "/hadirku" : "";
-  const encoded = encodeURIComponent(guestName);
-  return `${window.location.origin}${base}/invite/?s=${slug}&to=${encoded}`;
-}

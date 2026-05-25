@@ -256,6 +256,7 @@ export type Database = {
           attending: number;
           not_attending: number;
           pending: number;
+          total_seats: number;
         };
         Relationships: [];
       };

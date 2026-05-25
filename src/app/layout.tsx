@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
+import { PROD_URL } from "@/lib/constants";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -16,9 +17,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NODE_ENV === "production"
-      ? "https://andifila.github.io/hadirku"
-      : "http://localhost:3000"
+    process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3000"
   ),
   title: "Hadirku — Undangan Pernikahan Digital",
   description:
@@ -39,7 +38,7 @@ export const metadata: Metadata = {
 
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' https:",

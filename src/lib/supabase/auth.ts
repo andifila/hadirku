@@ -1,10 +1,8 @@
 import { supabase } from "./client";
+import { PROD_URL } from "@/lib/constants";
 
 function getRedirectUrl() {
-  const isProd = process.env.NODE_ENV === "production";
-  const base = isProd
-    ? "https://andifila.github.io/hadirku"
-    : "http://localhost:3000";
+  const base = process.env.NODE_ENV === "production" ? PROD_URL : "http://localhost:3000";
   return `${base}/auth/callback/`;
 }
 

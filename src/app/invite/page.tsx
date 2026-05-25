@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import {
   getInvitationBySlug,
-  getInvitationBySlugPreview,
   getPublicMessages,
   type PublicInvitation,
   type GuestMessage,
@@ -108,8 +107,7 @@ function InviteContent() {
 
   useEffect(() => {
     if (!slug) { setNotFound(true); setLoading(false); return; }
-    const fetcher = isPreview ? getInvitationBySlugPreview : getInvitationBySlug;
-    fetcher(slug)
+    getInvitationBySlug(slug, { preview: isPreview })
       .then((data) => {
         if (!data) { setNotFound(true); return; }
         setInvite(data);

@@ -29,34 +29,20 @@ export type PublicInvitation =
   };
 
 export async function getInvitationBySlug(
-  slug: string
+  slug: string,
+  { preview = false }: { preview?: boolean } = {}
 ): Promise<PublicInvitation | null> {
-  const { data, error } = await supabase
+  let query = supabase
     .from("invitations")
     .select("*, templates(slug)")
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .single();
+    .eq("slug", slug);
 
-  if (error) return null;
+  // Preview mode skips is_published filter; RLS ensures only owners see their drafts
+  if (!preview) {
+    query = query.eq("is_published", true);
+  }
 
-  const { templates, ...rest } = data as typeof data & {
-    templates: { slug: string } | null;
-  };
-  return { ...rest, template_slug: templates?.slug ?? "rustic-gold" };
-}
-
-// Used for preview mode — no is_published filter. RLS handles auth: owner can
-// see their own draft; unauthenticated users can only see published ones.
-export async function getInvitationBySlugPreview(
-  slug: string
-): Promise<PublicInvitation | null> {
-  const { data, error } = await supabase
-    .from("invitations")
-    .select("*, templates(slug)")
-    .eq("slug", slug)
-    .single();
-
+  const { data, error } = await query.single();
   if (error) return null;
 
   const { templates, ...rest } = data as typeof data & {

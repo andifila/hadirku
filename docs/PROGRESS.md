@@ -1,6 +1,6 @@
 # Progress — Hadirku
 
-> Terakhir diperbarui: 25 Mei 2026
+> Terakhir diperbarui: 25 Mei 2026 (review ke-2)
 
 ## Tech Stack
 
@@ -102,11 +102,18 @@
 - [x] RLS pada semua tabel
 - [x] `getUserInvitations` filter by `user_id`
 - [x] RSVP dedup server-side
-- [x] **Edge Function `submit-rsvp`** — validasi server-side: published check, deadline check, rate limiting 15/menit, dedup by phone+name, insert
+- [x] **Edge Function `submit-rsvp`** — validasi server-side: published check, deadline check, rate limiting 15/menit, dedup by phone+name, insert; CORS dibatasi ke app origin; validasi panjang name/message/guest_count
 - [x] **Rate limiting RSVP** — 15 request/menit per `invitation_id` di Edge Function
 - [x] **HTML injection prevention** — `escapeHtml()` di `notify-rsvp` untuk semua field user-supplied
-- [x] **CSP via meta tag** — Content-Security-Policy di `layout.tsx` (GitHub Pages tidak support HTTP headers)
+- [x] **CSP via meta tag** — Content-Security-Policy di `layout.tsx` tanpa `unsafe-eval`
+- [x] **notify-rsvp auth** — `WEBHOOK_SECRET` header check; validasi payload; `SITE_URL` env var
 - [x] **Refactor `invite/page.tsx`** — dipecah dari 2032 baris ke ~700 baris + 9 komponen terpisah di `src/components/invitation/`
+- [x] **Shared utils** — `src/lib/constants.ts`, `src/lib/utils/share.ts` (getShareLink/getInviteUrl), `src/components/ui/WaIcon.tsx`, `src/lib/supabase/rsvp-config.ts`; semua duplikasi dihapus
+- [x] **`getInvitationBySlug` unified** — satu fungsi dengan param `{ preview }` menggantikan dua fungsi terpisah
+- [x] **Dead code** — `markRsvpSubmitted`, `checkRsvpRateLimit`, `buildInviteUrl` dihapus
+- [x] **`bulkAddGuests` chunking** — insert per 500 baris agar tidak melebihi batas request Supabase
+- [x] **Dashboard optimasi** — hapus `guests` state; Realtime callback hanya re-fetch stats; headcount dari `total_seats` di view
+- [x] **`types.ts`** — tambah `total_seats` ke `invitation_stats` view type
 
 ---
 
@@ -114,7 +121,10 @@
 
 ### High Priority
 - [x] **404 page custom** — `public/404.html` branded, auto-redirect ke `/hadirku/` dalam 5 detik
-- [ ] **RLS pada view `invitation_stats`** — perlu tambah `WITH (security_invoker = true)` di SQL Supabase
+- [ ] **RLS pada view `invitation_stats`** — perlu `WITH (security_invoker = true)` di SQL Supabase
+- [ ] **ON DELETE CASCADE pada `guests.invitation_id`** — saat ini `deleteInvitation` hapus guests manual; SQL: `ALTER TABLE guests DROP CONSTRAINT IF EXISTS guests_invitation_id_fkey; ALTER TABLE guests ADD CONSTRAINT guests_invitation_id_fkey FOREIGN KEY (invitation_id) REFERENCES invitations(id) ON DELETE CASCADE;`
+- [ ] **Set `WEBHOOK_SECRET` di Supabase Edge Function env** — untuk autentikasi webhook `notify-rsvp`
+- [ ] **Set `SITE_URL` di Supabase Edge Function env** — nilai: `https://andifila.github.io/hadirku`
 - [ ] **Supabase magic link redirect URL** — update di Supabase Dashboard → Auth → URL Configuration ke `https://andifila.github.io/hadirku` dan `https://andifila.github.io/hadirku/auth/callback/`
 
 ### Medium Priority

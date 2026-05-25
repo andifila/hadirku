@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, BarChart2, Users, RefreshCw, Download, QrCode } from "lucide-react";
 import * as XLSX from "xlsx";
 import QRCode from "qrcode";
+import { getShareLink } from "@/lib/utils/share";
+import { RSVP_CONFIG } from "@/lib/supabase/rsvp-config";
 import { getUserInvitations } from "@/lib/supabase/invitations";
 import { getInvitationGuests, type Guest } from "@/lib/supabase/guests";
 import { getInvitationById, type Invitation } from "@/lib/supabase/invitation-crud";
@@ -13,21 +15,7 @@ import { getInvitationById, type Invitation } from "@/lib/supabase/invitation-cr
 
 type RsvpStatus = "attending" | "not_attending" | "pending";
 
-const RSVP_CFG: Record<RsvpStatus, { label: string; color: string; bg: string; border: string }> = {
-  attending:     { label: "Hadir",            color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
-  not_attending: { label: "Tidak Hadir",      color: "#dc2626", bg: "#fef2f2", border: "#fecaca" },
-  pending:       { label: "Belum Konfirmasi", color: "#d97706", bg: "#fffbeb", border: "#fde68a" },
-};
-
-// ── Utilities ─────────────────────────────────────────────────────────────────
-
-function getShareLink(slug: string): string {
-  if (typeof window === "undefined") return "";
-  const base = window.location.pathname.includes("/hadirku")
-    ? `${window.location.origin}/hadirku`
-    : window.location.origin;
-  return `${base}/invite/?s=${slug}`;
-}
+const RSVP_CFG = RSVP_CONFIG;
 
 function downloadMessages(messages: Guest[]) {
   const STATUS: Record<string, string> = {

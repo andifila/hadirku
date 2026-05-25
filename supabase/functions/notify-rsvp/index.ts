@@ -21,6 +21,15 @@ serve(async (req) => {
     return new Response("Method not allowed", { status: 405 });
   }
 
+  // Verify webhook secret to prevent unauthorized calls
+  const webhookSecret = Deno.env.get("WEBHOOK_SECRET");
+  if (webhookSecret) {
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader !== `Bearer ${webhookSecret}`) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+  }
+
   try {
     const payload = await req.json();
     const record = payload.record as {
@@ -33,9 +42,13 @@ serve(async (req) => {
       phone: string | null;
     };
 
+    if (!record?.invitation_id || !record?.name) {
+      return new Response("Invalid payload", { status: 400 });
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     // Get invitation details + owner
@@ -116,7 +129,7 @@ serve(async (req) => {
               </table>
             </div>
 
-            <a href="https://andifila.github.io/hadirku/dashboard/stats"
+            <a href="${Deno.env.get("SITE_URL") ?? "https://andifila.github.io/hadirku"}/dashboard/stats"
               style="display: inline-block; background: linear-gradient(135deg, #b08d57, #9a7040); color: #fff;
                      text-decoration: none; padding: 12px 24px; border-radius: 8px; font-size: 13px; font-family: sans-serif;">
               Lihat Semua RSVP
